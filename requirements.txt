@@ -1,0 +1,5 @@
+# Core dependencies
+ollama
+qdrant-client
+sentence-transformers
+pydantic>=2.0
