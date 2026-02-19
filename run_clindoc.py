@@ -375,6 +375,62 @@ class VerificadorVigencia:
             return {"valido": False, "detalle": f"Error al procesar formato de fecha: {str(e)}"}
 
 
+class AgenteEnsamblador:
+    def __init__(self, ruta_informe: str, ruta_anexos: List[str]):
+        self.ruta_informe = ruta_informe
+        self.ruta_anexos = ruta_anexos
+
+    def ensamblar(self, salida_final: str):
+        merger = pypdf.PdfWriter()
+        
+        # 1. Agregar el informe técnico generado
+        if os.path.exists(self.ruta_informe):
+            merger.append(self.ruta_informe)
+        
+        # 2. Agregar anexos (solo si son PDFs)
+        for anexo in self.ruta_anexos:
+            if anexo.lower().endswith('.pdf') and os.path.exists(anexo):
+                merger.append(anexo)
+        
+        with open(salida_final, "wb") as f:
+            merger.write(f)
+        merger.close()
+        return salida_final
+
+
+class AgenteRedactor:
+    def __init__(self, indice: IndiceCorpus, modelo: str = "gemma3:4b"):
+        self.indice = indice
+        self.modelo = obtener_modelo_ollama_disponible(modelo)
+
+    def redactar(self, seccion: Seccion) -> str:
+        """Redacta sección con Deep Linking a fuentes"""
+        evidencias = self.indice.buscar_evidencias(seccion.titulo)
+        
+        # Deep Linking: incluir chunk_id en las referencias
+        contexto = "\n".join([
+            f"- {e['texto']} [Fuente: {e['archivo']}#{e['chunk_id']}]"
+            for e in evidencias
+        ])
+        
+        prompt = f"""Eres un auditor clínico profesional experto en la normativa española de Incapacidades Temporales (Real Decreto 1060/2022). 
+Redacta la sección '{seccion.titulo}'.
+Instrucción: {seccion.instruccion}
+
+Si la sección trata sobre el diagnóstico, DEBES identificar e incluir el código CIE-10 (Clasificación Internacional de Enfermedades) correspondiente.
+Si falta información crítica para la validez legal de una baja (DNI, NUSS o Empresa), indica una 'ALERTA DE OMISIÓN ADM'.
+
+Datos: {contexto}
+IMPORTANTE: Cada afirmación debe citar su fuente usando el formato [Fuente: archivo#chunk_id]
+Responde de forma técnica y concisa en español."""
+        
+        try:
+            r = ollama.chat(model=self.modelo, messages=[{'role': 'user', 'content': prompt}])
+            return r['message']['content']
+        except Exception as e:
+            return f"Error en IA local: {str(e)}"
+
+
 if __name__ == "__main__":
     print("ClinDoc Agent - Pipeline de Ingesta v0.1")
     print("Motor semántico Qdrant inicializado correctamente.")
