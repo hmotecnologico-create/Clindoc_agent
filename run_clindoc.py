@@ -37,6 +37,62 @@ class GuionInforme(BaseModel):
     titulo: str
     secciones: List[Seccion]
 
+# === NUEVOS MODELOS FASE 5: Validación Pydantic ===
+class PatientAuditSchema(BaseModel):
+    """Esquema de validación para auditoría de pacientes"""
+    nif_detected: str = Field(..., min_length=9, max_length=9)
+    nif_validado: bool = False
+    nombre_completo: str
+    confidence_score: float = Field(ge=0.0, le=1.0)
+    validation_status: Literal["APPROVED", "BLOCKED", "PENDING"] = "PENDING"
+    fecha_auditoria: datetime = Field(default_factory=datetime.now)
+    
+    @field_validator('nif_detected')
+    @classmethod
+    def validar_nif_oficial(cls, v: str) -> str:
+        """Valida NIF/NIE español con algoritmo oficial"""
+        v = v.upper()
+        if len(v) != 9:
+            raise ValueError("NIF/NIE debe tener 9 caracteres")
+        letra_inicial = v[0]
+        if letra_inicial in "XYZ":
+            reemplazo = {"X": "0", "Y": "1", "Z": "2"}[letra_inicial]
+            nif_numerico = reemplazo + v[1:8]
+        else:
+            nif_numerico = v[:8]
+        if not nif_numerico.isdigit():
+            raise ValueError("Formato numérico de NIF/NIE inválido")
+        letra_control = v[8]
+        if not letra_control.isalpha():
+            raise ValueError("Último caracter debe ser letra")
+        letras = "TRWAGMYFPDXBNJZSQVHLCKE"
+        if letras[int(nif_numerico) % 23] != letra_control:
+            raise ValueError("Letra de control de NIF/NIE inválida")
+        return v
+
+def validar_nif(nif: str) -> bool:
+    """Valida NIF/NIE español - función auxiliar robusta con soporte NIE"""
+    try:
+        if not nif or len(nif) != 9:
+            return False
+        nif = nif.upper()
+        letra_inicial = nif[0]
+        if letra_inicial in "XYZ":
+            reemplazo = {"X": "0", "Y": "1", "Z": "2"}[letra_inicial]
+            nif_numerico = reemplazo + nif[1:8]
+        else:
+            nif_numerico = nif[:8]
+        if not nif_numerico.isdigit():
+            return False
+        letra_control = nif[8]
+        if not letra_control.isalpha():
+            return False
+        letras = "TRWAGMYFPDXBNJZSQVHLCKE"
+        return letras[int(nif_numerico) % 23] == letra_control
+    except:
+        return False
+
+
 # --- MOTOR SEMÁNTICO (Qdrant) ---
 class IndiceCorpus:
     """Motor de indexación y búsqueda vectorial con Qdrant local"""
