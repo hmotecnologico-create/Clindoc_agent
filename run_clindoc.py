@@ -13,12 +13,74 @@ from pydantic import BaseModel, Field, field_validator
 from sentence_transformers import SentenceTransformer
 from qdrant_client.http import models
 
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
 import json
+import pypdf
 
 # Forzar salida en UTF-8 para evitar errores de codificación en consola Windows
 if sys.stdout.encoding.lower() != 'utf-8':
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+# --- CIFRADO AES-256 (FASE 5) ---
+class CifradoClinDoc:
+    """Cifrado para datos sensibles en entorno local"""
+    def __init__(self, clave: str = "clinDoc_Sovereign_2026"):
+        import hashlib
+        from cryptography.fernet import Fernet
+        self.key = hashlib.sha256(clave.encode()).digest()
+        self.cipher = Fernet(self.key)
+    
+    def cifrar(self, data: str) -> str:
+        return self.cipher.encrypt(data.encode()).decode()
+    
+    def descifrar(self, data: str) -> str:
+        return self.cipher.decrypt(data.encode()).decode()
+
+
+# --- ANALYTICS RECORDER ---
+class DashboardRecorder:
+    def __init__(self, output_file: str = "dashboard_data.json"):
+        self.output_file = output_file
+        self.data = {
+            "session_start": datetime.now().isoformat(),
+            "kpis": {
+                "total_docs": 0,
+                "total_time": 0,
+                "avg_confidence": 0,
+                "critical_risks": 0,
+                "modelo_ia": "gemma3:4b"
+            },
+            "events": []
+        }
+
+    def record_event(self, event_type: str, details: Dict):
+        event = {
+            "timestamp": datetime.now().isoformat(),
+            "type": event_type,
+            "details": details
+        }
+        self.data["events"].append(event)
+        self._update_kpis()
+        self._save()
+
+    def _update_kpis(self):
+        doc_events = [e for e in self.data["events"] if e["type"] == "ingesta_documento"]
+        self.data["kpis"]["total_docs"] = len(doc_events)
+        
+        confidences = [e["details"].get("confianza", 0) for e in self.data["events"] if "confianza" in e["details"]]
+        if confidences:
+            self.data["kpis"]["avg_confidence"] = sum(confidences) / len(confidences)
+            
+        self.data["kpis"]["critical_risks"] = len([e for e in self.data["events"] if e["details"].get("estado_riesgo") == "CRITICAL"])
+
+    def _save(self):
+        with open(self.output_file, 'w', encoding='utf-8') as f:
+            json.dump(self.data, f, indent=4)
+
+
 
 # --- MODELOS DE DATOS (Pydantic v2) ---
 class Campo(BaseModel):
@@ -36,6 +98,15 @@ class Seccion(BaseModel):
 class GuionInforme(BaseModel):
     titulo: str
     secciones: List[Seccion]
+
+class IdentidadDocumento(BaseModel):
+    documento_id: str
+    nif: Optional[str] = None
+    nombre_completo: Optional[str] = None
+    num_seguridad_social: Optional[str] = None
+    empresa: Optional[str] = None
+    confianza: float = 0.0
+
 
 # === NUEVOS MODELOS FASE 5: Validación Pydantic ===
 class PatientAuditSchema(BaseModel):
