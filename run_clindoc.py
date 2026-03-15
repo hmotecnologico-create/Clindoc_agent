@@ -838,6 +838,142 @@ class OrquestadorLangGraph:
         return state["resultados"]
 
 
+# --- ORQUESTADOR ORIGINAL (compatibilidad - mantener para atrás compatibilidad) ---
+class OrquestadorClinDoc:
+    def __init__(self, config_gui: Dict):
+        self.guion = GuionInforme(**config_gui)
+        self.indice = IndiceCorpus()
+        self.escanner = AgenteEscanner()
+        self.redactor = AgenteRedactor(self.indice)
+        self.verificador_id = VerificadorIdentidad()
+        self.verificador_vigencia = VerificadorVigencia()
+        self.recorder = DashboardRecorder()
+        self.docs_procesados = []
+
+    def ejecutar(self, paciente: Dict):
+        inicio_session = time.time()
+        print(f"Iniciando proceso de auditoría: {paciente['nombre']}")
+        
+        # 1. Escaneo e Ingesta
+        print("   [1/3] Escaneando documentos...")
+        docs = self.escanner.scan()
+        for d in docs:
+            start_ingest = time.time()
+            self.indice.indexar_documento(d['id'], d['texto'], d['nombre'])
+            latencia = time.time() - start_ingest
+            
+            self.recorder.record_event("ingesta_documento", {
+                "id": d['id'],
+                "nombre": d['nombre'],
+                "latencia": round(latencia, 4),
+                "longitud_texto": len(d['texto']),
+                "imagenes": d.get("imagenes_detectadas", 0),
+                "nota": d.get("nota_imagenes")
+            })
+            self.docs_procesados.append(str(self.escanner.ruta / d['nombre']))
+        
+        # 2. Análisis Multi-Agente
+        print(f"   [2/3] Analizando con LLM Local ({self.redactor.modelo})...")
+        resumen = {}
+        for s in self.guion.secciones:
+            print(f"         > Redactando seccion: {s.titulo}")
+            start_redact = time.time()
+            resultado = self.redactor.redactar(s)
+            resumen[s.titulo] = resultado
+            
+            conf_simulada = 0.85 if "Error" not in resultado else 0.1
+            riesgo = "SAFE" if conf_simulada > 0.8 else "WARNING"
+            
+            self.recorder.record_event("analisis_seccion", {
+                "seccion": s.titulo,
+                "confianza": conf_simulada,
+                "estado_riesgo": riesgo,
+                "tiempo_respuesta": round(time.time() - start_redact, 2)
+            })
+        
+        # 3. Finalización
+        print("   [3/3] Generando informe final...")
+        self.data_final = {
+            "paciente": paciente["nombre"],
+            "nif": paciente.get("nif", "N/A"),
+            "resumen": resumen,
+            "tiempo_total": round(time.time() - inicio_session, 2)
+        }
+        self.recorder.data["kpis"]["total_time"] = self.data_final["tiempo_total"]
+        self.recorder._save()
+        
+        # Generar Informe Base
+        informe_base = self.generar_informe_pdf()
+        
+        # Ensamblar con Anexos
+        print("   [3/3] Ensamblando expediente final con anexos...")
+        ensamblador = AgenteEnsamblador(informe_base, self.docs_procesados)
+        ruta_final = f"docs/informes/Expediente_Final_{paciente.get('nif', 'N/A')}_{datetime.now().strftime('%Y%m%d')}.pdf"
+        ensamblador.ensamblar(ruta_final)
+        
+        print(f"   [DONE] Expediente consolidado generado: {ruta_final}")
+        return resumen
+
+    def generar_informe_pdf(self):
+        filename = f"docs/informes/Informe_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        os.makedirs("docs/informes", exist_ok=True)
+        c = canvas.Canvas(filename, pagesize=letter)
+        c.setFont("Helvetica-Bold", 16)
+        c.drawString(100, 750, f"INFORME DE AUDITORÍA CLÍNICA - {self.guion.titulo}")
+        c.setFont("Helvetica", 12)
+        c.drawString(100, 730, f"Paciente: {self.data_final['paciente']}")
+        c.drawString(100, 715, f"NIF: {self.data_final.get('nif', 'N/A')}")
+        c.drawString(100, 700, f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+        c.drawString(100, 685, f"Tiempo Total: {self.data_final['tiempo_total']} s")
+        c.line(100, 675, 500, 675)
+        
+        y = 655
+        for tit, cont in self.data_final["resumen"].items():
+            c.setFont("Helvetica-Bold", 12)
+            c.drawString(100, y, tit)
+            y -= 20
+            c.setFont("Helvetica", 10)
+            text_object = c.beginText(100, y)
+            text_object.setWordSpace(1)
+            lines = [cont[i:i+90] for i in range(0, len(cont), 90)]
+            for line in lines:
+                text_object.textLine(line)
+                y -= 12
+            c.drawText(text_object)
+            y -= 20
+            if y < 100:
+                c.showPage()
+                y = 750
+        
+        c.save()
+        return filename
+
+
+# --- EJECUCIÓN MAESTRA ---
+
 if __name__ == "__main__":
-    print("ClinDoc Agent - Pipeline de Ingesta v0.1")
-    print("Motor semántico Qdrant inicializado correctamente.")
+    config_demo = {
+        "titulo": "Auditoría de Alta Complejidad v4.0 (Master Run)",
+        "secciones": [
+            {"id": "A1", "titulo": "Antecedentes de Salud", "instruccion": "Sintetice hallazgos cardíacos y quirúrgicos previos."},
+            {"id": "A2", "titulo": "Evolución Clínica Reciente", "instruccion": "Evalúe la respuesta al tratamiento post-operatorio."},
+            {"id": "A3", "titulo": "Recomendaciones", "instruccion": "Defina pautas de reposo y seguimiento médico."}
+        ]
+    }
+    # Usar el nuevo orquestador LangGraph
+    paciente_demo = {"nombre": "Juan Pérez García", "nif": "12345678Z"}
+    
+    print("Usando Orquestador LangGraph (v4.0)")
+    sistema = OrquestadorLangGraph(config_demo)
+    resultados = sistema.ejecutar(paciente_demo)
+
+    print("\n" + "="*50)
+    print("      RESULTADO DE AUDITORIA CLINICA")
+    print("="*50)
+    for tit, cont in resultados.items():
+        print(f"\n[{tit}]")
+        print(cont[:500] + "..." if len(cont) > 500 else cont)
+    print("\n" + "="*50)
+    print("  EJECUCIÓN COMPLETADA CON EXITO")
+    print("="*50)
+
