@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Qdrant Local DB
+datos/qdrant_db/
+
+# Reports
+docs/informes/*.pdf
+
+# VS Code
+.vscode/

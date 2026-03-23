@@ -1,0 +1,17 @@
+# [ORQUESTADOR]
+langchain
+langgraph
+
+# [PROCESAMIENTO DOCUMENTAL]
+docling
+reportlab
+pypdf
+
+# [ÍNDICE SEMÁNTICO]
+qdrant-client
+sentence-transformers
+
+# [UTILIDADES]
+pydantic
+python-dotenv
+pyyaml
