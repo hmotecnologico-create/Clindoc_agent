@@ -1,0 +1,24 @@
+INFORME DE ALTA DE URGENCIAS
+HOSPITAL DE PRUEBA - UNIDAD DE TRAUMATOLOGÍA
+
+DATOS DEL PACIENTE:
+Nombre: Juan Pérez García
+NIF: 12345678X
+Fecha de Nacimiento: 15/05/1985
+
+MOTIVO DE CONSULTA:
+El paciente acude por dolor lumbar agudo tras esfuerzo físico en el trabajo.
+
+DIAGNÓSTICO:
+Lumbalgia aguda inespecífica. Se recomienda reposo absoluto por 3 días y tratamiento con analgésicos.
+
+TRATAMIENTO:
+- Ibuprofeno 600mg cada 8 horas.
+- Paracetamol 1g cada 12 horas.
+
+EVOLUCIÓN:
+El paciente presenta buena respuesta inicial al tratamiento. Se emite parte de baja médica con fecha de hoy 23/03/2026.
+
+Firmado: Dr. Manuel Médico
+Colegiado: 2828XXXX
+Fecha: 23/03/2026
