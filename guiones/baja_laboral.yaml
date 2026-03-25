@@ -1,0 +1,53 @@
+# guiones/baja_laboral.yaml
+titulo: "Informe Técnico de Expediente de Baja Laboral"
+paciente_campos_identidad:
+  - nif
+  - nombre_completo
+  - fecha_nacimiento
+  - num_seguridad_social
+
+secciones:
+  - id: S01
+    titulo: "Datos de Identificación del Paciente"
+    fuente_preferente: [informe_medico, baja_medica, poliza_seguro]
+    campos:
+      - nombre: nombre_completo
+        requerido: true
+      - nombre: nif
+        requerido: true
+        validacion_cruzada: true
+      - nombre: fecha_nacimiento
+        requerido: true
+
+  - id: S02
+    titulo: "Diagnóstico Principal y Fecha de Inicio de Baja"
+    fuente_preferente: [baja_medica_inicial, informe_alta_urgencias]
+    campos:
+      - nombre: diagnostico_principal
+        tipo: texto_clinico
+        requerido: true
+      - nombre: codigo_cie10
+        tipo: string
+        patron: "^[A-Z][0-9]{2}(\\.[0-9]{1,2})?$"
+      - nombre: fecha_inicio_baja
+        tipo: fecha
+        requerido: true
+        vigencia: activo
+
+  - id: S03
+    titulo: "Evolución Clínica"
+    fuente_preferente: [partes_confirmacion, informe_especialista]
+    campos:
+      - nombre: partes_confirmacion
+        tipo: lista_cronologica
+      - nombre: consulta_especialista
+        tipo: texto_clinico
+      - nombre: pruebas_complementarias
+        tipo: lista
+
+  - id: S04
+    titulo: "Conclusión y Estado Actual"
+    generado_por: agente_redactor
+    instruccion: >
+      Redacta un párrafo de conclusión que resuma el estado actual
+      del paciente según los documentos analizados.
