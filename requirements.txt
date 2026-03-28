@@ -3,3 +3,14 @@ ollama
 qdrant-client
 sentence-transformers
 pydantic>=2.0
+
+# [PROCESAMIENTO DE DOCUMENTOS]
+docling
+pypdf
+reportlab
+
+# [SEGURIDAD Y CIFRADO]
+pyyaml
+matplotlib
+requests
+cryptography  # Para cifrado AES-256
