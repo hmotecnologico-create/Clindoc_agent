@@ -1,0 +1,122 @@
+{
+  "info": {
+    "version": "v4.0",
+    "fecha": "2026-04-26T13:52:17.287365",
+    "objetivo": "Validación experimental del sistema ClinDoc Agent"
+  },
+  "extraccion": {
+    "timestamp": "2026-04-26T13:52:17.287365",
+    "docling": {
+      "disponible": true,
+      "archivos": 0,
+      "nota": "No hay PDFs"
+    },
+    "pypdf2": {
+      "archivos": 0,
+      "nota": "No hay PDFs"
+    },
+    "comparacion": {}
+  },
+  "formatos": {
+    "timestamp": "2026-04-26T13:52:59.526365",
+    "formatos": {
+      "md": {
+        "count": 4,
+        "imagenes": 0
+      }
+    },
+    "total_documentos": 4,
+    "tiempo_total": 0.0074
+  },
+  "indexacion": {
+    "timestamp": "2026-04-26T13:52:59.533763",
+    "documentos_indexados": 4,
+    "tiempo_indexacion": 1.0219,
+    "tiempo_por_doc": 0.2555
+  },
+  "validacion_identidad": {
+    "timestamp": "2026-04-26T13:53:06.048269",
+    "casos": [
+      {
+        "nombre": "NIF válido que coincide",
+        "resultado": true,
+        "esperado": true,
+        "acierto": true,
+        "detalle": "NIF COINCIDE: 12345678Z (formato: OK)"
+      },
+      {
+        "nombre": "NIF válido que NO coincide",
+        "resultado": false,
+        "esperado": false,
+        "acierto": true,
+        "detalle": "NIF NO COINCIDE: 87654321X (formato: OK)"
+      },
+      {
+        "nombre": "NIF inválido (letra incorrecta)",
+        "resultado": false,
+        "esperado": false,
+        "acierto": true,
+        "detalle": "NIF NO COINCIDE: 12345678A (formato: INVALIDO)"
+      },
+      {
+        "nombre": "Sin NIF en documento",
+        "resultado": false,
+        "esperado": false,
+        "acierto": true,
+        "detalle": "No se detectó NIF en el documento"
+      }
+    ],
+    "resumen": {
+      "total": 4,
+      "aciertos": 4,
+      "precision": 100.0
+    }
+  },
+  "validacion_vigencia": {
+    "timestamp": "2026-04-26T13:53:06.048269",
+    "casos": [
+      {
+        "nombre": "Documento reciente (< 6 meses)",
+        "resultado": true,
+        "esperado": true,
+        "acierto": true,
+        "detalle": "Fecha documento: 2026-03-15. OK"
+      },
+      {
+        "nombre": "Documento antiguo (> 6 meses)",
+        "resultado": false,
+        "esperado": false,
+        "acierto": true,
+        "detalle": "Fecha documento: 2024-08-15. ANTIGUO"
+      },
+      {
+        "nombre": "Documento expirado (fecha futura)",
+        "resultado": true,
+        "esperado": false,
+        "acierto": false,
+        "detalle": "Vigencia hasta 2027-04-15. OK"
+      }
+    ],
+    "resumen": {
+      "total": 3,
+      "aciertos": 2,
+      "precision": 66.7
+    }
+  },
+  "pipeline": {
+    "timestamp": "2026-04-26T13:53:06.049271",
+    "fases": {
+      "ingesta": 0.0038,
+      "indexacion": 0.9171,
+      "validacion_identidad": 0.0,
+      "validacion_vigencia": 0.001
+    },
+    "total": 0.9219,
+    "porcentajes": {
+      "ingesta": 0.4,
+      "indexacion": 99.5,
+      "validacion_identidad": 0.0,
+      "validacion_vigencia": 0.1
+    }
+  }
+}
