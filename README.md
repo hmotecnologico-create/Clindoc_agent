@@ -13,23 +13,38 @@ El sistema se organiza en los siguientes módulos core:
 4.  **Agente Redactor (RAG)**: Búsqueda semántica y síntesis de lenguaje natural citando fuentes.
 5.  **Agente Ensamblador**: Generación de documentos finales en PDF.
 
-## Estructura del Proyecto (Versión Jupyter)
-El sistema ha sido consolidado en cuadernos interactivos para facilitar su auditoría y presentación:
+## Estructura del Proyecto (Self-Contained)
+El repositorio ha sido organizado para ser totalmente portable, incluyendo código, scripts de soporte y datos de prueba:
 
-- **`ClinDoc_Agent_Master.ipynb`**: Cuaderno principal que contiene toda la lógica de los agentes, modelos de datos y el motor vectorial Qdrant.
-- **`ClinDoc_Agent_Demo.ipynb`**: Guía rápida de ejecución del pipeline paso a paso.
-- `guiones/`: Configuraciones YAML de los informes.
-- `datos/`: Expedientes clínicos y base de datos vectorial local.
+- **`run_clindoc.py`**: Orquestador principal del sistema y punto de entrada.
+- **`app_clindoc.py`**: Interfaz de usuario/Dashboard (Streamlit).
+- **`scripts/`**: Utilidades para la generación de diagramas técnicos (ERD, Secuencia) y gráficas estadísticas para la tesis.
+- **`sinteticos_master_run/`**: Datos clínicos sintéticos y evidencias de ejecución para auditoría.
+- **`guiones/`**: Configuraciones YAML de los informes.
+- **`datos/`**: Base de datos vectorial local (Qdrant).
+
+## Metodología y Apoyo de IA
+Este proyecto integra metodologías de desarrollo ágil asistido por **IA Generativa**. El uso de asistentes de IA (como Antigravity/Gemini) ha sido fundamental en:
+- **Optimización de Código**: Refactorización de lógica multi-agente y manejo de concurrencia.
+- **Visual Analytics**: Automatización de scripts para la generación de gráficas de rendimiento.
+- **Documentación Técnica**: Estructuración de especificaciones y diagramas arquitectónicos.
+
+Esta simbiosis humano-IA permite un desarrollo robusto, permitiendo al autor centrarse en la arquitectura de alto nivel y la validación clínica de los resultados.
 
 ## Requisitos
-- **Jupyter Notebook / VS Code**
-- **Ollama**: Servidor local de LLM.
-- **Python 3.10+** (con las dependencias de `requirements.txt`).
+- **Ollama**: Servidor local de LLM (configurado con modelos `gemma2` o similar).
+- **Python 3.10+** (instalar dependencias con `pip install -r requirements.txt`).
 
 ## Ejecución
-1. Abre VS Code en la carpeta `ClinDoc_Agent`.
-2. Abre `ClinDoc_Agent_Master.ipynb`.
-3. Ejecuta todas las celdas para inicializar el sistema y generar un informe de prueba.
+1. Asegúrate de tener Ollama corriendo localmente.
+2. Ejecuta el orquestador principal:
+   ```bash
+   python run_clindoc.py
+   ```
+3. Para visualizar el dashboard:
+   ```bash
+   streamlit run app_clindoc.py
+   ```
 
 ---
-*Este proyecto forma parte de un Trabajo Final de Máster enfocado en Visual Analytics y Big Data.*
+*Este proyecto forma parte de un Trabajo Final de Máster (TFM) enfocado en Visual Analytics y Big Data.*

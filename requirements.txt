@@ -15,3 +15,5 @@ sentence-transformers
 pydantic
 python-dotenv
 pyyaml
+matplotlib
+requests

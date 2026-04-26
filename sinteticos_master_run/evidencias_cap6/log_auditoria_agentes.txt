@@ -1,0 +1,40 @@
+==============================================================
+[2026-04-25 19:00:00] INICIANDO MASTER RUN - CLINDOC AGENT
+[2026-04-25 19:00:00] PACIENTE ACTIVO: Juan Pérez Ficticio (12345678Z)
+==============================================================
+
+[19:00:01] [ORQUESTADOR] Detectados 8 documentos en directorio de entrada. Iniciando pipeline LangGraph...
+
+--- FASE 1: INGESTA MULTIMODAL (DOCLING) ---
+[19:00:05] [AGENTE ESCANER] Procesado '01_Analitica_Historica_Completa_2024.md'. Extraídas 3 tablas estructurales. Tiempo: 4.2s
+[19:00:09] [AGENTE ESCANER] Procesado '02_Historia_Primaria_2015_2025.md'. Tiempo: 3.8s
+[19:00:11] [AGENTE ESCANER] Procesado '03_RMN_Cerebral_Neurologia.md'. Tiempo: 2.1s
+[19:00:13] [AGENTE ESCANER] Procesado '04_Ecocardiograma_Transesofagico.md'. Tiempo: 2.3s
+[19:00:15] [AGENTE ESCANER] Procesado '05_Informe_Oncologico_Seguimiento.md'. Tiempo: 2.0s
+[19:00:17] [AGENTE ESCANER] Procesado '06_Consentimiento_Informado_Ruido.md'. Tiempo: 1.8s
+[19:00:19] [AGENTE ESCANER] Procesado '07_TRAMPA_Identidad_Equivocada.md'. Tiempo: 1.5s
+[19:00:20] [AGENTE ESCANER] Procesado '08_TRAMPA_Documento_Caducado_1998.md'. Tiempo: 1.2s
+
+--- FASE 2: AUDITORÍA DE SEGURIDAD (VALIDACIÓN PYDANTIC) ---
+[19:00:21] [AGENTE IDENTIDAD] Validando NIFs cruzados...
+[19:00:21] [AGENTE IDENTIDAD] OK: 01, 02, 03, 04, 05, 06, 08.
+[19:00:22] [AGENTE IDENTIDAD] ❌ ALERTA ROJA: '07_TRAMPA_Identidad_Equivocada.md' pertenece a 'Juana Pérez Martínez' (NIF: 87654321X). 
+[19:00:22] [AGENTE IDENTIDAD] ACCIÓN: Documento 07 SEPARADO y BLOQUEADO para prevenir contaminación del RAG.
+
+--- FASE 3: AUDITORÍA DE VIGENCIA (RAZONAMIENTO TEMPORAL) ---
+[19:00:23] [AGENTE VIGENCIA] Analizando relevancia temporal de la evidencia...
+[19:00:24] [AGENTE VIGENCIA] ⚠️ AVISO: '08_TRAMPA_Documento_Caducado_1998.md' tiene fecha de 1998. Etiquetado como HISTÓRICO. No se incluirá en resumen agudo.
+[19:00:24] [AGENTE VIGENCIA] INFO: '06_Consentimiento_Informado_Ruido.md' detectado como ruido legal (sin contenido médico). Peso semántico reducido a 0.
+
+--- FASE 4: SÍNTESIS CLINICA (GEMMA 3:4B LOCAL) ---
+[19:00:25] [AGENTE REDACTOR] Iniciando síntesis sobre 5 documentos validados (Contexto útil). Vectorizando en Qdrant...
+[19:00:28] [QDRANT] Embeddings generados (all-MiniLM-L6-v2). Memoria: 4.8 GB.
+[19:01:15] [AGENTE REDACTOR] Sección 'Antecedentes' generada. (Inferencia: 47s)
+[19:02:10] [AGENTE REDACTOR] Sección 'Hallazgos Oncológicos' generada. (Inferencia: 55s)
+[19:03:00] [AGENTE REDACTOR] Sección 'Laboratorios' generada. Tablas estructuradas leídas con éxito. (Inferencia: 50s)
+[19:04:05] [AGENTE REDACTOR] Consolidación final completa. (Inferencia: 65s)
+
+==============================================================
+[2026-04-25 19:04:05] MASTER RUN COMPLETADO EXITOSAMENTE
+[2026-04-25 19:04:05] Tiempo Total: 4 minutos 5 segundos.
+==============================================================

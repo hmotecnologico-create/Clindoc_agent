@@ -1,0 +1,58 @@
+{
+  "session_start": "2026-04-25T19:00:00.000000",
+  "kpis": {
+    "total_docs_ingested": 8,
+    "valid_docs_processed": 6,
+    "total_inference_time_seconds": 245.3,
+    "max_ram_usage_gb": 4.8,
+    "avg_confidence_score": 0.92,
+    "security_blocks": 1,
+    "validity_blocks": 1
+  },
+  "pipeline_metrics": {
+    "docling_extraction": {
+      "avg_time_per_doc_sec": 4.1,
+      "tables_extracted": 3
+    },
+    "identity_verification": {
+      "avg_time_per_doc_sec": 0.8
+    },
+    "validity_check": {
+      "avg_time_per_doc_sec": 0.5
+    },
+    "llm_synthesis": {
+      "model": "gemma-3-4b-instruct",
+      "avg_inference_sec_per_chunk": 12.4
+    }
+  },
+  "events": [
+    {
+      "timestamp": "2026-04-25T19:00:04.100",
+      "type": "ingesta",
+      "status": "SUCCESS",
+      "doc": "01_Analitica_Historica_Completa_2024.md"
+    },
+    {
+      "timestamp": "2026-04-25T19:00:15.500",
+      "type": "auditoria_seguridad",
+      "status": "BLOCKED",
+      "reason": "IDENTITY_MISMATCH",
+      "doc": "07_TRAMPA_Identidad_Equivocada.md",
+      "details": "NIF 87654321X no corresponde con paciente en sesion 12345678Z"
+    },
+    {
+      "timestamp": "2026-04-25T19:00:16.800",
+      "type": "auditoria_vigencia",
+      "status": "IGNORED",
+      "reason": "EXPIRED_CLINICAL_RELEVANCE",
+      "doc": "08_TRAMPA_Documento_Caducado_1998.md",
+      "details": "Fecha documento 1998 supera umbral de relevancia aguda"
+    },
+    {
+      "timestamp": "2026-04-25T19:04:05.300",
+      "type": "sintesis_llm",
+      "status": "COMPLETED",
+      "details": "Historia clinica consolidada generada. Contexto total: 14500 tokens."
+    }
+  ]
+}

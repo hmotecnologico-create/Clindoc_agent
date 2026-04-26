@@ -1,0 +1,8 @@
+KPI,Valor
+total_docs_ingested,8.0
+valid_docs_processed,6.0
+total_inference_time_seconds,245.3
+max_ram_usage_gb,4.8
+avg_confidence_score,0.92
+security_blocks,1.0
+validity_blocks,1.0

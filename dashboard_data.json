@@ -1,0 +1,51 @@
+{
+    "session_start": "2026-04-24T19:35:01.219524",
+    "kpis": {
+        "total_docs": 1,
+        "total_time": 401.11,
+        "avg_confidence": 0.85,
+        "critical_risks": 0
+    },
+    "events": [
+        {
+            "timestamp": "2026-04-24T19:35:01.618445",
+            "type": "ingesta_documento",
+            "details": {
+                "id": "alta_juan_perez",
+                "nombre": "alta_juan_perez.txt",
+                "latencia": 0.3759,
+                "longitud_texto": 659
+            }
+        },
+        {
+            "timestamp": "2026-04-24T19:37:36.972790",
+            "type": "analisis_seccion",
+            "details": {
+                "seccion": "Antecedentes de Salud",
+                "confianza": 0.85,
+                "estado_riesgo": "SAFE",
+                "tiempo_respuesta": 155.35
+            }
+        },
+        {
+            "timestamp": "2026-04-24T19:38:31.025317",
+            "type": "analisis_seccion",
+            "details": {
+                "seccion": "Evoluci\u00f3n Cl\u00ednica Reciente",
+                "confianza": 0.85,
+                "estado_riesgo": "SAFE",
+                "tiempo_respuesta": 54.05
+            }
+        },
+        {
+            "timestamp": "2026-04-24T19:41:42.325400",
+            "type": "analisis_seccion",
+            "details": {
+                "seccion": "Recomendaciones",
+                "confianza": 0.85,
+                "estado_riesgo": "SAFE",
+                "tiempo_respuesta": 191.3
+            }
+        }
+    ]
+}
