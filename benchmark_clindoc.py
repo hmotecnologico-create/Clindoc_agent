@@ -394,6 +394,101 @@ def benchmark_pipeline():
     return resultados
 
 
+# === BENCHMARK 7: Matriz de Confusión (Flujo Médico-IA) ===
+def benchmark_matriz_confusion():
+    """
+    Prueba el flujo de auditoría médica.
+    Simula el flujo real: IA genera → Médico audita → Matriz se actualiza
+    
+    PRUEBAS REALIZADAS:
+    - Aprobación de sección (VP)
+    - Modificación por error (FP)
+    - Nuevo hallazgo (FN)
+    - Aprobación final
+    """
+    print("\n" + "="*60)
+    print("BENCHMARK 7: FLUJO DE AUDITORÍA MÉDICA")
+    print("="*60)
+    
+    from modulo_auditoria import GestorAuditorias, TipoValidacion, CategoriaError, ValidacionSeccion
+    
+    resultados = {
+        "timestamp": datetime.now().isoformat(),
+        "flujo": {}
+    }
+    
+    gestor = GestorAuditorias("datos/auditorias")
+    
+    # 1. Simular informe generado
+    print("\n[7.1] Generando informe de prueba...")
+    informe_demo = {
+        "paciente_nif": "TEST12345Z",
+        "paciente_nombre": "Paciente Test",
+        "resumen": {
+            "Antecedentes": "Hipertensión arterial...",
+            "Tratamiento": "Enalapril 5mg...",
+            "Alergias": "No constan"
+        }
+    }
+    informe_id = gestor.guardar_informe_pendiente(informe_demo)
+    resultados["flujo"]["informe_generado"] = informe_id
+    print(f"   ✓ Informe ID: {informe_id}")
+    
+    # 2. Aprobar sección (VP)
+    print("[7.2] Simulando aprobación médica...")
+    v1 = ValidacionSeccion(
+        seccion="Antecedentes",
+        validacion=TipoValidacion.APROBADO,
+        texto_original="Hipertensión arterial..."
+    )
+    gestor.registrar_validacion(informe_id, v1)
+    print("   ✓ Sección aprobada (VP++)")
+    
+    # 3. Modificar sección (FP)
+    print("[7.3] Simulando corrección médica...")
+    v2 = ValidacionSeccion(
+        seccion="Tratamiento",
+        validacion=TipoValidacion.MODIFICADO,
+        texto_original="Enalapril 5mg...",
+        texto_modificado="Losartán 50mg (corregido)",
+        categoria_error=CategoriaError.FALSO_POSITIVO
+    )
+    gestor.registrar_validacion(informe_id, v2)
+    print("   ✓ Sección modificada (FP++)")
+    
+    # 4. Añadir nuevo hallazgo (FN)
+    print("[7.4] Simulando nuevo hallazgo...")
+    v3 = ValidacionSeccion(
+        seccion="Alergias",
+        validacion=TipoValidacion.NUEVOhallazgo,
+        texto_original="",
+        notas_medico="Alergia a penicilina",
+        categoria_error=CategoriaError.OMISION
+    )
+    gestor.registrar_validacion(informe_id, v3)
+    print("   ✓ Nuevo hallazgo añadido (FN++)")
+    
+    # 5. Aprobar informe
+    print("[7.5] Aprobando informe...")
+    gestor.aprobar_informe(informe_id, "Aprobado con correcciones")
+    print("   ✓ Informe aprobado")
+    
+    # 6. Obtener métricas
+    stats = gestor.obtener_estadisticas()
+    matriz = stats["matriz_confusion"]["matriz"]
+    metricas = stats["matriz_confusion"]["metricas"]
+    
+    resultados["flujo"]["matriz"] = matriz
+    resultados["flujo"]["metricas"] = metricas
+    
+    print(f"\n   → Matriz de Confusión:")
+    print(f"   → VP: {matriz['vp']}, FP: {matriz['fp']}, VN: {matriz['vn']}, FN: {matriz['fn']}")
+    print(f"   → Precisión: {metricas['precision']}%")
+    print(f"   → F1-Score: {metricas['f1']}%")
+    
+    return resultados
+
+
 # === EJECUTAR TODOS LOS BENCHMARKS ===
 def ejecutar_todos_benchmarks():
     """Ejecuta todos los benchmarks y genera informe"""
@@ -446,6 +541,12 @@ def ejecutar_todos_benchmarks():
     except Exception as e:
         resultados["pipeline"] = {"error": str(e)}
         print(f"\n✗ Error en benchmark de pipeline: {e}")
+    
+    try:
+        resultados["matriz_confusion"] = benchmark_matriz_confusion()
+    except Exception as e:
+        resultados["matriz_confusion"] = {"error": str(e)}
+        print(f"\n✗ Error en benchmark de matriz de confusión: {e}")
     
     # Guardar resultados
     output_file = "benchmark_resultados.json"
