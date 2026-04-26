@@ -6,10 +6,12 @@ Dashboard completo que integra:
 2. Chat asistente para dudas
 3. Matriz de confusión
 4. Feedback loop médico-IA
+5. Historial clínico visual
 
 Este dashboard representa el FLUJO REAL del médico:
 - Se sienta → Busca paciente → Ve informe IA
 - Puede chatear con la IA sobre dudas
+- Revisa historial clínico visual
 - Aprueba/Modifica/Añade
 - Firma el informe (responsabilidad médica)
 
@@ -20,6 +22,7 @@ import streamlit as st
 import json
 from datetime import datetime
 from pathlib import Path
+from typing import List, Dict
 
 # Configuración de página
 st.set_page_config(
@@ -57,6 +60,7 @@ sys.path.insert(0, ".")
 from chat_asistente_medico import ChatAsistenteMedico, TipoMensaje
 from modulo_auditoria import GestorAuditorias, TipoValidacion, CategoriaError, ValidacionSeccion
 from run_clindoc import AgenteEscanner, IndiceCorpus
+from historial_clinico_visual import HistorialClinicoVisual
 
 
 class DashboardMedicov5:
@@ -99,6 +103,7 @@ class DashboardMedicov5:
                 "🏠 Inicio",
                 "🔍 Buscar Paciente",
                 "📋 Informes Pendientes",
+                "📈 Historial Clínico",
                 "💬 Chat Asistente",
                 "📊 Métricas de Calidad"
             ], label_visibility="collapsed")
@@ -448,6 +453,97 @@ class DashboardMedicov5:
             st.session_state.vista_actual = "inicio"
             st.rerun()
     
+    def vista_historial(self):
+        """Ver historial clínico visual del paciente"""
+        st.title("📈 Historial Clínico - Evolución del Paciente")
+        
+        # Selector de paciente
+        col1, col2 = st.columns([2, 1])
+        with col1:
+            paciente_seleccionado = st.selectbox(
+                "Seleccionar Paciente:",
+                options=self._listar_pacientes(),
+                format_func=lambda x: f"{x['nombre']} ({x['nif']})" if x else "Seleccionar..."
+            )
+        
+        if not paciente_seleccionado:
+            st.info("Seleccione un paciente para ver su historial clínico")
+            return
+        
+        # Mostrar historial
+        historial = HistorialClinicoVisual()
+        historial.cargar_expediente(
+            paciente_seleccionado["nif"], 
+            paciente_seleccionado["nombre"]
+        )
+        
+        if not historial.eventos:
+            st.warning(f"No se encontró información clínica para {paciente_seleccionado['nombre']}")
+            return
+        
+        # Estadísticas
+        stats = historial.obtener_estadisticas()
+        
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Eventos", stats["total_eventos"])
+        with col2:
+            st.metric("Días de Seguimiento", stats["dias_seguimiento"])
+        with col3:
+            st.metric("Eventos Importantes", stats["eventos_importantes"])
+        with col4:
+            st.metric("Período", f"{stats['primera_fecha'][:4]} - {stats['ultima_fecha'][:4]}")
+        
+        # Buscador
+        st.markdown("### 🔍 Buscar Término o Enfermedad")
+        busqueda = st.text_input("Buscar en historial:", 
+                                placeholder="diabetes, tensión, tratamiento, análisis...")
+        
+        if busqueda:
+            resultados = historial.buscar_termino(busqueda)
+            st.markdown(f"**{len(resultados)} resultados encontrados** para '{busqueda}'")
+            
+            for e in resultados:
+                with st.expander(f"📅 {e.fecha.strftime('%d/%m/%Y')} - {e.titulo}"):
+                    st.markdown(f"**Tipo:** {e.tipo.capitalize()}")
+                    st.markdown(f"**Descripción:** {e.descripcion}")
+                    st.markdown(f"**Fuente:** {e.fuente}")
+        
+        # Gráfico timeline
+        st.markdown("### 📊 Línea de Tiempo - Evolución Clínica")
+        fig = historial.generar_grafico_timeline()
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Tabla de eventos
+        st.markdown("### 📋 Lista de Eventos")
+        eventos = historial.generar_tabla_eventos()
+        if eventos:
+            import pandas as pd
+            df = pd.DataFrame(eventos)
+            st.dataframe(df, use_container_width=True)
+        
+        if st.button("← Volver"):
+            st.session_state.vista_actual = "inicio"
+            st.rerun()
+    
+    def _listar_pacientes(self) -> List[Dict]:
+        """Lista todos los pacientes con datos"""
+        pacientes = []
+        
+        # De auditorías
+        for archivo in Path("datos/auditorias").glob("inf_*.json"):
+            try:
+                with open(archivo, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    pacientes.append({
+                        "nif": data.get("paciente_nif", ""),
+                        "nombre": data.get("paciente_nombre", "")
+                    })
+            except:
+                pass
+        
+        return pacientes
+    
     def vista_chat(self):
         """Ver historial de chat"""
         st.title("💬 Chat Asistente")
@@ -548,6 +644,8 @@ class DashboardMedicov5:
             self.vista_buscar()
         elif opcion == "📋 Informes Pendientes":
             self.vista_pendientes()
+        elif opcion == "📈 Historial Clínico":
+            self.vista_historial()
         elif opcion == "💬 Chat Asistente":
             self.vista_chat()
         elif opcion == "📊 Métricas de Calidad":
