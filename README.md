@@ -24,7 +24,9 @@ El repositorio ha sido organizado para ser totalmente portable, incluyendo códi
 - **`datos/`**: Base de datos vectorial local (Qdrant).
 
 ## Metodología y Apoyo de IA
-Este proyecto integra metodologías de desarrollo ágil asistido por **IA Generativa**. El uso de asistentes de IA (como Antigravity/Gemini) ha sido fundamental en:
+Este proyecto integra metodologías de desarrollo ágil asistido por **IA Generativa**. ClinDoc Agent representa la evolución técnica de una fase previa de investigación en auditoría algorítmica iniciada en 2025, la cual fue refinada y adaptada en 2026 para el procesamiento especializado de documentos clínicos y cumplimiento normativo de salud.
+
+El uso de asistentes de IA (como Antigravity/Gemini) ha sido fundamental en:
 - **Optimización de Código**: Refactorización de lógica multi-agente y manejo de concurrencia.
 - **Visual Analytics**: Automatización de scripts para la generación de gráficas de rendimiento.
 - **Documentación Técnica**: Estructuración de especificaciones y diagramas arquitectónicos.
