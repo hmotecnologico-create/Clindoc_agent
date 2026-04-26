@@ -6,14 +6,16 @@ langgraph
 docling
 reportlab
 pypdf
+python-docx  # Para procesar .docx
 
 # [ÍNDICE SEMÁNTICO]
 qdrant-client
 sentence-transformers
 
 # [UTILIDADES]
-pydantic
+pydantic>=2.0
 python-dotenv
 pyyaml
 matplotlib
 requests
+cryptography  # Para cifrado AES-256
