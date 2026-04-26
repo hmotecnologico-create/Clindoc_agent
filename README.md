@@ -18,7 +18,7 @@ El repositorio ha sido organizado para ser totalmente portable, incluyendo códi
 
 - **`run_clindoc.py`**: Orquestador principal del sistema y punto de entrada.
 - **`app_clindoc.py`**: Interfaz de usuario/Dashboard (Streamlit).
-- **`scripts/`**: Utilidades para la generación de diagramas técnicos (ERD, Secuencia) y gráficas estadísticas para la tesis.
+- **`scripts/`**: Utilidades para la generación de diagramas técnicos, gráficas estadísticas y **generación de pacientes sintéticos vía LLM**.
 - **`sinteticos_master_run/`**: Datos clínicos sintéticos y evidencias de ejecución para auditoría.
 - **`guiones/`**: Configuraciones YAML de los informes.
 - **`datos/`**: Base de datos vectorial local (Qdrant).
