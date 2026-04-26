@@ -176,11 +176,11 @@ class IndiceCorpus:
             vector = self.modelo_emb.encode(frag).tolist()
             chunk_id = f"{doc_id}_chunk_{i}"
             points.append(models.PointStruct(
-                id=chunk_id,  # ← CHUNK_ID como ID
+                id=str(uuid.uuid4()),  # UUID válido para Qdrant
                 vector=vector, 
                 payload={
                     "texto": frag, 
-                    "chunk_id": chunk_id,  # ← GUARDAR PARA DEEP LINKING
+                    "chunk_id": chunk_id,  # GUARDAR PARA DEEP LINKING
                     "nombre_archivo": nombre_original, 
                     "doc_id": doc_id
                 }
@@ -395,6 +395,7 @@ class VerificadorIdentidad:
         }
 
 # --- VERIFICADOR DE VIGENCIA MEJORADO (FASE 2) ---
+class VerificadorVigencia:
     def __init__(self, dias_margen: int = 365):
         self.dias_margen = dias_margen
 
@@ -408,10 +409,10 @@ class VerificadorIdentidad:
             return {"valido": True, "detalle": "No se detectaron fechas para validar vigencia."}
         
         try:
-            # Tomamos la última fecha mencionada como la más relevante (ej: fecha de fin o firma)
+            # Tomamos la última fecha mencionada como la más relevante
             fecha_doc_str = fechas[-1].replace('-', '/')
             partes = fecha_doc_str.split('/')
-            if len(partes[2]) == 2: partes[2] = "20" + partes[2] # Arreglar años de 2 dígitos
+            if len(partes[2]) == 2: partes[2] = "20" + partes[2]
             fecha_doc = datetime.strptime("/".join(partes), "%d/%m/%Y")
             
             hoy = datetime.now()
@@ -861,21 +862,3 @@ if __name__ == "__main__":
     print("\n" + "="*50)
     print("  EJECUCIÓN COMPLETADA CON EXITO")
     print("="*50)
-            {"id": "A1", "titulo": "Antecedentes de Salud", "instruccion": "Sintetice hallazgos cardíacos y quirúrgicos previos."},
-            {"id": "A2", "titulo": "Evolución Clínica Reciente", "instruccion": "Evalúe la respuesta al tratamiento post-operatorio."},
-            {"id": "A3", "titulo": "Recomendaciones", "instruccion": "Defina pautas de reposo y seguimiento médico."}
-        ]
-    }
-    paciente_demo = {"nombre": "Juan Pérez García", "nif": "12345678X"}
-
-    sistema = OrquestadorClinDoc(config_demo)
-    resultados = sistema.ejecutar(paciente_demo)
-
-    print("\n" + "="*40)
-    print("      RESULTADO DE AUDITORIA CLINICA")
-    print("="*40)
-    for tit, cont in resultados.items():
-        print(f"\nSeccion: {tit}:\n{cont}")
-    print("\n" + "="*40)
-    print("  EJECUCIÓN COMPLETADA CON EXITO")
-    print("="*40)
