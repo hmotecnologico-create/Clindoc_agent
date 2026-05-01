@@ -1,0 +1,9 @@
+Documento,Tiempo_Ingesta_Sec,Tablas_Extraidas,Estado_Final
+01_Analitica_Historica_Completa_2024.md,4.2,3,SUCCESS
+02_Historia_Primaria_2015_2025.md,3.8,0,SUCCESS
+03_RMN_Cerebral_Neurologia.md,2.1,0,SUCCESS
+04_Ecocardiograma_Transesofagico.md,2.3,0,SUCCESS
+05_Informe_Oncologico_Seguimiento.md,2.0,0,SUCCESS
+06_Consentimiento_Informado_Ruido.md,1.8,0,SUCCESS
+07_TRAMPA_Identidad_Equivocada.md,1.5,0,BLOCKED
+08_TRAMPA_Documento_Caducado_1998.md,1.2,0,HISTORIC
