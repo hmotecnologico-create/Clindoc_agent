@@ -1,0 +1,43 @@
+{
+  "informe_id": "inf_TEST12345Z_20260426_200941",
+  "paciente_nif": "TEST12345Z",
+  "paciente_nombre": "Paciente Test",
+  "fecha_generacion": "2026-04-26T20:09:41.123590",
+  "estado": "aprobado",
+  "secciones": {
+    "Antecedentes": "Hipertensi\u00f3n arterial...",
+    "Tratamiento": "Enalapril 5mg...",
+    "Alergias": "No constan"
+  },
+  "validaciones": [
+    {
+      "seccion": "Antecedentes",
+      "validacion": "aprobado",
+      "texto_original": "Hipertensi\u00f3n arterial...",
+      "texto_modificado": null,
+      "notas_medico": null,
+      "categoria_error": null,
+      "timestamp": "2026-04-26T20:09:41.123590"
+    },
+    {
+      "seccion": "Tratamiento",
+      "validacion": "modificado",
+      "texto_original": "Enalapril 5mg...",
+      "texto_modificado": "Losart\u00e1n 50mg (corregido)",
+      "notas_medico": null,
+      "categoria_error": "falso_positivo",
+      "timestamp": "2026-04-26T20:09:41.137330"
+    },
+    {
+      "seccion": "Alergias",
+      "validacion": "nuevo_hallazgo",
+      "texto_original": "",
+      "texto_modificado": null,
+      "notas_medico": "Alergia a penicilina",
+      "categoria_error": "omision",
+      "timestamp": "2026-04-26T20:09:41.148594"
+    }
+  ],
+  "fecha_auditoria": "2026-04-26T20:09:41.166549",
+  "notas_auditoria": "Aprobado con correcciones"
+}

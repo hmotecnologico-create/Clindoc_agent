@@ -1,11 +1,11 @@
 {
   "info": {
     "version": "v4.0",
-    "fecha": "2026-04-26T13:52:17.287365",
+    "fecha": "2026-04-26T20:10:54.064752",
     "objetivo": "Validación experimental del sistema ClinDoc Agent"
   },
   "extraccion": {
-    "timestamp": "2026-04-26T13:52:17.287365",
+    "timestamp": "2026-04-26T20:10:54.064752",
     "docling": {
       "disponible": true,
       "archivos": 0,
@@ -18,24 +18,24 @@
     "comparacion": {}
   },
   "formatos": {
-    "timestamp": "2026-04-26T13:52:59.526365",
+    "timestamp": "2026-04-26T20:11:09.050447",
     "formatos": {
       "md": {
-        "count": 4,
+        "count": 13,
         "imagenes": 0
       }
     },
-    "total_documentos": 4,
-    "tiempo_total": 0.0074
+    "total_documentos": 13,
+    "tiempo_total": 0.004
   },
   "indexacion": {
-    "timestamp": "2026-04-26T13:52:59.533763",
-    "documentos_indexados": 4,
-    "tiempo_indexacion": 1.0219,
-    "tiempo_por_doc": 0.2555
+    "timestamp": "2026-04-26T20:11:09.054459",
+    "documentos_indexados": 13,
+    "tiempo_indexacion": 1.6968,
+    "tiempo_por_doc": 0.1305
   },
   "validacion_identidad": {
-    "timestamp": "2026-04-26T13:53:06.048269",
+    "timestamp": "2026-04-26T20:11:15.919126",
     "casos": [
       {
         "nombre": "NIF válido que coincide",
@@ -73,7 +73,7 @@
     }
   },
   "validacion_vigencia": {
-    "timestamp": "2026-04-26T13:53:06.048269",
+    "timestamp": "2026-04-26T20:11:15.920181",
     "casos": [
       {
         "nombre": "Documento reciente (< 6 meses)",
@@ -104,19 +104,38 @@
     }
   },
   "pipeline": {
-    "timestamp": "2026-04-26T13:53:06.049271",
+    "timestamp": "2026-04-26T20:11:15.922227",
     "fases": {
-      "ingesta": 0.0038,
-      "indexacion": 0.9171,
+      "ingesta": 0.0122,
+      "indexacion": 1.7545,
       "validacion_identidad": 0.0,
-      "validacion_vigencia": 0.001
+      "validacion_vigencia": 0.0
     },
-    "total": 0.9219,
+    "total": 1.7667,
     "porcentajes": {
-      "ingesta": 0.4,
-      "indexacion": 99.5,
+      "ingesta": 0.7,
+      "indexacion": 99.3,
       "validacion_identidad": 0.0,
-      "validacion_vigencia": 0.1
+      "validacion_vigencia": 0.0
+    }
+  },
+  "matriz_confusion": {
+    "timestamp": "2026-04-26T20:11:22.633218",
+    "flujo": {
+      "informe_generado": "inf_TEST12345Z_20260426_201122",
+      "matriz": {
+        "vp": 2,
+        "fp": 2,
+        "vn": 0,
+        "fn": 2
+      },
+      "metricas": {
+        "precision": 50.0,
+        "exhaustividad": 50.0,
+        "f1": 50.0,
+        "exactitud": 33.33,
+        "total_validaciones": 6
+      }
     }
   }
 }

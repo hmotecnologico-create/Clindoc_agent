@@ -1,50 +1,77 @@
 {
-    "session_start": "2026-04-24T19:35:01.219524",
+    "session_start": "2026-04-26T19:35:21.760003",
     "kpis": {
-        "total_docs": 1,
-        "total_time": 401.11,
+        "total_docs": 4,
+        "total_time": 694.48,
         "avg_confidence": 0.85,
         "critical_risks": 0
     },
     "events": [
         {
-            "timestamp": "2026-04-24T19:35:01.618445",
+            "timestamp": "2026-04-26T19:35:21.761120",
             "type": "ingesta_documento",
             "details": {
-                "id": "alta_juan_perez",
-                "nombre": "alta_juan_perez.txt",
-                "latencia": 0.3759,
-                "longitud_texto": 659
+                "id": "Doc1_Urgencias_05042026",
+                "formato": "md",
+                "imagenes": 0,
+                "nota": null
             }
         },
         {
-            "timestamp": "2026-04-24T19:37:36.972790",
+            "timestamp": "2026-04-26T19:35:21.856467",
+            "type": "ingesta_documento",
+            "details": {
+                "id": "Doc2_Analitica_10042026",
+                "formato": "md",
+                "imagenes": 0,
+                "nota": null
+            }
+        },
+        {
+            "timestamp": "2026-04-26T19:35:21.935688",
+            "type": "ingesta_documento",
+            "details": {
+                "id": "Doc3_Ecocardiograma_12042026",
+                "formato": "md",
+                "imagenes": 0,
+                "nota": null
+            }
+        },
+        {
+            "timestamp": "2026-04-26T19:35:22.016349",
+            "type": "ingesta_documento",
+            "details": {
+                "id": "Doc4_Informe_Alta_25042026",
+                "formato": "md",
+                "imagenes": 0,
+                "nota": null
+            }
+        },
+        {
+            "timestamp": "2026-04-26T19:37:36.920732",
             "type": "analisis_seccion",
             "details": {
                 "seccion": "Antecedentes de Salud",
                 "confianza": 0.85,
-                "estado_riesgo": "SAFE",
-                "tiempo_respuesta": 155.35
+                "estado_riesgo": "SAFE"
             }
         },
         {
-            "timestamp": "2026-04-24T19:38:31.025317",
+            "timestamp": "2026-04-26T19:41:05.358975",
             "type": "analisis_seccion",
             "details": {
                 "seccion": "Evoluci\u00f3n Cl\u00ednica Reciente",
                 "confianza": 0.85,
-                "estado_riesgo": "SAFE",
-                "tiempo_respuesta": 54.05
+                "estado_riesgo": "SAFE"
             }
         },
         {
-            "timestamp": "2026-04-24T19:41:42.325400",
+            "timestamp": "2026-04-26T19:46:56.212441",
             "type": "analisis_seccion",
             "details": {
                 "seccion": "Recomendaciones",
                 "confianza": 0.85,
-                "estado_riesgo": "SAFE",
-                "tiempo_respuesta": 191.3
+                "estado_riesgo": "SAFE"
             }
         }
     ]
