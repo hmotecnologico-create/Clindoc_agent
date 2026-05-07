@@ -100,7 +100,7 @@ class ChatAsistenteMedico:
     def __init__(self, ruta: str = "datos/conversaciones", modelo: str = "gemma3:4b"):
         self.ruta = Path(ruta)
         self.ruta.mkdir(parents=True, exist_ok=True)
-        self.modelo = modelo
+        self.modelo = obtener_modelo_ollama_disponible(modelo)
         self.conversacion_actual: Optional[Conversacion] = None
     
     def iniciar_conversacion(self, informe_id: str, paciente_nif: str, 
