@@ -169,11 +169,15 @@ with st.sidebar:
     st.header("Soberanía del Dato")
     st.info("🛡️ Todos los procesos se ejecutan en hardware local para garantizar cumplimiento RGPD.")
     st.write("---")
+    # Autodetección de LLM local
+    from chat_asistente_medico import obtener_modelo_ollama_disponible
+    modelo_activo = obtener_modelo_ollama_disponible("gemma3:4b")
+    
     st.markdown(f"""
     **Configuración Actual:**
-    - **LLM:** Llama 3.2 (Local)
-    - **Embedding:** all-MiniLM-L6-v2
-    - **DB Vectorial:** Qdrant
+    - **LLM Activo:** `{modelo_activo}` (Ollama)
+    - **Embedding:** `all-MiniLM-L6-v2`
+    - **DB Vectorial:** `Qdrant` (Local)
     - **Sesión:** {datetime.now().strftime('%H:%M:%S')}
     """)
     st.write("---")

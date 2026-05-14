@@ -1,16 +1,26 @@
-# Core dependencies
-ollama
+# [ORQUESTADOR]
+langchain
+langgraph
+
+# [PROCESAMIENTO DOCUMENTAL]
+docling
+reportlab
+pypdf
+python-docx  # Para procesar .docx
+
+# [ÍNDICE SEMÁNTICO]
 qdrant-client
 sentence-transformers
+
+# [UTILIDADES]
 pydantic>=2.0
-
-# [PROCESAMIENTO DE DOCUMENTOS]
-docling
-pypdf
-reportlab
-
-# [SEGURIDAD Y CIFRADO]
+python-dotenv
 pyyaml
 matplotlib
 requests
 cryptography  # Para cifrado AES-256
+
+# [INTERFAZ Y ANÁLISIS DE DATOS]
+streamlit
+plotly
+pandas

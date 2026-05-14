@@ -118,6 +118,18 @@ class DashboardMedicov5:
             with col2:
                 st.info("● Local")
             
+            # Autodetección de LLM e infraestructura local
+            from chat_asistente_medico import obtener_modelo_ollama_disponible
+            modelo_activo = obtener_modelo_ollama_disponible("gemma3:4b")
+            
+            st.markdown(f"""
+            **Infraestructura Local:**
+            - **LLM Activo:** `{modelo_activo}` (Ollama)
+            - **Embedding:** `all-MiniLM-L6-v2`
+            - **DB Vectorial:** `Qdrant` (Local)
+            - **Privacidad:** `100% RGPD Compliant` 🛡️
+            """)
+            
             st.markdown("---")
             
             # Guía rápida
