@@ -1,0 +1,20 @@
+perfil: baja_laboral
+
+paciente_demo:
+  nombre: "Juan Perez Garcia"
+  nif: "12345678Z"
+
+guion:
+  ruta: "guiones/baja_laboral.yaml"
+
+runtime:
+  llm_modelo: "gemma3:4b"
+  embedding_modelo: "all-MiniLM-L6-v2"
+  qdrant_path: "datos/qdrant_db_option2"
+  dashboard_output: "dashboard_data_option2.json"
+  expedientes_path: "datos/expedientes"
+
+alcance:
+  incluir_ui_avanzada: false
+  incluir_backend_alternativo: false
+  incluir_multicaso: false
