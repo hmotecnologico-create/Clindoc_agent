@@ -379,10 +379,9 @@ class HistorialClinicoVisual:
                 hovertemplate=
                 "<b>%{text}</b><br>" +
                 "Fecha: %{x}<br>" +
-                "Tipo: %{customdata}<br>" +
-                "Descripción: %{customdata2}<extra></extra>",
-                customdata=tipos,
-                customdata2=descripciones
+                "Tipo: %{customdata[0]}<br>" +
+                "Descripción: %{customdata[1]}<extra></extra>",
+                customdata=list(zip(tipos, descripciones))
             ),
             row=1, col=1
         )

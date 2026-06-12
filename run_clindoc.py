@@ -42,41 +42,70 @@ class CifradoClinDoc:
 class DashboardRecorder:
     def __init__(self, output_file: str = "dashboard_data.json"):
         self.output_file = output_file
-        self.data = {
-            "session_start": datetime.now().isoformat(),
-            "kpis": {
-                "total_docs": 0,
-                "total_time": 0,
-                "avg_confidence": 0,
-                "critical_risks": 0,
-                "modelo_ia": "gemma3:4b"
-            },
-            "events": []
-        }
+        self.data = self._load_existing()
+        if "pacientes" not in self.data:
+            self.data = {"pacientes": {}}
+        self.paciente_actual = None
+
+    def _load_existing(self):
+        if os.path.exists(self.output_file):
+            try:
+                with open(self.output_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except:
+                pass
+        return {"pacientes": {}}
+
+    def set_paciente(self, nif: str, nombre: str):
+        self.paciente_actual = nif
+        if nif not in self.data["pacientes"]:
+            self.data["pacientes"][nif] = {
+                "nombre": nombre,
+                "nif": nif,
+                "session_start": datetime.now().isoformat(),
+                "kpis": {
+                    "total_docs": 0,
+                    "total_time": 0,
+                    "avg_confidence": 0,
+                    "critical_risks": 0,
+                    "modelo_ia": "gemma3:4b"
+                },
+                "events": []
+            }
+        self._save()
 
     def record_event(self, event_type: str, details: Dict):
+        if not self.paciente_actual:
+            return
+            
         event = {
             "timestamp": datetime.now().isoformat(),
             "type": event_type,
             "details": details
         }
-        self.data["events"].append(event)
+        self.data["pacientes"][self.paciente_actual]["events"].append(event)
         self._update_kpis()
         self._save()
 
     def _update_kpis(self):
-        doc_events = [e for e in self.data["events"] if e["type"] == "ingesta_documento"]
-        self.data["kpis"]["total_docs"] = len(doc_events)
+        if not self.paciente_actual:
+            return
+        paciente_data = self.data["pacientes"][self.paciente_actual]
+        doc_events = [e for e in paciente_data["events"] if e["type"] == "ingesta_documento"]
+        paciente_data["kpis"]["total_docs"] = len(doc_events)
         
-        confidences = [e["details"].get("confianza", 0) for e in self.data["events"] if "confianza" in e["details"]]
+        confidences = [e["details"].get("confianza", 0) for e in paciente_data["events"] if "confianza" in e["details"]]
         if confidences:
-            self.data["kpis"]["avg_confidence"] = sum(confidences) / len(confidences)
+            paciente_data["kpis"]["avg_confidence"] = sum(confidences) / len(confidences)
             
-        self.data["kpis"]["critical_risks"] = len([e for e in self.data["events"] if e["details"].get("estado_riesgo") == "CRITICAL"])
+        riesgos_estado = [e for e in paciente_data["events"] if e["details"].get("estado_riesgo") == "CRITICAL"]
+        identidad_fallida = [e for e in paciente_data["events"] if e["type"] == "validacion_identidad" and e["details"].get("valido") is False]
+        paciente_data["kpis"]["critical_risks"] = len(riesgos_estado) + len(identidad_fallida)
 
     def _save(self):
         with open(self.output_file, 'w', encoding='utf-8') as f:
             json.dump(self.data, f, indent=4)
+
 
 
 # --- MODELOS DE DATOS (Pydantic v2 - FASE 5) ---
@@ -722,6 +751,9 @@ class OrquestadorLangGraph:
         if errores:
             state["errores"].extend(errores)
             state["retry_count"] = state.get("retry_count", 0) + 1
+            self.recorder.record_event("validacion_identidad", {"valido": False, "errores": errores})
+        else:
+            self.recorder.record_event("validacion_identidad", {"valido": True, "detalle": "NIF validado correctamente"})
         
         state["trace"].append(f"<<< FIN: Validación identidad {'FALLIDA' if errores else 'OK'}")
         return state
@@ -756,6 +788,7 @@ class OrquestadorLangGraph:
             conf = 0.85 if "Error" not in resultado else 0.1
             self.recorder.record_event("analisis_seccion", {
                 "seccion": seccion.titulo,
+                "texto": resultado,
                 "confianza": conf,
                 "estado_riesgo": "SAFE" if conf > 0.8 else "WARNING"
             })
@@ -847,7 +880,7 @@ class OrquestadorLangGraph:
     def ejecutar(self, paciente: Dict) -> Dict:
         """Ejecuta el pipeline completo"""
         inicio = time.time()
-        self.recorder.data["kpis"]["modelo_ia"] = self.redactor.modelo
+        self.recorder.data["pacientes"][paciente['nif']]["kpis"]["modelo_ia"] = self.redactor.modelo
         self.recorder._save()
         print(f"\n{'='*50}")
         print(f"  CLINDOC AGENT - AUDITORÍA CLÍNICA")
@@ -888,7 +921,7 @@ class OrquestadorLangGraph:
         
         # Tiempo total
         tiempo_total = round(time.time() - inicio, 2)
-        self.recorder.data["kpis"]["total_time"] = tiempo_total
+        self.recorder.data["pacientes"][paciente['nif']]["kpis"]["total_time"] = tiempo_total
         self.recorder._save()
         
         # Mostrar trace
@@ -1025,19 +1058,36 @@ if __name__ == "__main__":
             {"id": "A3", "titulo": "Recomendaciones", "instruccion": "Defina pautas de reposo y seguimiento médico."}
         ]
     }
-    # Usar el nuevo orquestador LangGraph
-    paciente_demo = {"nombre": "Juan Pérez García", "nif": "12345678Z"}
     
-    print("Usando Orquestador LangGraph (v4.0)")
+    print("Usando Orquestador LangGraph Multi-Paciente (v5.0)")
+    ruta_expedientes = Path("datos/expedientes")
+    ruta_expedientes.mkdir(parents=True, exist_ok=True)
+    carpetas_pacientes = [d for d in ruta_expedientes.iterdir() if d.is_dir()]
+    
+    if not carpetas_pacientes:
+        # Crear datos de prueba
+        (ruta_expedientes / "12345678Z").mkdir(exist_ok=True)
+        (ruta_expedientes / "12345678Z" / "paciente_juan.txt").write_text("Nombre: Juan Pérez García. Hallazgos: Evolución favorable post-cirugía.", encoding='utf-8')
+        (ruta_expedientes / "87654321A").mkdir(exist_ok=True)
+        (ruta_expedientes / "87654321A" / "paciente_maria.txt").write_text("Nombre: María Gómez. Hallazgos: Presenta cuadro de hipertensión controlada.", encoding='utf-8')
+        carpetas_pacientes = [d for d in ruta_expedientes.iterdir() if d.is_dir()]
+    
     sistema = OrquestadorLangGraph(config_demo)
-    resultados = sistema.ejecutar(paciente_demo)
+    
+    for carpeta in carpetas_pacientes:
+        nif_paciente = carpeta.name
+        # Buscar el nombre dentro del texto o usar un default
+        nombre_paciente = f"Paciente {nif_paciente}"
+        
+        paciente_data = {"nombre": nombre_paciente, "nif": nif_paciente}
+        
+        sistema.escanner.ruta = carpeta
+        sistema.recorder.set_paciente(nif_paciente, nombre_paciente)
+        
+        resultados = sistema.ejecutar(paciente_data)
+        
+        print(f"\n[{nif_paciente}] PROCESADO CORRECTAMENTE")
 
     print("\n" + "="*50)
-    print("      RESULTADO DE AUDITORIA CLINICA")
-    print("="*50)
-    for tit, cont in resultados.items():
-        print(f"\n[{tit}]")
-        print(cont[:500] + "..." if len(cont) > 500 else cont)
-    print("\n" + "="*50)
-    print("  EJECUCIÓN COMPLETADA CON EXITO")
+    print("  EJECUCIÓN MULTI-PACIENTE COMPLETADA CON EXITO")
     print("="*50)
