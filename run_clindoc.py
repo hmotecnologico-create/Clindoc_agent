@@ -678,6 +678,7 @@ class AgentState(TypedDict):
     errores: List[str]
     retry_count: int
     trace: List[str]  # Chain of thought
+    needs_retry: bool  # Bandera de autocorrección (Self-RAG)
 
 # --- ORQUESTADOR CON LANGGRAPH (FASE 2) ---
 class OrquestadorLangGraph:
@@ -697,10 +698,13 @@ class OrquestadorLangGraph:
     - Notas de imágenes: ✓ Incluidas en PDF
     - Alertas de validación: ✓ Incluidas en PDF
     
-    NOTA: Versión simplificada sin ciclos LangGraph reales
-    (para producción, usar langgraph.graph.StateGraph)
+    ORQUESTACIÓN: grafo de estados con langgraph.graph.StateGraph, con una arista
+    condicional de autocorrección (Self-RAG): si la crítica detecta una sección
+    fallida y quedan reintentos, el flujo vuelve al nodo de redacción.
     """
-    
+
+    MAX_RETRIES = 2  # Tope de ciclos de autocorrección (Self-RAG)
+
     def __init__(self, config_gui: Dict):
         self.guion = GuionInforme(**config_gui)
         self.indice = IndiceCorpus()
@@ -710,6 +714,34 @@ class OrquestadorLangGraph:
         self.verificador_vigencia = VerificadorVigencia()
         self.recorder = DashboardRecorder()
         self.docs_procesados = []
+        # Construir el grafo de estados LangGraph (con fallback secuencial si no está disponible)
+        self.app_graph = self._build_graph()
+
+    def _build_graph(self):
+        """Compila el StateGraph de LangGraph con ciclo condicional de autocorrección."""
+        try:
+            from langgraph.graph import StateGraph, START, END
+            g = StateGraph(AgentState)
+            g.add_node("ingestion", self._node_ingestion)
+            g.add_node("validate_identity", self._node_validate_identity)
+            g.add_node("validate_vigency", self._node_validate_vigency)
+            g.add_node("redact", self._node_redact)
+            g.add_node("critique", self._node_critique)
+            g.add_node("assemble", self._node_assemble)
+            g.add_edge(START, "ingestion")
+            g.add_edge("ingestion", "validate_identity")
+            g.add_edge("validate_identity", "validate_vigency")
+            g.add_edge("validate_vigency", "redact")
+            g.add_edge("redact", "critique")
+            # Arista CONDICIONAL: si una sección falló y quedan reintentos -> vuelve a redactar (ciclo Self-RAG)
+            g.add_conditional_edges("critique", self._route_after_critique,
+                                    {"redact": "redact", "assemble": "assemble"})
+            g.add_edge("assemble", END)
+            print("[INFO] Orquestacion con LangGraph (grafo de estados + ciclo de autocorreccion) ACTIVA")
+            return g.compile()
+        except Exception as e:
+            print(f"[AVISO] LangGraph no disponible ({e}); se usara el pipeline secuencial de respaldo")
+            return None
     
     def _extraer_nif(self, texto: str) -> Optional[str]:
         """Extrae NIF/NIE del texto"""
@@ -777,14 +809,19 @@ class OrquestadorLangGraph:
         return state
     
     def _node_redact(self, state: AgentState) -> AgentState:
-        """Nodo 4: Redactar resumen con RAG + Deep Linking"""
-        state["trace"].append(">>> REDACTANDO: Generando resumen clínico...")
-        
-        resultados = {}
+        """Nodo 4: Redactar resumen con RAG + Deep Linking (idempotente para el ciclo)"""
+        intento = state.get("retry_count", 0)
+        state["trace"].append(f">>> REDACTANDO: Generando resumen clínico... (intento {intento + 1})")
+
+        resultados = dict(state.get("resultados") or {})
         for seccion in self.guion.secciones:
+            previo = resultados.get(seccion.titulo, "")
+            # En un reintento, no re-redactar las secciones que ya salieron bien
+            if previo and "Error" not in previo:
+                continue
             resultado = self.redactor.redactar(seccion)
             resultados[seccion.titulo] = resultado
-            
+
             conf = 0.85 if "Error" not in resultado else 0.1
             self.recorder.record_event("analisis_seccion", {
                 "seccion": seccion.titulo,
@@ -792,10 +829,30 @@ class OrquestadorLangGraph:
                 "confianza": conf,
                 "estado_riesgo": "SAFE" if conf > 0.8 else "WARNING"
             })
-        
+
         state["resultados"] = resultados
         state["trace"].append("<<< FIN: Resumen redactado con Deep Linking")
         return state
+
+    def _node_critique(self, state: AgentState) -> AgentState:
+        """Nodo de crítica (Self-RAG): detecta secciones fallidas y decide si reintentar."""
+        resultados = state.get("resultados") or {}
+        fallidas = [t for t, c in resultados.items() if (not c) or ("Error" in c)]
+        if fallidas and state.get("retry_count", 0) < self.MAX_RETRIES:
+            state["retry_count"] = state.get("retry_count", 0) + 1
+            state["needs_retry"] = True
+            state["trace"].append(
+                f">>> AUTOCORRECCIÓN: {len(fallidas)} sección(es) fallida(s); reintento {state['retry_count']}/{self.MAX_RETRIES}")
+        else:
+            state["needs_retry"] = False
+            state["trace"].append(
+                f"<<< CRÍTICA: {len(fallidas)} sección(es) sin resolver tras {self.MAX_RETRIES} reintentos"
+                if fallidas else "<<< CRÍTICA: todas las secciones validadas")
+        return state
+
+    def _route_after_critique(self, state: AgentState) -> str:
+        """Arista condicional: vuelve a redactar o continúa al ensamblado."""
+        return "redact" if state.get("needs_retry") else "assemble"
     
     def _node_assemble(self, state: AgentState) -> AgentState:
         """Nodo 5: Ensamblar informe final con notas de imágenes"""
@@ -889,35 +946,36 @@ class OrquestadorLangGraph:
         print(f"NIF: {paciente.get('nif', 'N/A')}")
         print(f"{'='*50}\n")
         
-        # Ejecutar nodos secuencialmente (versión simple sin LangGraph completo)
         state: AgentState = {
             "documentos": [],
             "paciente": paciente,
             "resultados": {},
             "errores": [],
             "retry_count": 0,
-            "trace": []
+            "trace": [],
+            "needs_retry": False,
         }
-        
-        # 1. Ingesta
-        print("[FASE 1] Escaneo de documentos...")
-        state = self._node_ingestion(state)
-        
-        # 2. Validar identidad
-        print("[FASE 2] Validación de identidad...")
-        state = self._node_validate_identity(state)
-        
-        # 3. Validar vigencia
-        print("[FASE 3] Validación de vigencia...")
-        state = self._node_validate_vigency(state)
-        
-        # 4. Redactar
-        print("[FASE 4] Generación de resumen clínico...")
-        state = self._node_redact(state)
-        
-        # 5. Ensamblar
-        print("[FASE 5] Generación de informe PDF...")
-        state = self._node_assemble(state)
+
+        if self.app_graph is not None:
+            # Orquestación REAL con LangGraph (grafo de estados + ciclo de autocorrección)
+            print("[ORQUESTACIÓN] LangGraph StateGraph (ingestion→identity→vigency→redact→critique⟳→assemble)")
+            state = self.app_graph.invoke(state, config={"recursion_limit": 50})
+        else:
+            # Fallback: ejecución secuencial respetando el ciclo de autocorrección
+            print("[FASE 1] Escaneo de documentos...")
+            state = self._node_ingestion(state)
+            print("[FASE 2] Validación de identidad...")
+            state = self._node_validate_identity(state)
+            print("[FASE 3] Validación de vigencia...")
+            state = self._node_validate_vigency(state)
+            print("[FASE 4] Generación de resumen clínico...")
+            state = self._node_redact(state)
+            state = self._node_critique(state)
+            while state.get("needs_retry"):
+                state = self._node_redact(state)
+                state = self._node_critique(state)
+            print("[FASE 5] Generación de informe PDF...")
+            state = self._node_assemble(state)
         
         # Tiempo total
         tiempo_total = round(time.time() - inicio, 2)
