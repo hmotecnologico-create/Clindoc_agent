@@ -1,5 +1,6 @@
 import streamlit as st
 import json
+import re
 import pandas as pd
 from datetime import datetime
 import plotly.express as px
@@ -278,6 +279,39 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
         resumen_modificado = st.text_area(
             "Historia Clínica Consolidada (editable):",
             value=resumen_ia, height=380, key=f"resumen_{nif_seleccionado}")
+
+        # === 🔍 TRAZABILIDAD: de dónde sacó la IA cada sección (auditoría anti-huérfano) ===
+        st.markdown("#### 🔍 Trazabilidad — ¿de dónde sacó la IA cada sección?")
+        st.caption("Audite el respaldo de cada parte. Lo que no cite una fuente queda marcado como **huérfano** para revisión manual.")
+        ruta_docs_aud = Path(f"datos/expedientes/{nif_seleccionado}")
+        secciones_ia = [(ev['details'].get('seccion', 'Sección'), ev['details'].get('texto', ''))
+                        for ev in data["events"] if ev["type"] == "analisis_seccion" and ev['details'].get('texto')]
+        if not secciones_ia:
+            st.info("No hay secciones redactadas para auditar.")
+        n_huerfanas = 0
+        for seccion, texto_sec in secciones_ia:
+            fuentes = sorted(set(a.strip() for a in re.findall(r'\[Fuente:\s*([^\]#]+)', texto_sec)))
+            if not fuentes:
+                n_huerfanas += 1
+            etiqueta = "⚠️ SIN FUENTE (huérfano)" if not fuentes else f"✅ {len(fuentes)} fuente(s)"
+            with st.expander(f"📄 {seccion}  —  {etiqueta}"):
+                if not fuentes:
+                    st.error("⚠️ Esta sección NO cita ninguna fuente → posible afirmación no respaldada. Verifíquela manualmente.")
+                for archivo in fuentes:
+                    af = ruta_docs_aud / archivo
+                    st.markdown(f"**🔗 Respaldo:** `{archivo}`")
+                    if af.exists():
+                        st.text_area(f"Documento de origen — {archivo}",
+                                     value=af.read_text(encoding='utf-8', errors='ignore')[:2000],
+                                     height=120, disabled=True,
+                                     key=f"src_{nif_seleccionado}_{seccion[:12]}_{archivo}")
+                    else:
+                        st.caption("(documento de origen no localizado en disco)")
+        if secciones_ia:
+            if n_huerfanas == 0:
+                st.success(f"✅ Trazabilidad completa: las {len(secciones_ia)} secciones citan su fuente. **Ninguna huérfana.**")
+            else:
+                st.warning(f"⚠️ {n_huerfanas} de {len(secciones_ia)} secciones SIN fuente (huérfanas) → requieren verificación manual.")
 
         col_v1, col_v2 = st.columns([2, 3])
         nombre_medico = col_v1.text_input("Facultativo (nombre / nº colegiado):", key=f"med_{nif_seleccionado}")
