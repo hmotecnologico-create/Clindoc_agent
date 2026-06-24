@@ -145,7 +145,7 @@ with st.sidebar:
         
     chat = st.session_state.chat_asistente
     if not chat.conversacion_actual or chat.conversacion_actual.paciente_nif != nif_seleccionado:
-        chat.iniciar_conversacion(f"inf_{nif_seleccionado}", nif_seleccionado, data["nombre"])
+        _ = chat.iniciar_conversacion(f"inf_{nif_seleccionado}", nif_seleccionado, data["nombre"])
         
     # Contenedor para mensajes
     chat_container = st.container(height=300)
@@ -222,7 +222,7 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
     with tab_hist:
         st.subheader("Evolución Clínica del Paciente")
         historial = HistorialClinicoVisual(f"datos/expedientes/{nif_seleccionado}")
-        historial.cargar_expediente(nif_seleccionado, data["nombre"])
+        _ = historial.cargar_expediente(nif_seleccionado, data["nombre"])
         
         # --- LÍNEA DE TIEMPO INTERACTIVA ---
         if historial.eventos:
@@ -278,7 +278,7 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
         if st.button("✅ Validar y aprobar informe", type="primary", disabled=not visto_bueno):
             editado = resumen_modificado.strip() != resumen_ia.strip()
             pdf_bytes = generar_pdf_historia(data['nombre'], data['nif'], resumen_modificado, nombre_medico)
-            registrar_validacion_facultativo(data['nif'], nombre_medico, editado)
+            _ = registrar_validacion_facultativo(data['nif'], nombre_medico, editado)
             st.session_state[f"pdf_validado_{nif_seleccionado}"] = pdf_bytes
             accion = "editada y validada" if editado else "validada (visto bueno)"
             st.success(f"✅ Historia clínica **{accion}** por {nombre_medico or 'el facultativo'} "
