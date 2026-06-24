@@ -11,6 +11,58 @@ from pathlib import Path
 from historial_clinico_visual import HistorialClinicoVisual
 from chat_asistente_medico import ChatAsistenteMedico, TipoMensaje
 
+
+def generar_pdf_historia(nombre, nif, texto, medico):
+    """Genera, en memoria, el PDF de la Historia Clínica Consolidada validada por el facultativo."""
+    import io, textwrap
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.units import cm
+    from reportlab.pdfgen import canvas
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=A4)
+    w, h = A4
+    y = h - 2 * cm
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(2 * cm, y, "HISTORIA CLÍNICA CONSOLIDADA"); y -= 0.6 * cm
+    c.setFont("Helvetica-Oblique", 9)
+    c.drawString(2 * cm, y, "Síntesis documental generada por IA local y VALIDADA por facultativo"); y -= 0.8 * cm
+    c.setFont("Helvetica", 10)
+    c.drawString(2 * cm, y, f"Paciente: {nombre}    NIF: {nif}"); y -= 0.5 * cm
+    c.drawString(2 * cm, y, f"Validado por: {medico or 'Facultativo responsable'}    Fecha: {datetime.now():%d/%m/%Y %H:%M}"); y -= 0.3 * cm
+    c.line(2 * cm, y, w - 2 * cm, y); y -= 0.7 * cm
+    for raw in (texto or "").split("\n"):
+        bold = raw.startswith("## ") or raw.startswith("### ")
+        raw = raw.lstrip("# ").rstrip()
+        c.setFont("Helvetica-Bold", 11) if bold else c.setFont("Helvetica", 10)
+        for line in (textwrap.wrap(raw, 98) or [""]):
+            if y < 2 * cm:
+                c.showPage(); y = h - 2 * cm; c.setFont("Helvetica", 10)
+            c.drawString(2 * cm, y, line); y -= 0.5 * cm
+        y -= 0.1 * cm
+    c.save(); buf.seek(0)
+    return buf.getvalue()
+
+
+def registrar_validacion_facultativo(nif, medico, editado):
+    """Deja constancia de auditoría real (Human-in-the-Loop) de la validación médica."""
+    log_path = "datos/validaciones_facultativo.json"
+    registros = []
+    if os.path.exists(log_path):
+        try:
+            with open(log_path, encoding="utf-8") as f:
+                registros = json.load(f)
+        except Exception:
+            registros = []
+    registros.append({
+        "nif": nif,
+        "facultativo": medico or "(sin nombre)",
+        "accion": "editado y validado" if editado else "validado (visto bueno)",
+        "timestamp": datetime.now().isoformat()
+    })
+    os.makedirs("datos", exist_ok=True)
+    with open(log_path, "w", encoding="utf-8") as f:
+        json.dump(registros, f, indent=2, ensure_ascii=False)
+
 # Configuración de página
 st.set_page_config(
     page_title="ClinDoc Agent | Multi-Paciente",
@@ -200,24 +252,45 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
             st.info("No hay eventos clínicos extraídos aún.")
             
     with tab_resumen:
-        st.subheader("Auditoría del Resumen Generado por IA")
-        st.info("Valide y edite el resumen generado. Al guardar, quedará evidencia de la revisión médica.")
-        
+        st.subheader("📝 Historia Clínica Consolidada — Validación del Facultativo")
+        st.info("Revise, **edite o complete** el borrador generado por la IA. Debe **dar el visto bueno** para descargar el informe final; toda modificación queda registrada (Human-in-the-Loop).")
+
         # Recuperar resumen de los eventos de "analisis_seccion"
         resumen_ia = ""
         for ev in data["events"]:
             if ev["type"] == "analisis_seccion":
-                texto_seccion = ev['details'].get('texto', 'Generando texto...')
-                resumen_ia += f"### {ev['details'].get('seccion', 'Sección')}\n{texto_seccion}\n\n"
-        
+                texto_seccion = ev['details'].get('texto', '')
+                if texto_seccion:
+                    resumen_ia += f"## {ev['details'].get('seccion', 'Sección')}\n{texto_seccion}\n\n"
         if not resumen_ia:
-            resumen_ia = "No se encontraron resúmenes redactados para este paciente. (Se generarán en el próximo ciclo)"
-            
-        resumen_modificado = st.text_area("Borrador del Informe Médico:", value=resumen_ia, height=400)
-        
-        if st.button("💾 Guardar y Aprobar Informe", type="primary"):
-            st.success(f"✅ Informe auditado y guardado con éxito por el Doctor en turno ({datetime.now().strftime('%H:%M:%S')}).")
-            st.caption("La evidencia de esta modificación ha sido registrada en el sistema de auditoría (Blockchain/DB).")
+            resumen_ia = "No se encontraron secciones redactadas para este paciente."
+
+        resumen_modificado = st.text_area(
+            "Historia Clínica Consolidada (editable):",
+            value=resumen_ia, height=380, key=f"resumen_{nif_seleccionado}")
+
+        col_v1, col_v2 = st.columns([2, 3])
+        nombre_medico = col_v1.text_input("Facultativo (nombre / nº colegiado):", key=f"med_{nif_seleccionado}")
+        visto_bueno = col_v2.checkbox(
+            "✔️ Doy el visto bueno como facultativo responsable de esta historia clínica",
+            key=f"vb_{nif_seleccionado}")
+
+        if st.button("✅ Validar y aprobar informe", type="primary", disabled=not visto_bueno):
+            editado = resumen_modificado.strip() != resumen_ia.strip()
+            pdf_bytes = generar_pdf_historia(data['nombre'], data['nif'], resumen_modificado, nombre_medico)
+            registrar_validacion_facultativo(data['nif'], nombre_medico, editado)
+            st.session_state[f"pdf_validado_{nif_seleccionado}"] = pdf_bytes
+            accion = "editada y validada" if editado else "validada (visto bueno)"
+            st.success(f"✅ Historia clínica **{accion}** por {nombre_medico or 'el facultativo'} "
+                       f"({datetime.now():%d/%m/%Y %H:%M}). Registro de auditoría guardado.")
+
+        # Descarga del PDF una vez validado (persiste tras el rerun de Streamlit)
+        if st.session_state.get(f"pdf_validado_{nif_seleccionado}"):
+            st.download_button(
+                "⬇️ Descargar Historia Clínica Consolidada (PDF)",
+                data=st.session_state[f"pdf_validado_{nif_seleccionado}"],
+                file_name=f"Historia_Clinica_{data['nif']}_{datetime.now():%Y%m%d}.pdf",
+                mime="application/pdf", type="primary")
 
     with tab_traz:
         st.subheader("Línea de Tiempo de Ingreso de Folios")
@@ -246,7 +319,7 @@ else:
     
     with tab_pipe:
         st.subheader("Pipeline Multi-Agente (LangGraph)")
-        st.markdown("El sistema ejecuta 5 fases concurrentes de validación y extracción.")
+        st.markdown("El sistema ejecuta 5 agentes especializados en un **grafo de estados (LangGraph)** con ciclo de autocorrección.")
         agentes = {
             "Agente Escáner (Docling)": "ingesta_documento",
             "Verificador ID (Algoritmo NIF)": "validacion_identidad",
