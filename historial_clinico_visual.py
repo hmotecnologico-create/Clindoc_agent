@@ -168,30 +168,39 @@ class HistorialClinicoVisual:
         return eventos
     
     def _detectar_tipo_evento(self, texto: str, fecha_str: str) -> Tuple[str, str, int]:
-        """Detecta el tipo de evento basado en el contexto"""
-        texto_lower = texto.lower()
-        
+        """Detecta el tipo de evento según el contexto CERCANO a la fecha (no todo el documento)."""
+        # Acotar el análisis a la ventana de texto alrededor de la fecha
+        pos = texto.lower().find(fecha_str.lower())
+        if pos == -1:
+            contexto = texto.lower()
+        else:
+            contexto = texto[max(0, pos - 120): pos + 120].lower()
+
+        def contiene(palabra: str) -> bool:
+            # Límite de palabra: evita que "tac" coincida dentro de "contacto", etc.
+            return re.search(r'\b' + re.escape(palabra) + r'\b', contexto) is not None
+
         for palabra in self.palabras_clave.get("examen", []):
-            if palabra in texto_lower:
+            if contiene(palabra):
                 return "examen", f"Examen médico - {palabra.title()}", 2
-        
+
         for palabra in self.palabras_clave.get("diagnostico", []):
-            if palabra in texto_lower:
-                # Extraer diagnóstico
-                match = re.search(rf'{palabra}[:\s]+([^.]+)', texto_lower)
+            if contiene(palabra):
+                match = re.search(r'\b' + re.escape(palabra) + r'[:\s]+([^.\n]+)', contexto)
                 if match:
-                    return "diagnostico", f"Diagnóstico: {match.group(1)[:50]}", 3
-        
+                    return "diagnostico", f"Diagnóstico: {match.group(1).strip()[:50]}", 3
+                return "diagnostico", f"Diagnóstico ({palabra})", 3
+
         for palabra in self.palabras_clave.get("tratamiento", []):
-            if palabra in texto_lower:
-                return "tratamiento", "Tratamiento/Medicação", 2
-        
+            if contiene(palabra):
+                return "tratamiento", f"Tratamiento / Medicación ({palabra})", 2
+
         for palabra in self.palabras_clave.get("cita", []):
-            if palabra in texto_lower:
+            if contiene(palabra):
                 return "cita", f"Consulta médica - {palabra.title()}", 1
-        
-        # Por defecto, evento general
-        return "evento", f"Evento clínico - {fecha_str}", 1
+
+        # Por defecto, evento general fechado
+        return "evento", f"Evento clínico ({fecha_str})", 1
     
     def _buscar_por_palabras_clave(self, texto: str, fuente: str) -> List[EventoClinico]:
         """Busca eventos por palabras clave cuando no hay fechas claras"""
