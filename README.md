@@ -1,52 +1,75 @@
-# 🛡️ ClinDoc Agent
-> **Plataforma Multi-Agente Clínica para la Auditoría y Generación de Informes con LLM Local**
+# ClinDoc Agent
 
-## Descripción
-ClinDoc Agent es un sistema avanzado de inteligencia documental diseñado para automatizar la revisión de expedientes clínicos. Utiliza un pipeline multi-agente para validar la identidad de los pacientes, la vigencia de los documentos y sintetizar informes técnicos especializados sin necesidad de conexión a la nube, garantizando el cumplimiento de la normativa RGPD y LOPDGDD.
+> Sistema multiagente **local** para la validación documental y la generación guiada de informes de expedientes de incapacidad temporal.
 
-## Arquitectura del Sistema
-El sistema se organiza en los siguientes módulos core:
+ClinDoc Agent ingiere expedientes clínicos heterogéneos, **verifica la identidad** del paciente y la **vigencia** de los documentos, y redacta informes técnicos **trazables** guiados por un guion — **100 % en local**, sin enviar la información clínica a la nube. Está pensado para apoyar al facultativo en la auditoría documental de procesos de incapacidad temporal.
 
-1.  **Agente Escáner**: Ingesta y análisis de layout con Docling/OCR.
-2.  **Agente Verificador de Identidad**: Validación cruzada de NIF/Nombre.
-3.  **Agente de Vigencia**: Control de caducidad y períodos de referencia.
-4.  **Agente Redactor (RAG)**: Búsqueda semántica y síntesis de lenguaje natural citando fuentes.
-5.  **Agente Ensamblador**: Generación de documentos finales en PDF.
+## Arquitectura
 
-## Estructura del Proyecto (Self-Contained)
-El repositorio ha sido organizado para ser totalmente portable, incluyendo código, scripts de soporte y datos de prueba:
+Orquestación de cinco agentes especializados sobre un **grafo de estados (LangGraph)** con un **ciclo de autocorrección** (si una sección falla, se reintenta su redacción):
 
-- **`run_clindoc.py`**: Orquestador principal del sistema y punto de entrada.
-- **`app_clindoc.py`**: Interfaz de usuario/Dashboard (Streamlit).
-- **`scripts/`**: Utilidades para la generación de diagramas técnicos, gráficas estadísticas y **generación de pacientes sintéticos vía LLM**.
-- **`sinteticos_master_run/`**: Datos clínicos sintéticos y evidencias de ejecución para auditoría.
-- **`guiones/`**: Configuraciones YAML de los informes.
-- **`datos/`**: Base de datos vectorial local (Qdrant).
+```
+ingestion → validate_identity → validate_vigency → redact → critique ⟳ → assemble
+```
 
-## Metodología y Apoyo de IA
-Este proyecto integra metodologías de desarrollo ágil asistido por **IA Generativa**. ClinDoc Agent representa la evolución técnica de una fase previa de investigación en auditoría algorítmica iniciada en 2025, la cual fue refinada y adaptada en 2026 para el procesamiento especializado de documentos clínicos y cumplimiento normativo de salud.
+| Agente | Función | Tecnología |
+|---|---|---|
+| **Escáner** | Ingesta y extracción layout-aware (multiformato) | Docling (+ fallback PyPDF2), MD/TXT/DOCX |
+| **Verificador de Identidad** | Validación cruzada de NIF/NIE con algoritmo oficial español | regex + dígito de control |
+| **Verificador de Vigencia** | Control de fechas y caducidad documental | reglas deterministas |
+| **Redactor (RAG)** | Recuperación semántica + síntesis citando fuentes (Deep Linking) | Qdrant local (all-MiniLM-L6-v2, 384-d) + Ollama / `gemma3:4b` |
+| **Ensamblador** | Informe técnico en PDF + anexos | ReportLab + pypdf |
 
-El uso de asistentes de IA (como Antigravity/Gemini) ha sido fundamental en:
-- **Optimización de Código**: Refactorización de lógica multi-agente y manejo de concurrencia.
-- **Visual Analytics**: Automatización de scripts para la generación de gráficas de rendimiento.
-- **Documentación Técnica**: Estructuración de especificaciones y diagramas arquitectónicos.
+La validación (identidad, contratos de datos) se apoya en **Pydantic**; toda la traza queda registrada como *chain-of-thought* para auditoría.
 
-Esta simbiosis humano-IA permite un desarrollo robusto, permitiendo al autor centrarse en la arquitectura de alto nivel y la validación clínica de los resultados.
+## Contribución central: el guion como contrato semántico
+
+Los informes se estructuran según un **guion en YAML** (`guiones/baja_laboral.yaml`) que actúa como contrato semántico: define secciones, campos y criterios. La variante **`v5_option2/`** ejecuta el sistema dirigido por ese guion.
 
 ## Requisitos
-- **Ollama**: Servidor local de LLM (configurado con modelos `gemma2` o similar).
-- **Python 3.10+** (instalar dependencias con `pip install -r requirements.txt`).
 
-## Ejecución
-1. Asegúrate de tener Ollama corriendo localmente.
-2. Ejecuta el orquestador principal:
-   ```bash
-   python run_clindoc.py
-   ```
-3. Para visualizar el dashboard:
-   ```bash
-   streamlit run app_clindoc.py
-   ```
+- **Python 3.10+** — `pip install -r requirements.txt`
+- **Ollama** corriendo en local con el modelo `gemma3:4b` — `ollama pull gemma3:4b`
 
----
-*Este proyecto forma parte de un Trabajo Final de Máster (TFM) enfocado en Visual Analytics y Big Data.*
+## Uso
+
+```bash
+# Pipeline completo (orquestación LangGraph)
+python run_clindoc.py
+
+# Variante dirigida por el guion YAML
+python v5_option2/run_clindoc_option2.py
+
+# Interfaz / dashboard
+streamlit run app_clindoc.py
+```
+
+Los expedientes a procesar se colocan en `datos/expedientes/<NIF>/`. Los informes se generan en `docs/informes/`.
+
+## Estructura del repositorio (solo aplicativo)
+
+```
+run_clindoc.py              Orquestador (LangGraph) + los 5 agentes
+app_clindoc.py              Interfaz / dashboard (Streamlit)
+chat_asistente_medico.py    Asistente médico sobre el expediente (RAG)
+historial_clinico_visual.py Visor de historial + Deep Linking
+modulo_auditoria.py         Módulo de auditoría
+dashboard_medico.py         Panel del facultativo
+guiones/baja_laboral.yaml   Guion de informe (contrato semántico)
+v5_option2/                 Variante dirigida por guion YAML
+docs/                       Manuales de usuario y revisor técnico
+requirements.txt            Dependencias
+```
+
+## Documentación
+
+- **Manual de usuario (facultativo):** [`docs/MANUAL_FACULTATIVO.md`](docs/MANUAL_FACULTATIVO.md)
+- **Manual del revisor técnico:** [`docs/MANUAL_REVISOR_TECNICO.md`](docs/MANUAL_REVISOR_TECNICO.md)
+
+## Privacidad
+
+La ejecución es **íntegramente local**: los datos clínicos no salen del equipo. Por ello, los **datos de pacientes** (`datos/`) y los **informes generados** (`docs/informes/`) **no se versionan** en este repositorio.
+
+## Contexto
+
+Aplicativo desarrollado en el marco de un Trabajo Fin de Máster (UNIR). El corpus de evaluación es **sintético** (generado para pruebas), por privacidad.

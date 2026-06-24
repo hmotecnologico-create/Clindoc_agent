@@ -160,3 +160,13 @@ dashboard_data*.json
 *.bak_*
 *.bak
 docs/PRESENTACION_MARLON.md
+
+# ===== NO forma parte del aplicativo (tooling del TFM / investigación / salidas) =====
+scripts/
+scratch/
+benchmark_resultados*.json
+benchmark_clindoc.py
+benchmarking_ingesta.py
+runner_masterrun_real.py
+runner_stress_524.py
+generar_corpus_524folios.py
