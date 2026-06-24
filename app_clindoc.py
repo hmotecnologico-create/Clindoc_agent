@@ -227,9 +227,10 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
         # --- LÍNEA DE TIEMPO INTERACTIVA ---
         if historial.eventos:
             st.markdown("### 📋 Línea de Tiempo de Eventos Clínicos")
-            st.caption("Haz clic en cualquier evento para abrir y leer el documento médico original asociado a esa fecha.")
-            
-            for i, ev in enumerate(historial.eventos):
+            st.caption("Haz clic en un evento para ver el documento (y la imagen) de origen — trazabilidad para auditar la IA y detectar omisiones.")
+
+            eventos_clinicos = [e for e in historial.eventos if e.tipo != "evento"]
+            for i, ev in enumerate(eventos_clinicos):
                 # Determinar icono según tipo
                 icono = "💊" if ev.tipo == "tratamiento" else "🩺" if ev.tipo == "diagnostico" else "🧪" if ev.tipo == "examen" else "📅"
                 
@@ -248,6 +249,15 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
                             st.error("No se pudo leer el documento original.")
                     else:
                         st.warning("El documento original ha sido archivado o no está disponible en la ruta.")
+
+                    # Trazabilidad VISUAL (anti-caja negra): en pruebas de imagen, mostrar el estudio
+                    # para que el facultativo verifique la fuente y detecte posibles errores u omisiones de la IA.
+                    if ev.tipo == "examen":
+                        imgs = sorted(list(ruta_docs.glob("*.png")) + list(ruta_docs.glob("*.jpg")) + list(ruta_docs.glob("*.jpeg")))
+                        if imgs:
+                            st.markdown("**🖼️ Estudio de imagen asociado (revisión del especialista):**")
+                            st.image(str(imgs[0]), use_container_width=True,
+                                     caption="⚠️ La IA NO interpreta la imagen — el facultativo la revisa para verificar la fuente y detectar omisiones.")
         else:
             st.info("No hay eventos clínicos extraídos aún.")
             
