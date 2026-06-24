@@ -13,34 +13,87 @@ from historial_clinico_visual import HistorialClinicoVisual
 from chat_asistente_medico import ChatAsistenteMedico, TipoMensaje
 
 
+def _periodo_historia(texto):
+    """Calcula el período (desde–hasta) a partir de las fechas que aparecen en la historia."""
+    fechas = []
+    for d_, m_, y_ in re.findall(r'\b(\d{1,2})[/-](\d{1,2})[/-](\d{4})\b', texto or ""):
+        try:
+            fechas.append(datetime(int(y_), int(m_), int(d_)))
+        except Exception:
+            pass
+    fechas = [f for f in fechas if 1990 <= f.year <= datetime.now().year]
+    if not fechas:
+        return "no determinado en los documentos"
+    return f"{min(fechas):%d/%m/%Y} — {max(fechas):%d/%m/%Y}"
+
+
 def generar_pdf_historia(nombre, nif, texto, medico):
-    """Genera, en memoria, el PDF de la Historia Clínica Consolidada validada por el facultativo."""
-    import io, textwrap
+    """Genera, en memoria, el PDF profesional de la Historia Clínica Consolidada validada por el facultativo."""
+    import io
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.units import cm
-    from reportlab.pdfgen import canvas
+    from reportlab.lib import colors
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+    from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer, Table,
+                                    TableStyle, HRFlowable)
+
+    def fmt(s):
+        s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        return re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+
+    AZUL = colors.HexColor("#1e3a8a")
+    GRIS = colors.HexColor("#555555")
+    ahora = datetime.now()
+    periodo = _periodo_historia(texto)
+
     buf = io.BytesIO()
-    c = canvas.Canvas(buf, pagesize=A4)
-    w, h = A4
-    y = h - 2 * cm
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(2 * cm, y, "HISTORIA CLÍNICA CONSOLIDADA"); y -= 0.6 * cm
-    c.setFont("Helvetica-Oblique", 9)
-    c.drawString(2 * cm, y, "Síntesis documental generada por IA local y VALIDADA por facultativo"); y -= 0.8 * cm
-    c.setFont("Helvetica", 10)
-    c.drawString(2 * cm, y, f"Paciente: {nombre}    NIF: {nif}"); y -= 0.5 * cm
-    c.drawString(2 * cm, y, f"Validado por: {medico or 'Facultativo responsable'}    Fecha: {datetime.now():%d/%m/%Y %H:%M}"); y -= 0.3 * cm
-    c.line(2 * cm, y, w - 2 * cm, y); y -= 0.7 * cm
+    doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=2.2 * cm, rightMargin=2.2 * cm,
+                            topMargin=1.8 * cm, bottomMargin=1.8 * cm,
+                            title=f"Historia Clínica Consolidada - {nombre}", author=medico or "ClinDoc Agent")
+    ss = getSampleStyleSheet()
+    s_title = ParagraphStyle("t", parent=ss["Title"], fontName="Helvetica-Bold", fontSize=16, textColor=AZUL, spaceAfter=1, alignment=TA_CENTER)
+    s_sub = ParagraphStyle("s", parent=ss["Normal"], fontName="Helvetica-Oblique", fontSize=8.5, textColor=GRIS, alignment=TA_CENTER, spaceAfter=8)
+    s_h = ParagraphStyle("h", parent=ss["Heading2"], fontName="Helvetica-Bold", fontSize=11.5, textColor=AZUL, spaceBefore=9, spaceAfter=3)
+    s_body = ParagraphStyle("b", parent=ss["Normal"], fontName="Helvetica", fontSize=10, leading=14, alignment=TA_JUSTIFY, spaceAfter=3)
+    s_cell = ParagraphStyle("c", parent=ss["Normal"], fontName="Helvetica", fontSize=9.5, leading=13)
+    s_foot = ParagraphStyle("f", parent=ss["Normal"], fontName="Helvetica", fontSize=9, textColor=GRIS, leading=13)
+
+    el = [Paragraph("HISTORIA CLÍNICA CONSOLIDADA", s_title),
+          Paragraph("Síntesis documental generada por IA local · validada por facultativo · ClinDoc Agent", s_sub),
+          HRFlowable(width="100%", thickness=1.2, color=AZUL, spaceAfter=8)]
+    cab = Table([[Paragraph(f"<b>Paciente:</b> {nombre}", s_cell), Paragraph(f"<b>NIF:</b> {nif}", s_cell)],
+                 [Paragraph(f"<b>Período de la historia:</b> {periodo}", s_cell),
+                  Paragraph(f"<b>Tipo:</b> síntesis documental trazable", s_cell)]],
+                colWidths=[9.6 * cm, 7.0 * cm])
+    cab.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#cccccc")),
+                             ("INNERGRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#e6e6e6")),
+                             ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f4f7fc")),
+                             ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                             ("LEFTPADDING", (0, 0), (-1, -1), 8), ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+                             ("TOPPADDING", (0, 0), (-1, -1), 5), ("BOTTOMPADDING", (0, 0), (-1, -1), 5)]))
+    el += [cab, Spacer(1, 10)]
+
     for raw in (texto or "").split("\n"):
-        bold = raw.startswith("## ") or raw.startswith("### ")
-        raw = raw.lstrip("# ").rstrip()
-        c.setFont("Helvetica-Bold", 11) if bold else c.setFont("Helvetica", 10)
-        for line in (textwrap.wrap(raw, 98) or [""]):
-            if y < 2 * cm:
-                c.showPage(); y = h - 2 * cm; c.setFont("Helvetica", 10)
-            c.drawString(2 * cm, y, line); y -= 0.5 * cm
-        y -= 0.1 * cm
-    c.save(); buf.seek(0)
+        line = raw.rstrip()
+        if not line.strip():
+            el.append(Spacer(1, 4))
+        elif line.lstrip().startswith("## ") or line.lstrip().startswith("### "):
+            el.append(Paragraph(fmt(line.lstrip("# ").strip()), s_h))
+        else:
+            el.append(Paragraph(fmt(line), s_body))
+
+    el += [Spacer(1, 14),
+           HRFlowable(width="100%", thickness=0.8, color=colors.HexColor("#cccccc"), spaceAfter=6),
+           Paragraph(f"<b>Período cubierto por la historia:</b> {periodo}", s_foot),
+           Paragraph(f"<b>Historia realizada el:</b> {ahora:%d/%m/%Y} a las {ahora:%H:%M} h", s_foot),
+           Spacer(1, 20),
+           Paragraph(f"<b>Facultativo responsable:</b> {medico or '________________________'}", s_foot),
+           Spacer(1, 6),
+           Paragraph("Firma: ______________________________&nbsp;&nbsp;&nbsp;&nbsp;"
+                     f"Fecha y hora: {ahora:%d/%m/%Y %H:%M} h", s_foot)]
+    doc.build(el)
+    buf.seek(0)
     return buf.getvalue()
 
 
@@ -301,12 +354,14 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
                     af = ruta_docs_aud / archivo
                     st.markdown(f"**🔗 Respaldo:** `{archivo}`")
                     if af.exists():
+                        contenido_fuente = af.read_text(encoding='utf-8', errors='ignore')
+                        st.caption(f"📄 Documento de origen COMPLETO ({len(contenido_fuente):,} caracteres) — todo el contexto relacionado:")
                         st.text_area(f"Documento de origen — {archivo}",
-                                     value=af.read_text(encoding='utf-8', errors='ignore')[:2000],
-                                     height=120, disabled=True,
+                                     value=contenido_fuente,
+                                     height=280, disabled=True,
                                      key=f"src_{nif_seleccionado}_{seccion[:12]}_{archivo}")
                     else:
-                        st.caption("(documento de origen no localizado en disco)")
+                        st.caption("⚠️ Fuente citada por la IA pero NO localizada como documento real → posible cita no verificable (auditar).")
         if secciones_ia:
             if n_huerfanas == 0:
                 st.success(f"✅ Trazabilidad completa: las {len(secciones_ia)} secciones citan su fuente. **Ninguna huérfana.**")
