@@ -148,3 +148,15 @@ cython_debug/
 # OS files
 .DS_Store
 Thumbs.db
+
+# ===== ClinDoc: datos clínicos y salidas — NO subir a repo público =====
+datos/expedientes/
+datos/expedientes_524/
+datos/conversaciones/
+datos/qdrant_db/
+docs/informes/
+dashboard_data*.json
+# Backups locales y presentación interna
+*.bak_*
+*.bak
+docs/PRESENTACION_MARLON.md
