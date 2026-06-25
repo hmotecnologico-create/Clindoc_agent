@@ -58,20 +58,21 @@ class DashboardRecorder:
 
     def set_paciente(self, nif: str, nombre: str):
         self.paciente_actual = nif
-        if nif not in self.data["pacientes"]:
-            self.data["pacientes"][nif] = {
-                "nombre": nombre,
-                "nif": nif,
-                "session_start": datetime.now().isoformat(),
-                "kpis": {
-                    "total_docs": 0,
-                    "total_time": 0,
-                    "avg_confidence": 0,
-                    "critical_risks": 0,
-                    "modelo_ia": "gemma3:4b"
-                },
-                "events": []
-            }
+        # Reset del paciente en CADA procesamiento: reprocesar reemplaza sus datos,
+        # no acumula eventos de runs anteriores (evita duplicar docs/KPIs y mezclar redacciones).
+        self.data["pacientes"][nif] = {
+            "nombre": nombre,
+            "nif": nif,
+            "session_start": datetime.now().isoformat(),
+            "kpis": {
+                "total_docs": 0,
+                "total_time": 0,
+                "avg_confidence": 0,
+                "critical_risks": 0,
+                "modelo_ia": "gemma3:4b"
+            },
+            "events": []
+        }
         self._save()
 
     def record_event(self, event_type: str, details: Dict):

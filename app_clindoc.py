@@ -349,7 +349,8 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
         if st.session_state.get(sk_fuente) not in docs_disponibles:
             st.session_state[sk_fuente] = docs_disponibles[0] if docs_disponibles else None
 
-        st.markdown("### 🩺 Estación de auditoría — fuente ⟷ historia")
+        st.markdown("### 🩺 Estación de auditoría")
+        st.markdown("**Paso 1 · Revise la fuente y edite la historia** — a la izquierda el respaldo documental, a la derecha la historia editable.")
         col_fuente, col_hist = st.columns(2)
 
         with col_fuente:
@@ -370,7 +371,9 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
                                               key=f"resumen_{nif_seleccionado}", label_visibility="collapsed")
 
         # === Trazabilidad por sección + botón 👁️ que abre la fuente a la izquierda ===
-        st.markdown("#### 🔍 Trazabilidad — cada sección y su respaldo (👁️ abre la fuente arriba)")
+        st.divider()
+        st.markdown("#### 🔍 Paso 2 · Trazabilidad — verifique el respaldo de cada sección")
+        st.caption("Cada sección de la historia con su(s) fuente(s). El botón 👁️ abre la fuente en el panel de la izquierda. Lo que no tenga fuente se marca como huérfano.")
         secciones_ia = [(ev['details'].get('seccion', 'Sección'), ev['details'].get('texto', ''))
                         for ev in data["events"] if ev["type"] == "analisis_seccion" and ev['details'].get('texto')]
         n_huerfanas = 0
@@ -396,6 +399,10 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
         st.caption(f"📌 El expediente aporta **{len(docs_disponibles)} documentos** de soporte. Verifique que la historia refleja TODOS los eventos clínicos relevantes antes de validar.")
 
         # === Visto bueno + validación (deja huella) + descarga ===
+        st.divider()
+        st.markdown("#### ✅ Paso 3 · Visto bueno del facultativo")
+        if secciones_ia and n_huerfanas > 0:
+            st.warning(f"⚠️ Hay **{n_huerfanas}** sección(es) sin fuente (huérfanas). Revíselas en el Paso 2 antes de aprobar — usted asume la responsabilidad de lo que valide.")
         col_v1, col_v2 = st.columns([2, 3])
         nombre_medico = col_v1.text_input("Facultativo (nombre / nº colegiado):", key=f"med_{nif_seleccionado}")
         visto_bueno = col_v2.checkbox(
