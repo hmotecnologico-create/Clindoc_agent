@@ -967,7 +967,10 @@ class OrquestadorLangGraph:
         print(f"Paciente: {paciente['nombre']}")
         print(f"NIF: {paciente.get('nif', 'N/A')}")
         print(f"{'='*50}\n")
-        
+
+        # AISLAMIENTO: colección propia y limpia para este paciente (no mezcla folios entre pacientes)
+        self.indice.usar_coleccion_paciente(paciente['nif'])
+
         state: AgentState = {
             "documentos": [],
             "paciente": paciente,
@@ -1131,23 +1134,55 @@ class OrquestadorClinDoc:
         return filename
 
 
+# --- CARGA DEL GUION YAML (contrato semántico que dirige el demo) ---
+def cargar_guion_yaml(ruta: str = "guiones/baja_laboral.yaml") -> Dict:
+    """Carga el guion (baja_laboral.yaml) y lo mapea a {titulo, secciones:[{id,titulo,instruccion}]}.
+    Las secciones con 'campos' (y sin 'instruccion') derivan su instrucción de esos campos, de modo
+    que el guion YAML dirige el demo principal (contrato semántico) en vez de secciones hardcoded."""
+    with open(ruta, encoding="utf-8") as f:
+        y = yaml.safe_load(f)
+    secciones = []
+    for s in y.get("secciones", []):
+        instr = (s.get("instruccion") or "").strip()
+        if not instr:
+            campos = [c.get("nombre", "") for c in s.get("campos", []) if c.get("nombre")]
+            campos_txt = ", ".join(campos) if campos else "los datos relevantes del expediente"
+            instr = (f"Redacta la sección '{s['titulo']}' cubriendo: {campos_txt}. "
+                     f"Cíñete estrictamente a la evidencia documental del expediente.")
+        secciones.append({"id": s["id"], "titulo": s["titulo"], "instruccion": instr})
+    return {"titulo": y.get("titulo", "Informe Técnico de Expediente"), "secciones": secciones}
+
+
 # --- EJECUCIÓN MAESTRA ---
 if __name__ == "__main__":
-    config_demo = {
-        "titulo": "Auditoría de Alta Complejidad v4.0 (Master Run)",
-        "secciones": [
-            {"id": "A1", "titulo": "Antecedentes de Salud", "instruccion": "Sintetice hallazgos cardíacos y quirúrgicos previos."},
-            {"id": "A2", "titulo": "Evolución Clínica Reciente", "instruccion": "Evalúe la respuesta al tratamiento post-operatorio."},
-            {"id": "A3", "titulo": "Recomendaciones", "instruccion": "Defina pautas de reposo y seguimiento médico."}
-        ]
-    }
-    
+    # El guion YAML (contrato semántico) dirige el demo; fallback a secciones por defecto si falla
+    try:
+        config_demo = cargar_guion_yaml("guiones/baja_laboral.yaml")
+        print(f"Guion YAML cargado: {len(config_demo['secciones'])} secciones desde baja_laboral.yaml -> "
+              + ", ".join(s['titulo'] for s in config_demo['secciones']))
+    except Exception as e:
+        print(f"[AVISO] No se pudo cargar el guion YAML ({e}); usando secciones por defecto.")
+        config_demo = {
+            "titulo": "Auditoría de Alta Complejidad v4.0 (Master Run)",
+            "secciones": [
+                {"id": "A1", "titulo": "Antecedentes de Salud", "instruccion": "Sintetice hallazgos cardíacos y quirúrgicos previos."},
+                {"id": "A2", "titulo": "Evolución Clínica Reciente", "instruccion": "Evalúe la respuesta al tratamiento post-operatorio."},
+                {"id": "A3", "titulo": "Recomendaciones", "instruccion": "Defina pautas de reposo y seguimiento médico."}
+            ]
+        }
+
     print("Usando Orquestador LangGraph Multi-Paciente (v5.0)")
     ruta_expedientes = Path("datos/expedientes")
     ruta_expedientes.mkdir(parents=True, exist_ok=True)
     carpetas_pacientes = [d for d in ruta_expedientes.iterdir() if d.is_dir()]
-    
-    if not carpetas_pacientes:
+
+    # Permite procesar UN solo paciente:  python run_clindoc.py <NIF>
+    nif_arg = sys.argv[1] if len(sys.argv) > 1 else None
+    if nif_arg:
+        carpetas_pacientes = [d for d in carpetas_pacientes if d.name == nif_arg]
+        print(f">>> Procesando SOLO el paciente indicado: {nif_arg} ({len(carpetas_pacientes)} carpeta encontrada)")
+
+    if not carpetas_pacientes and not nif_arg:
         # Crear datos de prueba
         (ruta_expedientes / "12345678Z").mkdir(exist_ok=True)
         (ruta_expedientes / "12345678Z" / "paciente_juan.txt").write_text("Nombre: Juan Pérez García. Hallazgos: Evolución favorable post-cirugía.", encoding='utf-8')
