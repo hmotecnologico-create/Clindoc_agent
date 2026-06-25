@@ -418,25 +418,31 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
                 mime="application/pdf", type="primary")
 
     with tab_traz:
-        st.subheader("Línea de Tiempo de Ingreso de Folios")
-        df_events = pd.DataFrame(data["events"])
-        if not df_events.empty:
-            df_docs = df_events[df_events['type'] == 'ingesta_documento'].copy()
-            if not df_docs.empty:
-                df_docs['timestamp'] = pd.to_datetime(df_docs['timestamp'])
-                df_docs['Nombre Archivo'] = df_docs['details'].apply(lambda x: str(x.get('id', 'Desconocido')) + "." + str(x.get('formato', 'pdf')))
-                
-                # Crear Timeline Gantt
-                fig_gantt = px.scatter(df_docs, x="timestamp", y="Nombre Archivo", 
-                                       color="Nombre Archivo", title="Registro de Entrada de Documentos al Sistema",
-                                       size_max=15, size=[10]*len(df_docs))
-                fig_gantt.update_traces(marker=dict(symbol='diamond-dot'))
-                fig_gantt.update_layout(xaxis_title="Fecha de Ingesta", yaxis_title="Documento", showlegend=False)
-                st.plotly_chart(fig_gantt, use_container_width=True)
-            else:
-                st.info("No hay documentos procesados aún para este paciente.")
+        st.subheader("📅 Trazabilidad de Folios — por fecha y tipo de estudio")
+        st.caption("Cada folio/evento del expediente, ubicable por fecha y por tipo. Ordene haciendo clic en una columna; filtre por tipo o busque por nombre.")
+        historial_t = HistorialClinicoVisual(f"datos/expedientes/{nif_seleccionado}")
+        _ = historial_t.cargar_expediente(nif_seleccionado, data["nombre"])
+        if historial_t.eventos:
+            filas = [{"Fecha": e.fecha.strftime("%d/%m/%Y"),
+                      "_orden": e.fecha,
+                      "Tipo de estudio": e.tipo.capitalize(),
+                      "Evento / Estudio": e.titulo,
+                      "Documento (folio)": e.fuente} for e in historial_t.eventos]
+            df_fol = pd.DataFrame(filas).sort_values("_orden").drop(columns=["_orden"]).reset_index(drop=True)
+            c1, c2 = st.columns(2)
+            tipos = ["(todos)"] + sorted(df_fol["Tipo de estudio"].unique().tolist())
+            ftipo = c1.selectbox("Filtrar por tipo de estudio:", tipos, key=f"ftipo_{nif_seleccionado}")
+            fbusca = c2.text_input("Buscar (documento / evento):", key=f"fbusca_{nif_seleccionado}")
+            df_view = df_fol
+            if ftipo != "(todos)":
+                df_view = df_view[df_view["Tipo de estudio"] == ftipo]
+            if fbusca:
+                mask = df_view.apply(lambda r: fbusca.lower() in (str(r["Evento / Estudio"]) + str(r["Documento (folio)"])).lower(), axis=1)
+                df_view = df_view[mask]
+            st.dataframe(df_view, use_container_width=True, hide_index=True, height=430)
+            st.caption(f"📌 Mostrando {len(df_view)} de {len(df_fol)} folios/eventos del expediente.")
         else:
-            st.info("No hay eventos registrados.")
+            st.info("No hay folios con fecha identificada para este paciente.")
 
 # PERFIL TRIBUNAL
 else:
