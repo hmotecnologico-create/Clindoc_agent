@@ -326,6 +326,7 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
     with tab_resumen:
         st.subheader("📝 Historia Clínica Consolidada — Validación del Facultativo")
         st.info("Revise, **edite o complete** el borrador generado por la IA. Debe **dar el visto bueno** para descargar el informe final; toda modificación queda registrada (Human-in-the-Loop).")
+        st.warning("🔒 **Principio del sistema:** la aplicación **NO inventa**. Solo redacta sobre la evidencia documental del expediente y **cada párrafo cita su fuente**. Lo que no tenga respaldo se marca como **HUÉRFANO** para su revisión. El visto bueno es responsabilidad del **facultativo**, no de la IA.")
 
         # Recuperar resumen de los eventos de "analisis_seccion"
         resumen_ia = ""
