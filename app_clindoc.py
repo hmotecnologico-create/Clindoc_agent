@@ -419,28 +419,40 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
 
     with tab_traz:
         st.subheader("📅 Trazabilidad de Folios — por fecha y tipo de estudio")
-        st.caption("Cada folio/evento del expediente, ubicable por fecha y por tipo. Ordene haciendo clic en una columna; filtre por tipo o busque por nombre.")
+        st.caption("Cada folio del expediente, ubicable por fecha y por tipo de estudio. Ordene haciendo clic en una columna; filtre por tipo o busque por nombre de documento.")
+        def _tipo_estudio(nombre, tipo_evento):
+            # tipo detectado por contenido; si es genérico, se deriva del nombre del documento (determinista, no inventa nada clínico)
+            if tipo_evento and tipo_evento.lower() not in ("evento", ""):
+                return tipo_evento.capitalize()
+            base = str(nombre).upper()
+            for pref, etiqueta in (("TRAMPA", "⚠ Errata"), ("RAD", "Radiología"), ("RX", "Radiología"),
+                                   ("TAC", "TAC"), ("RMN", "RMN"), ("ECO", "Ecografía"), ("LAB", "Laboratorio"),
+                                   ("ANA", "Analítica"), ("CONS", "Consulta"), ("URG", "Urgencias"),
+                                   ("INTERC", "Interconsulta"), ("INF", "Informe"), ("ALTA", "Alta"),
+                                   ("QUIR", "Quirúrgico"), ("REHAB", "Rehabilitación"), ("FARM", "Farmacia"), ("IT", "Parte IT")):
+                if base.startswith(pref):
+                    return etiqueta
+            return "Documento"
         historial_t = HistorialClinicoVisual(f"datos/expedientes/{nif_seleccionado}")
         _ = historial_t.cargar_expediente(nif_seleccionado, data["nombre"])
         if historial_t.eventos:
             filas = [{"Fecha": e.fecha.strftime("%d/%m/%Y"),
                       "_orden": e.fecha,
-                      "Tipo de estudio": e.tipo.capitalize(),
-                      "Evento / Estudio": e.titulo,
+                      "Tipo de estudio": _tipo_estudio(e.fuente, e.tipo),
                       "Documento (folio)": e.fuente} for e in historial_t.eventos]
-            df_fol = pd.DataFrame(filas).sort_values("_orden").drop(columns=["_orden"]).reset_index(drop=True)
+            df_fol = (pd.DataFrame(filas).sort_values("_orden").drop(columns=["_orden"])
+                      .drop_duplicates().reset_index(drop=True))
             c1, c2 = st.columns(2)
             tipos = ["(todos)"] + sorted(df_fol["Tipo de estudio"].unique().tolist())
             ftipo = c1.selectbox("Filtrar por tipo de estudio:", tipos, key=f"ftipo_{nif_seleccionado}")
-            fbusca = c2.text_input("Buscar (documento / evento):", key=f"fbusca_{nif_seleccionado}")
+            fbusca = c2.text_input("Buscar (documento):", key=f"fbusca_{nif_seleccionado}")
             df_view = df_fol
             if ftipo != "(todos)":
                 df_view = df_view[df_view["Tipo de estudio"] == ftipo]
             if fbusca:
-                mask = df_view.apply(lambda r: fbusca.lower() in (str(r["Evento / Estudio"]) + str(r["Documento (folio)"])).lower(), axis=1)
-                df_view = df_view[mask]
+                df_view = df_view[df_view["Documento (folio)"].str.lower().str.contains(fbusca.lower())]
             st.dataframe(df_view, use_container_width=True, hide_index=True, height=430)
-            st.caption(f"📌 Mostrando {len(df_view)} de {len(df_fol)} folios/eventos del expediente.")
+            st.caption(f"📌 Mostrando {len(df_view)} de {len(df_fol)} folios del expediente.")
         else:
             st.info("No hay folios con fecha identificada para este paciente.")
 
