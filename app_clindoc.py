@@ -401,15 +401,41 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
         # === Visto bueno + validación (deja huella) + descarga ===
         st.divider()
         st.markdown("#### ✅ Paso 3 · Visto bueno del facultativo")
-        if secciones_ia and n_huerfanas > 0:
-            st.warning(f"⚠️ Hay **{n_huerfanas}** sección(es) sin fuente (huérfanas). Revíselas en el Paso 2 antes de aprobar — usted asume la responsabilidad de lo que valide.")
+
+        # REGLA DE ORO: chequeo PÁRRAFO A PÁRRAFO sobre la historia editada (ningún párrafo sin fuente)
+        def _parrafos_sin_fuente(texto):
+            huer = []
+            for bloque in re.split(r'\n\s*\n', texto or ""):
+                b = bloque.strip()
+                if not b:
+                    continue
+                contenido = " ".join(l for l in b.split("\n") if not l.lstrip().startswith("#")).strip()
+                if not contenido:
+                    continue
+                if "[Fuente:" not in b and "Sin información documental" not in b:
+                    huer.append(contenido)
+            return huer
+        parrafos_huerfanos = _parrafos_sin_fuente(resumen_modificado)
+        asumo_notas = True
+        if parrafos_huerfanos:
+            st.error(f"🚫 **Regla de oro:** hay **{len(parrafos_huerfanos)}** párrafo(s) SIN fuente en la historia. La aplicación no respalda párrafos huérfanos.")
+            with st.expander(f"Ver los {len(parrafos_huerfanos)} párrafo(s) sin fuente"):
+                for p in parrafos_huerfanos:
+                    st.markdown(f"- {p[:160]}{'…' if len(p) > 160 else ''}")
+            asumo_notas = st.checkbox(
+                "Estos párrafos son **notas propias del facultativo** (no generadas por la IA) y las asumo bajo mi responsabilidad.",
+                key=f"asumo_{nif_seleccionado}")
+
         col_v1, col_v2 = st.columns([2, 3])
         nombre_medico = col_v1.text_input("Facultativo (nombre / nº colegiado):", key=f"med_{nif_seleccionado}")
         visto_bueno = col_v2.checkbox(
             "✔️ Doy el visto bueno bajo MI responsabilidad como facultativo (no la de la IA)",
             key=f"vb_{nif_seleccionado}")
 
-        if st.button("✅ Validar y aprobar informe", type="primary", disabled=not visto_bueno):
+        bloqueado = (not visto_bueno) or (bool(parrafos_huerfanos) and not asumo_notas)
+        if parrafos_huerfanos and not asumo_notas:
+            st.caption("⛔ Visto bueno **bloqueado** hasta resolver los párrafos sin fuente (o asumirlos como notas propias).")
+        if st.button("✅ Validar y aprobar informe", type="primary", disabled=bloqueado):
             editado = resumen_modificado.strip() != resumen_ia.strip()
             pdf_bytes = generar_pdf_historia(data['nombre'], data['nif'], resumen_modificado, nombre_medico)
             _ = registrar_validacion_facultativo(data['nif'], nombre_medico, editado, resumen_modificado)

@@ -21,6 +21,7 @@ Este módulo es CRÍTICO para Capítulo 5 y 6 del TFM:
 
 import json
 import os
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Optional
@@ -193,29 +194,60 @@ class ChatAsistenteMedico:
                 f"Esta corrección ayudará a mejorar la precisión del sistema en futuras generaciones. "
                 f"¿Desea que actualice el informe con esta corrección?")
     
+    def _buscar_en_folios(self, consulta: str, max_folios: int = 5) -> List:
+        """Busca la consulta del médico DIRECTAMENTE en los folios del expediente del paciente.
+        Devuelve [(score, nombre_folio, snippet), ...] ordenado por relevancia. No inventa: solo lee folios."""
+        nif = self.conversacion_actual.paciente_nif if self.conversacion_actual else None
+        if not nif:
+            return []
+        carpeta = Path("datos/expedientes") / nif
+        if not carpeta.exists():
+            return []
+        terminos = [t.lower() for t in re.findall(r'\w+', consulta) if len(t) > 3]
+        if not terminos:
+            return []
+        resultados = []
+        for archivo in sorted(carpeta.glob("*")):
+            if archivo.suffix.lower() not in (".md", ".txt"):
+                continue
+            try:
+                texto = archivo.read_text(encoding="utf-8", errors="ignore")
+            except Exception:
+                continue
+            tl = texto.lower()
+            score = sum(tl.count(t) for t in terminos)
+            if score > 0:
+                pos = min((tl.find(t) for t in terminos if t in tl), default=0)
+                snippet = texto[max(0, pos - 90):pos + 220].strip().replace("\n", " ")
+                resultados.append((score, archivo.name, snippet))
+        resultados.sort(key=lambda x: x[0], reverse=True)
+        return resultados[:max_folios]
+
     def _generar_respuesta(self, pregunta: str) -> str:
-        """Genera respuesta de la IA usando contexto del informe"""
-        
-        # Cargar contexto del informe
-        contexto = self._obtener_contexto_informe()
-        
-        # Construir prompt
-        prompt = f"""Eres un asistente médico experto. Un doctor está revisando 
-un informe generado por IA y tiene la siguiente pregunta:
+        """Responde la consulta del médico BUSCANDO EN LOS FOLIOS del expediente (no inventa).
+        Si encuentra evidencia, la cita; si no, indica que la decisión es del facultativo."""
+        folios = self._buscar_en_folios(pregunta)
+        sin_doc = ("No hay ningún documento en el expediente que respalde esa consulta — "
+                   "la decisión queda a criterio del facultativo.")
+        if folios:
+            contexto = "\n".join(f"- [{nombre}] {snip}" for _, nombre, snip in folios)
+            instruccion = (f"Responde ÚNICAMENTE con lo que aparece en los FOLIOS y CITA el folio entre [corchetes]. "
+                           f"Si los folios no responden la pregunta, responde EXACTAMENTE: \"{sin_doc}\"")
+        else:
+            return sin_doc
+
+        prompt = f"""Eres un asistente que SOLO consulta los folios del expediente clínico. NO inventas ni añades conocimiento externo.
 
 PREGUNTA DEL MÉDICO: {pregunta}
 
-CONTEXTO DEL INFORME:
+FOLIOS DEL EXPEDIENTE (ÚNICA fuente permitida):
 {contexto}
 
 INSTRUCCIONES:
-1. Responde de forma clara y técnica
-2. Si no tienes información suficiente, dilo
-3. Si el médico hace una corrección, reconócela y agradécela
-4. Recuerda: el médico es quien firma el informe, tú eres solo un asistente
+{instruccion}
+Recuerda: el médico es quien decide y firma; tú solo localizas evidencia en los folios.
+Responde en español, de forma breve y directa."""
 
-Responde en español de forma profesional."""
-        
         try:
             respuesta = ollama.chat(
                 model=self.modelo,
