@@ -218,6 +218,22 @@ class IndiceCorpus:
                 vectors_config=models.VectorParams(size=384, distance=models.Distance.COSINE),
             )
 
+    def usar_coleccion_paciente(self, nif: str):
+        """AISLAMIENTO POR PACIENTE: cada paciente usa su propia colección 'expediente_{nif}',
+        recreada limpia en cada procesamiento. Evita mezclar folios entre pacientes en la
+        recuperación (RAG) y elimina de raíz los puntos duplicados al reprocesar."""
+        self.nombre_coleccion = f"expediente_{nif}"
+        try:
+            existentes = [c.name for c in self.cliente.get_collections().collections]
+            if self.nombre_coleccion in existentes:
+                self.cliente.delete_collection(self.nombre_coleccion)
+        except Exception:
+            pass
+        self.cliente.create_collection(
+            collection_name=self.nombre_coleccion,
+            vectors_config=models.VectorParams(size=384, distance=models.Distance.COSINE),
+        )
+
     def _semantic_chunking(self, texto: str) -> List[str]:
         """Chunking semántico mejorado - respeta párrafos y tablas"""
         # Dividir por párrafos primero
@@ -1016,7 +1032,10 @@ class OrquestadorClinDoc:
     def ejecutar(self, paciente: Dict):
         inicio_session = time.time()
         print(f"Iniciando proceso de auditoría: {paciente['nombre']}")
-        
+
+        # AISLAMIENTO: colección propia y limpia para este paciente (no mezcla folios entre pacientes)
+        self.indice.usar_coleccion_paciente(paciente['nif'])
+
         # 1. Escaneo e Ingesta
         print("   [1/3] Escaneando documentos...")
         docs = self.escanner.scan()
