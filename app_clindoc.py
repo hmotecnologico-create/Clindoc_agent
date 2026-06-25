@@ -97,8 +97,8 @@ def generar_pdf_historia(nombre, nif, texto, medico):
     return buf.getvalue()
 
 
-def registrar_validacion_facultativo(nif, medico, editado):
-    """Deja constancia de auditoría real (Human-in-the-Loop) de la validación médica."""
+def registrar_validacion_facultativo(nif, medico, editado, historia=None):
+    """Constancia de auditoría (Human-in-the-Loop): registra la validación y guarda la HUELLA de la historia validada."""
     log_path = "datos/validaciones_facultativo.json"
     registros = []
     if os.path.exists(log_path):
@@ -107,15 +107,23 @@ def registrar_validacion_facultativo(nif, medico, editado):
                 registros = json.load(f)
         except Exception:
             registros = []
+    ts = datetime.now()
     registros.append({
         "nif": nif,
         "facultativo": medico or "(sin nombre)",
         "accion": "editado y validado" if editado else "validado (visto bueno)",
-        "timestamp": datetime.now().isoformat()
+        "timestamp": ts.isoformat()
     })
     os.makedirs("datos", exist_ok=True)
     with open(log_path, "w", encoding="utf-8") as f:
         json.dump(registros, f, indent=2, ensure_ascii=False)
+    # Huella: guardar la versión exacta de la historia que el facultativo validó/editó
+    if historia is not None:
+        os.makedirs("datos/historias_validadas", exist_ok=True)
+        with open(f"datos/historias_validadas/{nif}_{ts:%Y%m%d_%H%M%S}.txt", "w", encoding="utf-8") as f:
+            f.write(f"# HISTORIA CLÍNICA VALIDADA\n# Facultativo responsable: {medico or '(sin nombre)'}\n"
+                    f"# Fecha/hora: {ts:%d/%m/%Y %H:%M:%S}\n"
+                    f"# Acción: {'EDITADA y validada' if editado else 'validada (visto bueno, sin cambios)'}\n\n{historia}")
 
 # Configuración de página
 st.set_page_config(
@@ -323,67 +331,85 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
         resumen_ia = ""
         for ev in data["events"]:
             if ev["type"] == "analisis_seccion":
-                texto_seccion = ev['details'].get('texto', '')
+                texto_seccion = (ev['details'].get('texto', '') or '').strip()
                 if texto_seccion:
-                    resumen_ia += f"## {ev['details'].get('seccion', 'Sección')}\n{texto_seccion}\n\n"
+                    # La IA ya suele incluir su propio "## Título"; solo añadirlo si falta (evita duplicar)
+                    if not texto_seccion.lstrip().startswith("#"):
+                        texto_seccion = f"## {ev['details'].get('seccion', 'Sección')}\n{texto_seccion}"
+                    resumen_ia += texto_seccion + "\n\n"
         if not resumen_ia:
             resumen_ia = "No se encontraron secciones redactadas para este paciente."
 
-        resumen_modificado = st.text_area(
-            "Historia Clínica Consolidada (editable):",
-            value=resumen_ia, height=380, key=f"resumen_{nif_seleccionado}")
-
-        # === 🔍 TRAZABILIDAD: de dónde sacó la IA cada sección (auditoría anti-huérfano) ===
-        st.markdown("#### 🔍 Trazabilidad — ¿de dónde sacó la IA cada sección?")
-        st.caption("Audite el respaldo de cada parte. Lo que no cite una fuente queda marcado como **huérfano** para revisión manual.")
+        # ===================== ESTACIÓN DE AUDITORÍA: fuente ⟷ historia =====================
         ruta_docs_aud = Path(f"datos/expedientes/{nif_seleccionado}")
+        docs_disponibles = sorted([p.name for p in ruta_docs_aud.glob("*")
+                                   if p.suffix.lower() in (".md", ".txt")])
+        sk_fuente = f"fuente_activa_{nif_seleccionado}"
+        if st.session_state.get(sk_fuente) not in docs_disponibles:
+            st.session_state[sk_fuente] = docs_disponibles[0] if docs_disponibles else None
+
+        st.markdown("### 🩺 Estación de auditoría — fuente ⟷ historia")
+        col_fuente, col_hist = st.columns(2)
+
+        with col_fuente:
+            st.markdown(f"##### 📚 Respaldo documental ({len(docs_disponibles)} fuentes del expediente)")
+            if docs_disponibles:
+                idx = docs_disponibles.index(st.session_state[sk_fuente]) if st.session_state[sk_fuente] in docs_disponibles else 0
+                sel = st.selectbox("Documento de origen:", docs_disponibles, index=idx, key=f"selfuente_{nif_seleccionado}")
+                st.session_state[sk_fuente] = sel
+                st.text_area("Contenido COMPLETO de la fuente:",
+                             value=(ruta_docs_aud / sel).read_text(encoding="utf-8", errors="ignore"),
+                             height=430, disabled=True, key=f"viewfuente_{nif_seleccionado}")
+            else:
+                st.warning("No hay documentos de origen disponibles para este paciente.")
+
+        with col_hist:
+            st.markdown("##### ✍️ Historia clínica (edite / complete — bajo su responsabilidad)")
+            resumen_modificado = st.text_area("Historia (editable):", value=resumen_ia, height=430,
+                                              key=f"resumen_{nif_seleccionado}", label_visibility="collapsed")
+
+        # === Trazabilidad por sección + botón 👁️ que abre la fuente a la izquierda ===
+        st.markdown("#### 🔍 Trazabilidad — cada sección y su respaldo (👁️ abre la fuente arriba)")
         secciones_ia = [(ev['details'].get('seccion', 'Sección'), ev['details'].get('texto', ''))
                         for ev in data["events"] if ev["type"] == "analisis_seccion" and ev['details'].get('texto')]
-        if not secciones_ia:
-            st.info("No hay secciones redactadas para auditar.")
         n_huerfanas = 0
-        for seccion, texto_sec in secciones_ia:
+        for si, (seccion, texto_sec) in enumerate(secciones_ia):
             fuentes = sorted(set(a.strip() for a in re.findall(r'\[Fuente:\s*([^\]#]+)', texto_sec)))
             if not fuentes:
                 n_huerfanas += 1
             etiqueta = "⚠️ SIN FUENTE (huérfano)" if not fuentes else f"✅ {len(fuentes)} fuente(s)"
             with st.expander(f"📄 {seccion}  —  {etiqueta}"):
                 if not fuentes:
-                    st.error("⚠️ Esta sección NO cita ninguna fuente → posible afirmación no respaldada. Verifíquela manualmente.")
-                for archivo in fuentes:
-                    af = ruta_docs_aud / archivo
-                    st.markdown(f"**🔗 Respaldo:** `{archivo}`")
-                    if af.exists():
-                        contenido_fuente = af.read_text(encoding='utf-8', errors='ignore')
-                        st.caption(f"📄 Documento de origen COMPLETO ({len(contenido_fuente):,} caracteres) — todo el contexto relacionado:")
-                        st.text_area(f"Documento de origen — {archivo}",
-                                     value=contenido_fuente,
-                                     height=280, disabled=True,
-                                     key=f"src_{nif_seleccionado}_{seccion[:12]}_{archivo}")
-                    else:
-                        st.caption("⚠️ Fuente citada por la IA pero NO localizada como documento real → posible cita no verificable (auditar).")
+                    st.error("⚠️ Sección SIN fuente → afirmación no respaldada por la IA. Verifíquela manualmente.")
+                for fi, archivo in enumerate(fuentes):
+                    existe = (ruta_docs_aud / archivo).exists()
+                    c1, c2 = st.columns([5, 1])
+                    c1.markdown(f"🔗 `{archivo}`" + ("" if existe else "  ⚠️ *no localizada (cita no verificable)*"))
+                    if existe and c2.button("👁️ Ver", key=f"ver_{nif_seleccionado}_{si}_{fi}"):
+                        st.session_state[sk_fuente] = archivo
+                        st.rerun()
         if secciones_ia:
-            if n_huerfanas == 0:
-                st.success(f"✅ Trazabilidad completa: las {len(secciones_ia)} secciones citan su fuente. **Ninguna huérfana.**")
-            else:
-                st.warning(f"⚠️ {n_huerfanas} de {len(secciones_ia)} secciones SIN fuente (huérfanas) → requieren verificación manual.")
+            (st.success if n_huerfanas == 0 else st.warning)(
+                "✅ Trazabilidad completa: ninguna sección huérfana." if n_huerfanas == 0
+                else f"⚠️ {n_huerfanas} de {len(secciones_ia)} secciones SIN fuente → verificación manual.")
+        st.caption(f"📌 El expediente aporta **{len(docs_disponibles)} documentos** de soporte. Verifique que la historia refleja TODOS los eventos clínicos relevantes antes de validar.")
 
+        # === Visto bueno + validación (deja huella) + descarga ===
         col_v1, col_v2 = st.columns([2, 3])
         nombre_medico = col_v1.text_input("Facultativo (nombre / nº colegiado):", key=f"med_{nif_seleccionado}")
         visto_bueno = col_v2.checkbox(
-            "✔️ Doy el visto bueno como facultativo responsable de esta historia clínica",
+            "✔️ Doy el visto bueno bajo MI responsabilidad como facultativo (no la de la IA)",
             key=f"vb_{nif_seleccionado}")
 
         if st.button("✅ Validar y aprobar informe", type="primary", disabled=not visto_bueno):
             editado = resumen_modificado.strip() != resumen_ia.strip()
             pdf_bytes = generar_pdf_historia(data['nombre'], data['nif'], resumen_modificado, nombre_medico)
-            _ = registrar_validacion_facultativo(data['nif'], nombre_medico, editado)
+            _ = registrar_validacion_facultativo(data['nif'], nombre_medico, editado, resumen_modificado)
             st.session_state[f"pdf_validado_{nif_seleccionado}"] = pdf_bytes
             accion = "editada y validada" if editado else "validada (visto bueno)"
-            st.success(f"✅ Historia clínica **{accion}** por {nombre_medico or 'el facultativo'} "
-                       f"({datetime.now():%d/%m/%Y %H:%M}). Registro de auditoría guardado.")
+            st.success(f"✅ Historia **{accion}** por {nombre_medico or 'el facultativo'} "
+                       f"({datetime.now():%d/%m/%Y %H:%M}). **Huella de auditoría guardada** (queda constancia de lo editado).")
 
-        # Descarga del PDF una vez validado (persiste tras el rerun de Streamlit)
         if st.session_state.get(f"pdf_validado_{nif_seleccionado}"):
             st.download_button(
                 "⬇️ Descargar Historia Clínica Consolidada (PDF)",

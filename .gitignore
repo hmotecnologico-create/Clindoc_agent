@@ -170,3 +170,7 @@ benchmarking_ingesta.py
 runner_masterrun_real.py
 runner_stress_524.py
 generar_corpus_524folios.py
+
+# Auditoria/huellas del facultativo (datos clinicos)
+datos/historias_validadas/
+datos/*.json

@@ -637,16 +637,21 @@ class AgenteRedactor:
             for e in evidencias
         ])
         
-        prompt = f"""Eres un auditor clínico profesional experto en la normativa española de Incapacidades Temporales (Real Decreto 1060/2022). 
-Redacta la sección '{seccion.titulo}'.
-Instrucción: {seccion.instruccion}
+        prompt = f"""Eres un auditor clínico que redacta la sección '{seccion.titulo}' de una historia clínica consolidada para un proceso de Incapacidad Temporal (RD 1060/2022).
 
-Si la sección trata sobre el diagnóstico, DEBES identificar e incluir el código CIE-10 (Clasificación Internacional de Enfermedades) correspondiente.
-Si falta información crítica para la validez legal de una baja (DNI, NUSS o Empresa), indica una 'ALERTA DE OMISIÓN ADM'.
+REGLAS ESTRICTAS Y OBLIGATORIAS:
+1. PROHIBIDO INVENTAR. Solo puedes afirmar lo que aparece de forma EXPLÍCITA en los DATOS de abajo. No supongas, no infieras, no añadas conocimiento médico externo.
+2. NADA HUÉRFANO: CADA párrafo DEBE terminar con su cita en el formato [Fuente: archivo#chunk_id]. Un párrafo sin fuente NO está permitido.
+3. Si los DATOS no contienen información para esta sección, responde EXACTAMENTE y solo: "Sin información documental para esta sección."
+4. Estilo ASERTIVO y DIRECTO. Para una conclusión o recomendación usa el patrón: "Basado en [documento/estudio del DD/MM/AAAA], se determina/observa ...". Prohibido el relleno y los disclaimers genéricos ("recomendaciones generales", "debe individualizarse", etc.).
+5. NO confundas un procedimiento (p. ej. artroscopia) con un diagnóstico. Incluye el código CIE-10 SOLO si aparece textualmente o es inequívoco en los DATOS.
 
-Datos: {contexto}
-IMPORTANTE: Cada afirmación debe citar su fuente usando el formato [Fuente: archivo#chunk_id]
-Responde de forma técnica y concisa en español."""
+Instrucción de la sección: {seccion.instruccion}
+
+DATOS (ÚNICA fuente permitida; redacta cada párrafo a partir de aquí):
+{contexto}
+
+Responde en español, técnico y conciso. Recuerda: cada párrafo con su [Fuente: ...]; si no hay datos para la sección, escribe únicamente "Sin información documental para esta sección."."""
         
         try:
             r = ollama.chat(model=self.modelo, messages=[{'role': 'user', 'content': prompt}])
