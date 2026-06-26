@@ -2,6 +2,8 @@
 
 > Sistema multiagente **local** para la validación documental y la generación guiada de informes de expedientes de incapacidad temporal.
 
+> 🚀 **¿Cómo ejecutarlo?** Guía paso a paso para clonar y poner en marcha el sistema: **[GUIA_DE_EJECUCION.md](GUIA_DE_EJECUCION.md)**.
+
 ClinDoc Agent ingiere expedientes clínicos heterogéneos, **verifica la identidad** del paciente y la **vigencia** de los documentos, y redacta informes técnicos **trazables** guiados por un guion — **100 % en local**, sin enviar la información clínica a la nube. Está pensado para apoyar al facultativo en la auditoría documental de procesos de incapacidad temporal.
 
 ## Arquitectura
