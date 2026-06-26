@@ -174,13 +174,21 @@ def registrar_validacion_facultativo(nif, medico, editado, historia=None):
     os.makedirs("datos", exist_ok=True)
     with open(log_path, "w", encoding="utf-8") as f:
         json.dump(registros, f, indent=2, ensure_ascii=False)
-    # Huella: guardar la versión exacta de la historia que el facultativo validó/editó
+    # Huella: la historia validada se guarda CIFRADA (AES-256-GCM) en reposo (RNF-01 / RGPD)
     if historia is not None:
         os.makedirs("datos/historias_validadas", exist_ok=True)
-        with open(f"datos/historias_validadas/{nif}_{ts:%Y%m%d_%H%M%S}.txt", "w", encoding="utf-8") as f:
-            f.write(f"# HISTORIA CLÍNICA VALIDADA\n# Facultativo responsable: {medico or '(sin nombre)'}\n"
-                    f"# Fecha/hora: {ts:%d/%m/%Y %H:%M:%S}\n"
-                    f"# Acción: {'EDITADA y validada' if editado else 'validada (visto bueno, sin cambios)'}\n\n{historia}")
+        contenido = (f"# HISTORIA CLÍNICA VALIDADA\n# Facultativo responsable: {medico or '(sin nombre)'}\n"
+                     f"# Fecha/hora: {ts:%d/%m/%Y %H:%M:%S}\n"
+                     f"# Acción: {'EDITADA y validada' if editado else 'validada (visto bueno, sin cambios)'}\n\n{historia}")
+        base = f"datos/historias_validadas/{nif}_{ts:%Y%m%d_%H%M%S}"
+        try:
+            from cifrado import CifradoClinDoc
+            with open(base + ".enc", "w", encoding="utf-8") as f:
+                f.write(CifradoClinDoc().cifrar(contenido))
+        except Exception as e:
+            # Si el cifrado fallara, NO dejar el dato clínico en claro
+            with open(base + ".error.txt", "w", encoding="utf-8") as f:
+                f.write(f"[huella no guardada: cifrado no disponible: {e}]")
 
 # Configuración de página
 st.set_page_config(

@@ -24,20 +24,8 @@ if sys.stdout.encoding.lower() != 'utf-8':
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
-# --- CIFRADO AES-256 (FASE 5) ---
-class CifradoClinDoc:
-    """Cifrado para datos sensibles en entorno local"""
-    def __init__(self, clave: str = "clinDoc_Sovereign_2026"):
-        import hashlib
-        from cryptography.fernet import Fernet
-        self.key = hashlib.sha256(clave.encode()).digest()
-        self.cipher = Fernet(self.key)
-    
-    def cifrar(self, data: str) -> str:
-        return self.cipher.encrypt(data.encode()).decode()
-    
-    def descifrar(self, data: str) -> str:
-        return self.cipher.decrypt(data.encode()).decode()
+# --- CIFRADO AES-256-GCM (módulo ligero) ---
+from cifrado import CifradoClinDoc
 
 # --- ANALYTICS RECORDER ---
 class DashboardRecorder:
