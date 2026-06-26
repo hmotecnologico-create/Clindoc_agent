@@ -3,6 +3,7 @@ import os
 import re
 import yaml
 import uuid
+import hashlib
 import time
 import ollama
 import qdrant_client
@@ -208,6 +209,7 @@ class IndiceCorpus:
         self.cliente = qdrant_client.QdrantClient(path=ruta_db)
         self.modelo_emb = SentenceTransformer('all-MiniLM-L6-v2') 
         self.nombre_coleccion = "expediente_clinico"
+        self.patient_hash = None
         self._setup_qdrant()
 
     def _setup_qdrant(self):
@@ -219,10 +221,12 @@ class IndiceCorpus:
             )
 
     def usar_coleccion_paciente(self, nif: str):
-        """AISLAMIENTO POR PACIENTE: cada paciente usa su propia colección 'expediente_{nif}',
-        recreada limpia en cada procesamiento. Evita mezclar folios entre pacientes en la
-        recuperación (RAG) y elimina de raíz los puntos duplicados al reprocesar."""
-        self.nombre_coleccion = f"expediente_{nif}"
+        """AISLAMIENTO + SEUDONIMIZACIÓN POR PACIENTE (RGPD): el NIF se reduce a su hash SHA-256
+        (patient_hash) y la colección vectorial se nombra con ese hash ('expediente_{hash}'),
+        recreada limpia en cada procesamiento. El NIF en claro NUNCA se persiste en la base
+        vectorial; además evita mezclar folios entre pacientes y los puntos duplicados al reprocesar."""
+        self.patient_hash = hashlib.sha256(nif.encode("utf-8")).hexdigest()
+        self.nombre_coleccion = f"expediente_{self.patient_hash}"
         try:
             existentes = [c.name for c in self.cliente.get_collections().collections]
             if self.nombre_coleccion in existentes:
@@ -265,10 +269,11 @@ class IndiceCorpus:
                 id=str(uuid.uuid4()),  # UUID válido para Qdrant
                 vector=vector, 
                 payload={
-                    "texto": frag, 
+                    "texto": frag,
                     "chunk_id": chunk_id,  # GUARDAR PARA DEEP LINKING
-                    "nombre_archivo": nombre_original, 
-                    "doc_id": doc_id
+                    "nombre_archivo": nombre_original,
+                    "doc_id": doc_id,
+                    "patient_hash": self.patient_hash  # seudonimización SHA-256 del NIF (RGPD)
                 }
             ))
         self.cliente.upsert(collection_name=self.nombre_coleccion, points=points)
