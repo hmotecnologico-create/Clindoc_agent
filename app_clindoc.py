@@ -70,6 +70,47 @@ def render_folio_resaltado(ruta_str, chunk_idx, pdf_str=None):
     return pg.get_pixmap(dpi=135).tobytes("png"), encontrado, 1, 1
 
 
+@st.cache_data(show_spinner=False)
+def _campos_guion(ruta="guiones/baja_laboral.yaml"):
+    """Carga los campos por sección del guion YAML (contrato semántico): {titulo: [campos]}."""
+    import yaml
+    try:
+        y = yaml.safe_load(Path(ruta).read_text(encoding="utf-8"))
+        return {s["titulo"]: s.get("campos", []) for s in y.get("secciones", [])}
+    except Exception:
+        return {}
+
+
+def _validar_campo(campo, texto):
+    """Valida un campo del guion contra el texto de la sección. Devuelve (estado, detalle).
+    Estados: ok / aviso / falta / manual."""
+    nombre = campo.get("nombre", "")
+    patron = campo.get("patron")
+    requerido = campo.get("requerido", False)
+    falta = "falta" if requerido else "aviso"
+    if patron:  # p.ej. CIE-10
+        p = patron[1:] if patron.startswith("^") else patron
+        p = p[:-1] if p.endswith("$") else p
+        m = re.search(p, texto)
+        return ("ok", f"patrón cumplido → {m.group(0)}") if m else (falta, "patrón no encontrado")
+    if campo.get("tipo") == "fecha" or nombre.startswith("fecha"):
+        return ("ok", "fecha presente") if re.search(r"\d{1,2}[/-]\d{1,2}[/-]\d{4}", texto) else (falta, "sin fecha")
+    claves = {
+        "num_seguridad_social": [r"seguridad social", r"\bnuss\b", r"n\.?u\.?s\.?s"],
+        "empresa": [r"empresa"],
+        "nif": [r"\b\d{8}[A-Za-z]\b"],
+        "nombre_completo": [r"[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+ [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+", r"paciente"],
+        "diagnostico_principal": [r"diagn[oó]stic"],
+    }
+    kws = claves.get(nombre)
+    if kws:
+        for k in kws:
+            if re.search(k, texto, re.IGNORECASE):
+                return "ok", "presente"
+        return falta, "no detectado"
+    return "manual", "verificación del facultativo"
+
+
 def _periodo_historia(texto):
     """Calcula el período (desde–hasta) a partir de las fechas que aparecen en la historia."""
     fechas = []
@@ -483,6 +524,26 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
                 "✅ Trazabilidad completa: ninguna sección huérfana." if n_huerfanas == 0
                 else f"⚠️ {n_huerfanas} de {len(secciones_ia)} secciones SIN fuente → verificación manual.")
         st.caption(f"📌 El expediente aporta **{len(docs_disponibles)} documentos** de soporte. Verifique que la historia refleja TODOS los eventos clínicos relevantes antes de validar.")
+
+        # === Validación de campos del guion (contrato semántico YAML) ===
+        campos_por_sec = _campos_guion()
+        if campos_por_sec and secciones_ia:
+            st.divider()
+            st.markdown("#### 🧪 Validación de campos del guion (contrato semántico)")
+            st.caption("Cada campo definido en `baja_laboral.yaml` se verifica contra la sección redactada (patrón CIE-10, fechas, presencia, validación cruzada).")
+            _icono = {"ok": "✅", "aviso": "🟡", "falta": "⚠️", "manual": "👤"}
+            for seccion, texto_sec in secciones_ia:
+                campos = campos_por_sec.get(seccion, [])
+                if not campos:
+                    continue
+                faltan = sum(1 for c in campos if _validar_campo(c, texto_sec)[0] == "falta")
+                cab = f"📋 {seccion} — {len(campos)} campo(s)" + (f"  ·  ⚠️ {faltan} sin cumplir" if faltan else "  ·  ✅ completos")
+                with st.expander(cab):
+                    for campo in campos:
+                        estado, detalle = _validar_campo(campo, texto_sec)
+                        req = " *(requerido)*" if campo.get("requerido") else ""
+                        cruz = " · 🔁 validación cruzada" if campo.get("validacion_cruzada") else ""
+                        st.markdown(f"{_icono.get(estado,'')} **{campo.get('nombre')}**{req}{cruz} — {detalle}")
 
         # === Visto bueno + validación (deja huella) + descarga ===
         st.divider()
