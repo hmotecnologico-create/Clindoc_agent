@@ -174,3 +174,6 @@ generar_corpus_524folios.py
 # Auditoria/huellas del facultativo (datos clinicos)
 datos/historias_validadas/
 datos/*.json
+
+# PDFs canonicos de folios (datos clinicos)
+datos/expedientes_pdf/

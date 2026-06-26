@@ -32,30 +32,42 @@ def _chunking_folio(texto):
 
 
 @st.cache_data(show_spinner=False)
-def render_folio_resaltado(ruta_str, chunk_idx):
-    """DEEP LINKING FORENSE: renderiza el folio a una página y dibuja un recuadro visual
-    sobre la línea EXACTA del fragmento citado, localizada por sus coordenadas (bbox).
-    Devuelve PNG (bytes). Se calcula al vuelo; no re-ejecuta el pipeline."""
+def render_folio_resaltado(ruta_str, chunk_idx, pdf_str=None):
+    """DEEP LINKING FORENSE: abre el PDF canónico del folio, va a la PÁGINA del fragmento
+    citado y dibuja un recuadro visual sobre la LÍNEA exacta, localizada por sus coordenadas.
+    Devuelve (PNG, encontrado, n_pagina, total_paginas). Si no hay PDF canónico, renderiza el fragmento."""
     texto = Path(ruta_str).read_text(encoding="utf-8", errors="ignore")
     frags = _chunking_folio(texto)
     idx = chunk_idx if 0 <= chunk_idx < len(frags) else (len(frags) - 1 if frags else 0)
     fragmento = (frags[idx] if frags else texto).strip()
-    # Render del FRAGMENTO citado (chunk) en su propia página: siempre cabe y se localiza
+
+    pdf = Path(pdf_str) if pdf_str else None
+    if pdf and pdf.exists():
+        from normalizador_pdf import localizar_en_pdf
+        pagina, rects = localizar_en_pdf(str(pdf), fragmento)
+        d = fitz.open(str(pdf))
+        pg = d[pagina]
+        for r in rects:
+            rr = fitz.Rect(r)
+            linea = fitz.Rect(pg.rect.x0 + 26, rr.y0 - 1.5, pg.rect.x1 - 26, rr.y1 + 1.5)
+            pg.draw_rect(linea, color=(0.85, 0, 0), width=1.6)
+            pg.add_highlight_annot(linea)
+        return pg.get_pixmap(dpi=120).tobytes("png"), bool(rects), pagina + 1, d.page_count
+
+    # Fallback (sin PDF canónico): render del fragmento citado en su propia página
     n_lineas = fragmento.count('\n') + max(2, int(len(fragmento) / 95)) + 4
     alto = float(min(70 + n_lineas * 13.5, 1500))
     doc = fitz.open()
     page = doc.new_page(width=595, height=alto)
     page.insert_textbox(fitz.Rect(38, 30, 558, alto - 20), fragmento, fontsize=10, fontname="helv")
     pg = fitz.open(stream=doc.tobytes(), filetype="pdf")[0]
-    # recuadro sobre las primeras líneas de la evidencia citada (localizadas por sus coordenadas)
-    lineas = [l.strip() for l in fragmento.split('\n') if len(l.strip()) > 12]
     encontrado = False
-    for aguja in lineas[:2]:
+    for aguja in [l.strip() for l in fragmento.split('\n') if len(l.strip()) > 12][:2]:
         for r in pg.search_for(aguja[:80]):
             pg.draw_rect(r, color=(0.85, 0, 0), width=1.6)
             pg.add_highlight_annot(r)
             encontrado = True
-    return pg.get_pixmap(dpi=135).tobytes("png"), encontrado
+    return pg.get_pixmap(dpi=135).tobytes("png"), encontrado, 1, 1
 
 
 def _periodo_historia(texto):
@@ -449,11 +461,12 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
                     if existe and st.session_state.get(rk) == (archivo, chunk_id):
                         m = re.search(r'_chunk_(\d+)', chunk_id or "")
                         idx = int(m.group(1)) if m else 0
+                        pdf_canon = str(Path("datos/expedientes_pdf") / nif_seleccionado / (Path(archivo).stem + ".pdf"))
                         try:
-                            png, encontrado = render_folio_resaltado(str(ruta_docs_aud / archivo), idx)
-                            cap = (f"🔎 Deep Linking — fragmento citado resaltado por sus coordenadas en {archivo}"
+                            png, encontrado, pagina, total_pags = render_folio_resaltado(str(ruta_docs_aud / archivo), idx, pdf_canon)
+                            cap = (f"🔎 Deep Linking — {archivo} · página {pagina}/{total_pags} · recuadro sobre la línea citada"
                                    if encontrado else
-                                   f"🔎 Folio {archivo} (no se pudo localizar el fragmento exacto para el recuadro)")
+                                   f"🔎 {archivo} · página {pagina}/{total_pags} (no se localizó el fragmento exacto)")
                             st.image(png, caption=cap, use_container_width=True)
                         except Exception as e:
                             st.warning(f"No se pudo renderizar el resaltado de {archivo}: {e}")

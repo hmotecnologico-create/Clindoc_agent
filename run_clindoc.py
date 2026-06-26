@@ -976,6 +976,14 @@ class OrquestadorLangGraph:
         # AISLAMIENTO: colección propia y limpia para este paciente (no mezcla folios entre pacientes)
         self.indice.usar_coleccion_paciente(paciente['nif'])
 
+        # NORMALIZACIÓN: folios heterogéneos -> PDF canónico (habilita el Deep Linking por coordenadas)
+        try:
+            from normalizador_pdf import generar_pdfs_paciente
+            ok_pdf, tot_pdf = generar_pdfs_paciente(paciente['nif'])
+            print(f"   [ingesta] {ok_pdf}/{tot_pdf} folios normalizados a PDF canónico")
+        except Exception as _e:
+            print(f"   [aviso] no se pudieron generar PDFs canónicos: {_e}")
+
         state: AgentState = {
             "documentos": [],
             "paciente": paciente,
