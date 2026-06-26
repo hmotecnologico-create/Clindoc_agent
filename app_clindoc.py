@@ -7,10 +7,55 @@ import plotly.express as px
 import plotly.graph_objects as go
 import os
 from pathlib import Path
+import fitz  # PyMuPDF: render del folio + resaltado por coordenadas (Deep Linking forense)
 
 # Importaciones de los nuevos módulos
 from historial_clinico_visual import HistorialClinicoVisual
 from chat_asistente_medico import ChatAsistenteMedico, TipoMensaje
+
+
+def _chunking_folio(texto):
+    """Réplica del chunking del pipeline (run_clindoc._semantic_chunking) para localizar
+    el fragmento citado dentro del folio."""
+    parrafos = (texto or "").split('\n\n')
+    frags, cur = [], ""
+    for p in parrafos:
+        if len(cur) + len(p) < 1000:
+            cur += p + "\n\n"
+        else:
+            if cur:
+                frags.append(cur.strip())
+            cur = p + "\n\n"
+    if cur:
+        frags.append(cur.strip())
+    return frags if frags else [texto or ""]
+
+
+@st.cache_data(show_spinner=False)
+def render_folio_resaltado(ruta_str, chunk_idx):
+    """DEEP LINKING FORENSE: renderiza el folio a una página y dibuja un recuadro visual
+    sobre la línea EXACTA del fragmento citado, localizada por sus coordenadas (bbox).
+    Devuelve PNG (bytes). Se calcula al vuelo; no re-ejecuta el pipeline."""
+    texto = Path(ruta_str).read_text(encoding="utf-8", errors="ignore")
+    frags = _chunking_folio(texto)
+    idx = chunk_idx if 0 <= chunk_idx < len(frags) else (len(frags) - 1 if frags else 0)
+    fragmento = (frags[idx] if frags else texto).strip()
+    # Render del FRAGMENTO citado (chunk) en su propia página: siempre cabe y se localiza
+    n_lineas = fragmento.count('\n') + max(2, int(len(fragmento) / 95)) + 4
+    alto = float(min(70 + n_lineas * 13.5, 1500))
+    doc = fitz.open()
+    page = doc.new_page(width=595, height=alto)
+    page.insert_textbox(fitz.Rect(38, 30, 558, alto - 20), fragmento, fontsize=10, fontname="helv")
+    pg = fitz.open(stream=doc.tobytes(), filetype="pdf")[0]
+    # recuadro sobre las primeras líneas de la evidencia citada (localizadas por sus coordenadas)
+    lineas = [l.strip() for l in fragmento.split('\n') if len(l.strip()) > 12]
+    encontrado = False
+    for aguja in lineas[:2]:
+        for r in pg.search_for(aguja[:80]):
+            pg.draw_rect(r, color=(0.85, 0, 0), width=1.6)
+            pg.add_highlight_annot(r)
+            encontrado = True
+    return pg.get_pixmap(dpi=135).tobytes("png"), encontrado
 
 
 def _periodo_historia(texto):
@@ -378,20 +423,40 @@ if perfil == "👨‍⚕️ Doctor (Facultativo)":
                         for ev in data["events"] if ev["type"] == "analisis_seccion" and ev['details'].get('texto')]
         n_huerfanas = 0
         for si, (seccion, texto_sec) in enumerate(secciones_ia):
-            fuentes = sorted(set(a.strip() for a in re.findall(r'\[Fuente:\s*([^\]#]+)', texto_sec)))
+            citas_raw = re.findall(r'\[Fuente:\s*([^\]#]+?)\s*(?:#([^\]]+))?\]', texto_sec)
+            citas = []
+            for arch, chk in citas_raw:
+                par = (arch.strip(), (chk or "").strip())
+                if par not in citas:
+                    citas.append(par)
+            fuentes = sorted(set(a for a, _ in citas))
             if not fuentes:
                 n_huerfanas += 1
             etiqueta = "⚠️ SIN FUENTE (huérfano)" if not fuentes else f"✅ {len(fuentes)} fuente(s)"
             with st.expander(f"📄 {seccion}  —  {etiqueta}"):
                 if not fuentes:
                     st.error("⚠️ Sección SIN fuente → afirmación no respaldada por la IA. Verifíquela manualmente.")
-                for fi, archivo in enumerate(fuentes):
+                rk = f"resaltar_{nif_seleccionado}"
+                for fi, (archivo, chunk_id) in enumerate(citas):
                     existe = (ruta_docs_aud / archivo).exists()
-                    c1, c2 = st.columns([5, 1])
+                    c1, c2, c3 = st.columns([4, 1, 1.4])
                     c1.markdown(f"🔗 `{archivo}`" + ("" if existe else "  ⚠️ *no localizada (cita no verificable)*"))
                     if existe and c2.button("👁️ Ver", key=f"ver_{nif_seleccionado}_{si}_{fi}"):
                         st.session_state[sk_fuente] = archivo
                         st.rerun()
+                    if existe and c3.button("🔍 Resaltar", key=f"res_{nif_seleccionado}_{si}_{fi}"):
+                        st.session_state[rk] = (archivo, chunk_id)
+                    if existe and st.session_state.get(rk) == (archivo, chunk_id):
+                        m = re.search(r'_chunk_(\d+)', chunk_id or "")
+                        idx = int(m.group(1)) if m else 0
+                        try:
+                            png, encontrado = render_folio_resaltado(str(ruta_docs_aud / archivo), idx)
+                            cap = (f"🔎 Deep Linking — fragmento citado resaltado por sus coordenadas en {archivo}"
+                                   if encontrado else
+                                   f"🔎 Folio {archivo} (no se pudo localizar el fragmento exacto para el recuadro)")
+                            st.image(png, caption=cap, use_container_width=True)
+                        except Exception as e:
+                            st.warning(f"No se pudo renderizar el resaltado de {archivo}: {e}")
         if secciones_ia:
             (st.success if n_huerfanas == 0 else st.warning)(
                 "✅ Trazabilidad completa: ninguna sección huérfana." if n_huerfanas == 0
