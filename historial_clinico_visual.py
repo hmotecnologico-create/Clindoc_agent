@@ -243,6 +243,23 @@ class HistorialClinicoVisual:
         
         return texto[inicio:fin].strip()
     
+    def _extraer_texto(self, archivo: Path) -> str:
+        """Extrae texto según el formato real del archivo (mismo criterio que AgenteEscanner:
+        PDF -> pypdf, DOCX -> python-docx, MD/TXT -> lectura directa; PNG no se procesa)."""
+        ext = archivo.suffix.lower()
+        if ext == ".pdf":
+            import pypdf
+            with open(archivo, "rb") as f:
+                reader = pypdf.PdfReader(f)
+                return "".join(p.extract_text() or "" for p in reader.pages)
+        if ext == ".docx":
+            from docx import Document as DocxDocument
+            doc = DocxDocument(archivo)
+            return "\n".join(p.text for p in doc.paragraphs)
+        if ext in (".md", ".txt"):
+            return archivo.read_text(encoding="utf-8")
+        return ""
+
     def cargar_expediente(self, paciente_nif: str, paciente_nombre: str):
         """Carga todos los documentos de un paciente"""
         self.paciente_actual = {
@@ -251,31 +268,56 @@ class HistorialClinicoVisual:
         }
         self.eventos = []
         
-        # Cargar desde carpeta de auditorías
-        carpeta = Path("datos/auditorias")
-        if carpeta.exists():
-            for archivo in carpeta.glob(f"inf_{paciente_nif}_*.json"):
-                try:
-                    with open(archivo, "r", encoding="utf-8") as f:
-                        data = json.load(f)
+        # Cargar desde dashboard_data.json
+        ruta_db = Path("dashboard_data.json")
+        if ruta_db.exists():
+            try:
+                with open(ruta_db, "r", encoding="utf-8") as f:
+                    db = json.load(f)
                     
-                    # Buscar en secciones
-                    secciones = data.get("secciones", {})
-                    for seccion, contenido in secciones.items():
+                # Buscar el paciente (soporta lista o diccionario)
+                pacientes_data = db.get("pacientes", {})
+                paciente_data = None
+                if isinstance(pacientes_data, dict):
+                    if paciente_nif in pacientes_data:
+                        paciente_data = pacientes_data[paciente_nif]
+                        # Asegurar que tenga el NIF
+                        paciente_data["nif"] = paciente_nif
+                elif isinstance(pacientes_data, list):
+                    for p in pacientes_data:
+                        if isinstance(p, dict) and p.get("nif") == paciente_nif:
+                            paciente_data = p
+                            break
+                        
+                if paciente_data:
+                    # Extraer eventos de la historia clínica
+                    hc = paciente_data.get("historia_clinica", "")
+                    if hc:
                         eventos = self._extraer_eventos_de_documento(
-                            data.get("informe_id", ""),
-                            contenido,
-                            f"sección: {seccion}"
+                            "Historia Clínica Central",
+                            hc,
+                            "Resumen RAG"
                         )
                         self.eventos.extend(eventos)
-                except:
-                    pass
+                    # Extraer eventos de los informes de alta
+                    altas = paciente_data.get("informes_alta", "")
+                    if altas:
+                        eventos = self._extraer_eventos_de_documento(
+                            "Informes de Alta",
+                            altas,
+                            "Resumen RAG"
+                        )
+                        self.eventos.extend(eventos)
+            except Exception as e:
+                print(f"Error cargando trazabilidad: {e}")
         
         # Cargar también desde carpeta de expedientes
         if self.ruta.exists():
             for archivo in self.ruta.glob("*"):
                 try:
-                    contenido = archivo.read_text(encoding="utf-8")
+                    contenido = self._extraer_texto(archivo)
+                    if not contenido:
+                        continue
                     eventos = self._extraer_eventos_de_documento(
                         archivo.stem,
                         contenido,

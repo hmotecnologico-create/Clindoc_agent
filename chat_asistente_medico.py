@@ -208,10 +208,22 @@ class ChatAsistenteMedico:
             return []
         resultados = []
         for archivo in sorted(carpeta.glob("*")):
-            if archivo.suffix.lower() not in (".md", ".txt"):
+            ext = archivo.suffix.lower()
+            if ext not in (".md", ".txt", ".pdf", ".docx"):
                 continue
             try:
-                texto = archivo.read_text(encoding="utf-8", errors="ignore")
+                if ext == ".pdf":
+                    import pypdf
+                    with open(archivo, "rb") as f:
+                        reader = pypdf.PdfReader(f)
+                        texto = "".join(p.extract_text() or "" for p in reader.pages)
+                elif ext == ".docx":
+                    from docx import Document as DocxDocument
+                    texto = "\n".join(p.text for p in DocxDocument(archivo).paragraphs)
+                else:
+                    texto = archivo.read_text(encoding="utf-8", errors="ignore")
+                if not texto.strip():
+                    continue
             except Exception:
                 continue
             tl = texto.lower()

@@ -1,0 +1,25 @@
+{
+  "n_docs": 150,
+  "resultados": {
+    "Qdrant": {
+      "t_index": 2.443,
+      "t_query": 0.204,
+      "acierto3": 75.0
+    },
+    "ChromaDB": {
+      "t_index": 0.072,
+      "t_query": 0.281,
+      "acierto3": 75.0
+    },
+    "FAISS": {
+      "t_index": 0.0,
+      "t_query": 0.233,
+      "acierto3": 75.0
+    },
+    "Milvus": {
+      "t_index": 0.079,
+      "t_query": 0.752,
+      "acierto3": 75.0
+    }
+  }
+}

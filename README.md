@@ -19,7 +19,7 @@ ingestion → validate_identity → validate_vigency → redact → critique ⟳
 | **Escáner** | Ingesta y extracción layout-aware (multiformato) | Docling (+ fallback PyPDF2), MD/TXT/DOCX |
 | **Verificador de Identidad** | Validación cruzada de NIF/NIE con algoritmo oficial español | regex + dígito de control |
 | **Verificador de Vigencia** | Control de fechas y caducidad documental | reglas deterministas |
-| **Redactor (RAG)** | Recuperación semántica + síntesis citando fuentes (Deep Linking) | Qdrant local (all-MiniLM-L6-v2, 384-d) + Ollama / `gemma3:4b` |
+| **Redactor (RAG)** | Recuperación semántica + síntesis citando fuentes (Deep Linking) | Qdrant local (paraphrase-multilingual-mpnet-base-v2, 768-d) + Ollama / `gemma3:4b` |
 | **Ensamblador** | Informe técnico en PDF + anexos | ReportLab + pypdf |
 
 La validación (identidad, contratos de datos) se apoya en **Pydantic**; toda la traza queda registrada como *chain-of-thought* para auditoría.

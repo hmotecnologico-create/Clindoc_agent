@@ -14,222 +14,8 @@ from historial_clinico_visual import HistorialClinicoVisual
 from chat_asistente_medico import ChatAsistenteMedico, TipoMensaje
 
 
-def _chunking_folio(texto):
-    """Réplica del chunking del pipeline (run_clindoc._semantic_chunking) para localizar
-    el fragmento citado dentro del folio."""
-    parrafos = (texto or "").split('\n\n')
-    frags, cur = [], ""
-    for p in parrafos:
-        if len(cur) + len(p) < 1000:
-            cur += p + "\n\n"
-        else:
-            if cur:
-                frags.append(cur.strip())
-            cur = p + "\n\n"
-    if cur:
-        frags.append(cur.strip())
-    return frags if frags else [texto or ""]
 
-
-@st.cache_data(show_spinner=False)
-def render_folio_resaltado(ruta_str, chunk_idx, pdf_str=None):
-    """DEEP LINKING FORENSE: abre el PDF canónico del folio, va a la PÁGINA del fragmento
-    citado y dibuja un recuadro visual sobre la LÍNEA exacta, localizada por sus coordenadas.
-    Devuelve (PNG, encontrado, n_pagina, total_paginas). Si no hay PDF canónico, renderiza el fragmento."""
-    texto = Path(ruta_str).read_text(encoding="utf-8", errors="ignore")
-    frags = _chunking_folio(texto)
-    idx = chunk_idx if 0 <= chunk_idx < len(frags) else (len(frags) - 1 if frags else 0)
-    fragmento = (frags[idx] if frags else texto).strip()
-
-    pdf = Path(pdf_str) if pdf_str else None
-    if pdf and pdf.exists():
-        from normalizador_pdf import localizar_en_pdf
-        pagina, rects = localizar_en_pdf(str(pdf), fragmento)
-        d = fitz.open(str(pdf))
-        pg = d[pagina]
-        for r in rects:
-            rr = fitz.Rect(r)
-            linea = fitz.Rect(pg.rect.x0 + 26, rr.y0 - 1.5, pg.rect.x1 - 26, rr.y1 + 1.5)
-            pg.draw_rect(linea, color=(0.85, 0, 0), width=1.6)
-            pg.add_highlight_annot(linea)
-        return pg.get_pixmap(dpi=120).tobytes("png"), bool(rects), pagina + 1, d.page_count
-
-    # Fallback (sin PDF canónico): render del fragmento citado en su propia página
-    n_lineas = fragmento.count('\n') + max(2, int(len(fragmento) / 95)) + 4
-    alto = float(min(70 + n_lineas * 13.5, 1500))
-    doc = fitz.open()
-    page = doc.new_page(width=595, height=alto)
-    page.insert_textbox(fitz.Rect(38, 30, 558, alto - 20), fragmento, fontsize=10, fontname="helv")
-    pg = fitz.open(stream=doc.tobytes(), filetype="pdf")[0]
-    encontrado = False
-    for aguja in [l.strip() for l in fragmento.split('\n') if len(l.strip()) > 12][:2]:
-        for r in pg.search_for(aguja[:80]):
-            pg.draw_rect(r, color=(0.85, 0, 0), width=1.6)
-            pg.add_highlight_annot(r)
-            encontrado = True
-    return pg.get_pixmap(dpi=135).tobytes("png"), encontrado, 1, 1
-
-
-@st.cache_data(show_spinner=False)
-def _campos_guion(ruta="guiones/baja_laboral.yaml"):
-    """Carga los campos por sección del guion YAML (contrato semántico): {titulo: [campos]}."""
-    import yaml
-    try:
-        y = yaml.safe_load(Path(ruta).read_text(encoding="utf-8"))
-        return {s["titulo"]: s.get("campos", []) for s in y.get("secciones", [])}
-    except Exception:
-        return {}
-
-
-def _validar_campo(campo, texto):
-    """Valida un campo del guion contra el texto de la sección. Devuelve (estado, detalle).
-    Estados: ok / aviso / falta / manual."""
-    nombre = campo.get("nombre", "")
-    patron = campo.get("patron")
-    requerido = campo.get("requerido", False)
-    falta = "falta" if requerido else "aviso"
-    if patron:  # p.ej. CIE-10
-        p = patron[1:] if patron.startswith("^") else patron
-        p = p[:-1] if p.endswith("$") else p
-        m = re.search(p, texto)
-        return ("ok", f"patrón cumplido → {m.group(0)}") if m else (falta, "patrón no encontrado")
-    if campo.get("tipo") == "fecha" or nombre.startswith("fecha"):
-        return ("ok", "fecha presente") if re.search(r"\d{1,2}[/-]\d{1,2}[/-]\d{4}", texto) else (falta, "sin fecha")
-    claves = {
-        "num_seguridad_social": [r"seguridad social", r"\bnuss\b", r"n\.?u\.?s\.?s"],
-        "empresa": [r"empresa"],
-        "nif": [r"\b\d{8}[A-Za-z]\b"],
-        "nombre_completo": [r"[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+ [A-ZÁÉÍÓÚÑ][a-záéíóúñ]+", r"paciente"],
-        "diagnostico_principal": [r"diagn[oó]stic"],
-    }
-    kws = claves.get(nombre)
-    if kws:
-        for k in kws:
-            if re.search(k, texto, re.IGNORECASE):
-                return "ok", "presente"
-        return falta, "no detectado"
-    return "manual", "verificación del facultativo"
-
-
-def _periodo_historia(texto):
-    """Calcula el período (desde–hasta) a partir de las fechas que aparecen en la historia."""
-    fechas = []
-    for d_, m_, y_ in re.findall(r'\b(\d{1,2})[/-](\d{1,2})[/-](\d{4})\b', texto or ""):
-        try:
-            fechas.append(datetime(int(y_), int(m_), int(d_)))
-        except Exception:
-            pass
-    fechas = [f for f in fechas if 1990 <= f.year <= datetime.now().year]
-    if not fechas:
-        return "no determinado en los documentos"
-    return f"{min(fechas):%d/%m/%Y} — {max(fechas):%d/%m/%Y}"
-
-
-def generar_pdf_historia(nombre, nif, texto, medico):
-    """Genera, en memoria, el PDF profesional de la Historia Clínica Consolidada validada por el facultativo."""
-    import io
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib.units import cm
-    from reportlab.lib import colors
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
-    from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer, Table,
-                                    TableStyle, HRFlowable)
-
-    def fmt(s):
-        s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-        return re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
-
-    AZUL = colors.HexColor("#1e3a8a")
-    GRIS = colors.HexColor("#555555")
-    ahora = datetime.now()
-    periodo = _periodo_historia(texto)
-
-    buf = io.BytesIO()
-    doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=2.2 * cm, rightMargin=2.2 * cm,
-                            topMargin=1.8 * cm, bottomMargin=1.8 * cm,
-                            title=f"Historia Clínica Consolidada - {nombre}", author=medico or "ClinDoc Agent")
-    ss = getSampleStyleSheet()
-    s_title = ParagraphStyle("t", parent=ss["Title"], fontName="Helvetica-Bold", fontSize=16, textColor=AZUL, spaceAfter=1, alignment=TA_CENTER)
-    s_sub = ParagraphStyle("s", parent=ss["Normal"], fontName="Helvetica-Oblique", fontSize=8.5, textColor=GRIS, alignment=TA_CENTER, spaceAfter=8)
-    s_h = ParagraphStyle("h", parent=ss["Heading2"], fontName="Helvetica-Bold", fontSize=11.5, textColor=AZUL, spaceBefore=9, spaceAfter=3)
-    s_body = ParagraphStyle("b", parent=ss["Normal"], fontName="Helvetica", fontSize=10, leading=14, alignment=TA_JUSTIFY, spaceAfter=3)
-    s_cell = ParagraphStyle("c", parent=ss["Normal"], fontName="Helvetica", fontSize=9.5, leading=13)
-    s_foot = ParagraphStyle("f", parent=ss["Normal"], fontName="Helvetica", fontSize=9, textColor=GRIS, leading=13)
-
-    el = [Paragraph("HISTORIA CLÍNICA CONSOLIDADA", s_title),
-          Paragraph("Síntesis documental generada por IA local · validada por facultativo · ClinDoc Agent", s_sub),
-          HRFlowable(width="100%", thickness=1.2, color=AZUL, spaceAfter=8)]
-    cab = Table([[Paragraph(f"<b>Paciente:</b> {nombre}", s_cell), Paragraph(f"<b>NIF:</b> {nif}", s_cell)],
-                 [Paragraph(f"<b>Período de la historia:</b> {periodo}", s_cell),
-                  Paragraph(f"<b>Tipo:</b> síntesis documental trazable", s_cell)]],
-                colWidths=[9.6 * cm, 7.0 * cm])
-    cab.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.5, colors.HexColor("#cccccc")),
-                             ("INNERGRID", (0, 0), (-1, -1), 0.3, colors.HexColor("#e6e6e6")),
-                             ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#f4f7fc")),
-                             ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                             ("LEFTPADDING", (0, 0), (-1, -1), 8), ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-                             ("TOPPADDING", (0, 0), (-1, -1), 5), ("BOTTOMPADDING", (0, 0), (-1, -1), 5)]))
-    el += [cab, Spacer(1, 10)]
-
-    for raw in (texto or "").split("\n"):
-        line = raw.rstrip()
-        if not line.strip():
-            el.append(Spacer(1, 4))
-        elif line.lstrip().startswith("## ") or line.lstrip().startswith("### "):
-            el.append(Paragraph(fmt(line.lstrip("# ").strip()), s_h))
-        else:
-            el.append(Paragraph(fmt(line), s_body))
-
-    el += [Spacer(1, 14),
-           HRFlowable(width="100%", thickness=0.8, color=colors.HexColor("#cccccc"), spaceAfter=6),
-           Paragraph(f"<b>Período cubierto por la historia:</b> {periodo}", s_foot),
-           Paragraph(f"<b>Historia realizada el:</b> {ahora:%d/%m/%Y} a las {ahora:%H:%M} h", s_foot),
-           Spacer(1, 20),
-           Paragraph(f"<b>Facultativo responsable:</b> {medico or '________________________'}", s_foot),
-           Spacer(1, 6),
-           Paragraph("Firma: ______________________________&nbsp;&nbsp;&nbsp;&nbsp;"
-                     f"Fecha y hora: {ahora:%d/%m/%Y %H:%M} h", s_foot)]
-    doc.build(el)
-    buf.seek(0)
-    return buf.getvalue()
-
-
-def registrar_validacion_facultativo(nif, medico, editado, historia=None):
-    """Constancia de auditoría (Human-in-the-Loop): registra la validación y guarda la HUELLA de la historia validada."""
-    log_path = "datos/validaciones_facultativo.json"
-    registros = []
-    if os.path.exists(log_path):
-        try:
-            with open(log_path, encoding="utf-8") as f:
-                registros = json.load(f)
-        except Exception:
-            registros = []
-    ts = datetime.now()
-    registros.append({
-        "nif": nif,
-        "facultativo": medico or "(sin nombre)",
-        "accion": "editado y validado" if editado else "validado (visto bueno)",
-        "timestamp": ts.isoformat()
-    })
-    os.makedirs("datos", exist_ok=True)
-    with open(log_path, "w", encoding="utf-8") as f:
-        json.dump(registros, f, indent=2, ensure_ascii=False)
-    # Huella: la historia validada se guarda CIFRADA (AES-256-GCM) en reposo (RNF-01 / RGPD)
-    if historia is not None:
-        os.makedirs("datos/historias_validadas", exist_ok=True)
-        contenido = (f"# HISTORIA CLÍNICA VALIDADA\n# Facultativo responsable: {medico or '(sin nombre)'}\n"
-                     f"# Fecha/hora: {ts:%d/%m/%Y %H:%M:%S}\n"
-                     f"# Acción: {'EDITADA y validada' if editado else 'validada (visto bueno, sin cambios)'}\n\n{historia}")
-        base = f"datos/historias_validadas/{nif}_{ts:%Y%m%d_%H%M%S}"
-        try:
-            from cifrado import CifradoClinDoc
-            with open(base + ".enc", "w", encoding="utf-8") as f:
-                f.write(CifradoClinDoc().cifrar(contenido))
-        except Exception as e:
-            # Si el cifrado fallara, NO dejar el dato clínico en claro
-            with open(base + ".error.txt", "w", encoding="utf-8") as f:
-                f.write(f"[huella no guardada: cifrado no disponible: {e}]")
+from utils.ui_helpers import _chunking_folio, render_folio_resaltado, _campos_guion, _validar_campo, _periodo_historia, generar_pdf_historia, registrar_validacion_facultativo
 
 # Configuración de página
 st.set_page_config(
@@ -238,29 +24,81 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- ESTILO PREMIUM ---
+
+# --- ESTILO CLÍNICO E INSTITUCIONAL ---
 st.markdown("""
     <style>
-    .main { background-color: #f0f2f6; }
-    [data-testid="stMetricValue"] { font-size: 28px; color: #1e3a8a; }
-    .stTabs [data-baseweb="tab-list"] { gap: 24px; }
+    /* Estilos Clínicos - Severo y Utililitario */
+    .main { background-color: #FFFFFF; font-family: 'Roboto', 'Arial', sans-serif; }
+    
+    /* Tipografía y métricas (Sobrias) */
+    [data-testid="stMetricValue"] { 
+        font-size: 28px; 
+        color: #1a202c; 
+        font-weight: bold;
+    }
+    [data-testid="stMetricLabel"] {
+        color: #4a5568;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+    }
+    
+    /* Pestañas estilizadas (Flat Design Institucional) */
+    .stTabs [data-baseweb="tab-list"] { 
+        gap: 0px; 
+        padding-bottom: 0px;
+        border-bottom: 2px solid #cbd5e0;
+        background-color: #f7fafc;
+    }
     .stTabs [data-baseweb="tab"] {
         height: 50px;
-        white-space: pre-wrap;
-        background-color: #ffffff;
-        border-radius: 5px 5px 0px 0px;
-        gap: 1px;
-        padding-top: 10px;
-        padding-bottom: 10px;
+        background-color: transparent;
+        border-radius: 0px;
+        border-right: 1px solid #e2e8f0;
+        padding: 10px 20px;
+        font-weight: 600;
+        font-size: 14px;
+        color: #4a5568;
     }
-    .stTabs [aria-selected="true"] { background-color: #e5e7eb; border-bottom: 2px solid #1e3a8a; }
-    .agent-card {
-        background-color: white;
-        padding: 15px;
-        border-radius: 10px;
-        border-left: 5px solid #1e3a8a;
-        margin-bottom: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    .stTabs [data-baseweb="tab"]:hover {
+        background-color: #edf2f7;
+    }
+    .stTabs [aria-selected="true"] { 
+        background-color: #FFFFFF; 
+        border-top: 3px solid #005B96; 
+        border-bottom: 2px solid #FFFFFF;
+        color: #005B96;
+    }
+    
+    /* Tarjetas de datos (Flat sin sombras exageradas) */
+    .premium-card {
+        background: #FFFFFF;
+        padding: 20px;
+        border: 1px solid #cbd5e0;
+        border-left: 6px solid #005B96;
+        margin-bottom: 15px;
+    }
+    
+    /* Botones principales */
+    div.stButton > button {
+        border-radius: 4px;
+        font-weight: 600;
+        border: 1px solid #cbd5e0;
+        background-color: #f7fafc;
+        color: #2d3748;
+    }
+    div.stButton > button:hover {
+        border-color: #005B96;
+        color: #005B96;
+    }
+    div.stButton > button[kind="primary"] {
+        background-color: #005B96;
+        color: white;
+        border: none;
+    }
+    div.stButton > button[kind="primary"]:hover {
+        background-color: #003f6b;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -281,7 +119,7 @@ pacientes_db = data_general.get("pacientes", {})
 with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/3774/3774293.png", width=80)
     st.header("Modo de Acceso")
-    perfil = st.radio("Seleccione Perfil:", ["👨‍⚕️ Doctor (Facultativo)", "🎓 Tribunal Académico"])
+    perfil = st.radio("Seleccione Perfil:", ["Doctor (Facultativo)", "Tribunal Académico"])
     st.write("---")
     
     st.header("Buscador de Pacientes")
@@ -307,7 +145,7 @@ with st.sidebar:
     st.caption("ClinDoc Agent v5.0")
     
     st.write("---")
-    st.header("💬 Chat Asistente")
+    st.header("Chat Asistente")
     if 'chat_asistente' not in st.session_state:
         st.session_state.chat_asistente = ChatAsistenteMedico()
         
@@ -335,13 +173,64 @@ col_t1, col_t2 = st.columns([4, 1])
 with col_t1:
     st.title("🛡️ ClinDoc Agent | Expediente Clínico")
     
-    # Perfil del Paciente (Datos Personales Básicos)
-    with st.container():
-        st.markdown(f"### 👤 Datos Personales: {data['nombre']}")
-        col_p1, col_p2, col_p3 = st.columns(3)
-        col_p1.markdown(f"**NIF:** `{data['nif']}`")
-        col_p2.markdown("**Estado:** Activo")
-        col_p3.markdown("**Último Ingreso:** 2026")
+    # --- RELOJ REGRESIVO ---
+    if os.path.exists("eta.txt"):
+        try:
+            target_time = float(open("eta.txt").read().strip())
+            import time
+            if time.time() < target_time:
+                js_code = f"""
+                <div id="countdown" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 16px; font-weight: bold; color: #856404; padding: 12px; background-color: #fff3cd; border-radius: 8px; text-align: center; border: 1px solid #ffeeba; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);"></div>
+                <script>
+                var targetTime = {target_time} * 1000;
+                var x = setInterval(function() {{
+                    var now = new Date().getTime();
+                    var distance = targetTime - now;
+                    if (distance < 0) {{
+                        clearInterval(x);
+                        document.getElementById("countdown").innerHTML = "✅ Procesamiento finalizado (Estimación). Por favor, haz clic en 'Refrescar Datos'.";
+                        document.getElementById("countdown").style.backgroundColor = "#d4edda";
+                        document.getElementById("countdown").style.color = "#155724";
+                        document.getElementById("countdown").style.borderColor = "#c3e6cb";
+                    }} else {{
+                        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                        document.getElementById("countdown").innerHTML = "⚙️ <b>PROCESANDO EXPEDIENTE:</b> Tiempo estimado restante: " + minutes + "m " + seconds + "s";
+                    }}
+                }}, 1000);
+                </script>
+                """
+                import streamlit.components.v1 as components
+                components.html(js_code, height=70)
+        except:
+            pass
+    
+    DEMO_PATIENTS = {
+        "25988000R": {"edad": 45, "sexo": "Masculino", "telefono": "654 321 987", "direccion": "Calle Mayor 12, 3ºB, Madrid"},
+        "52880483X": {"edad": 38, "sexo": "Femenino", "telefono": "698 765 432", "direccion": "Avenida de la Libertad 45, Barcelona"}
+    }
+    demo_data = DEMO_PATIENTS.get(data['nif'], {"edad": "N/A", "sexo": "N/A", "telefono": "N/A", "direccion": "N/A"})
+    
+    # Perfil del Paciente (Datos Personales Básicos - Estilo Premium)
+    st.markdown(f"""
+    <div class="premium-card">
+        <h2 style="margin-top:0; color:#005B96;">{data['nombre']}</h2>
+        <div style="display:flex; justify-content:space-between; flex-wrap:wrap; color:#2d3748;">
+            <div style="flex:1; min-width:200px;">
+                <p><b>NIF:</b> <span style="background:#e0f2fe; padding:2px 8px; border-radius:4px; font-family:monospace;">{data['nif']}</span></p>
+                <p><b>Edad:</b> {demo_data['edad']} años</p>
+            </div>
+            <div style="flex:1; min-width:200px;">
+                <p><b>Sexo:</b> {demo_data['sexo']}</p>
+                <p><b>Estado:</b> <span style="color:#047857; font-weight:bold;">● Activo</span></p>
+            </div>
+            <div style="flex:1; min-width:200px;">
+                <p><b>Teléfono:</b> {demo_data['telefono']}</p>
+                <p><b>Dirección:</b> {demo_data['direccion']}</p>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
     st.write("") # Espacio
     
@@ -353,7 +242,13 @@ with col_t1:
             st.success("✅ **Validación NIF:** Identidad verificada con el documento.")
         else:
             errores = ult_evento["details"].get("errores", [])
-            errores_txt = " | ".join(errores) if errores else "No se encontró el NIF en el documento."
+            if not errores:
+                errores_txt = "No se encontró el NIF en el documento."
+            elif len(errores) > 3:
+                errores_txt = " | ".join(errores[:3]) + f" ... (y {len(errores) - 3} alertas más ocultas por volumen)"
+            else:
+                errores_txt = " | ".join(errores)
+            
             st.error(f"🚨 **ALERTA DE SEGURIDAD (ERRATA):** {errores_txt}")
             
             # Permitir ver el documento que generó la errata
@@ -374,268 +269,213 @@ with col_t2:
     if st.button("🔄 Refrescar Datos", use_container_width=True):
         st.rerun()
 
-# --- KPIs SUPERIORES ---
-kpi1, kpi2, kpi3, kpi4 = st.columns(4)
-kpi1.metric("📄 Documentos", data["kpis"]["total_docs"])
-kpi2.metric("⏱️ Tiempo Total", f"{data['kpis']['total_time']}s")
-kpi3.metric("🎯 Confianza", f"{round(data['kpis']['avg_confidence']*100, 1)}%")
-kpi4.metric("🚨 Riesgos", data["kpis"]["critical_risks"], delta_color="inverse")
-
-st.markdown("---")
+# --- KPIs SUPERIORES (Solo para Tribunal) ---
+if perfil == "Tribunal Académico":
+    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+    kpi1.metric("📄 Documentos", data["kpis"]["total_docs"])
+    kpi2.metric("⏱️ Tiempo Total", f"{data['kpis']['total_time']}s")
+    kpi3.metric("🎯 Confianza", f"{round(data['kpis']['avg_confidence']*100, 1)}%")
+    kpi4.metric("🚨 Riesgos", data["kpis"]["critical_risks"], delta_color="inverse")
+    st.markdown("---")
 
 # PERFIL DOCTOR
-if perfil == "👨‍⚕️ Doctor (Facultativo)":
-    tab_hist, tab_resumen, tab_traz = st.tabs(["📈 Historial Clínico", "📝 Resumen Auditable", "📅 Trazabilidad Folios"])
-    
-    with tab_hist:
-        st.subheader("Evolución Clínica del Paciente")
-        historial = HistorialClinicoVisual(f"datos/expedientes/{nif_seleccionado}")
-        _ = historial.cargar_expediente(nif_seleccionado, data["nombre"])
-        
-        # --- LÍNEA DE TIEMPO INTERACTIVA ---
-        if historial.eventos:
-            st.markdown("### 📋 Línea de Tiempo de Eventos Clínicos")
-            st.caption("Haz clic en un evento para ver el documento (y la imagen) de origen — trazabilidad para auditar la IA y detectar omisiones.")
-
-            eventos_clinicos = [e for e in historial.eventos if e.tipo != "evento"]
-            for i, ev in enumerate(eventos_clinicos):
-                # Determinar icono según tipo
-                icono = "💊" if ev.tipo == "tratamiento" else "🩺" if ev.tipo == "diagnostico" else "🧪" if ev.tipo == "examen" else "📅"
-                
-                with st.expander(f"{icono} **{ev.fecha.strftime('%d/%m/%Y')}** | {ev.titulo}"):
-                    st.markdown(f"**Detalle extraído por IA:** {ev.descripcion}")
-                    st.markdown(f"**Archivo de origen:** `{ev.fuente}`")
-                    
-                    # Cargar y mostrar el documento original de forma contextualizada
-                    ruta_docs = Path(f"datos/expedientes/{nif_seleccionado}")
-                    archivo_fuente = ruta_docs / ev.fuente
-                    if archivo_fuente.exists():
-                        try:
-                            texto_doc = archivo_fuente.read_text(encoding='utf-8')
-                            st.text_area("Contenido del documento en esta fecha:", value=texto_doc, height=150, disabled=True, key=f"doc_{nif_seleccionado}_{i}")
-                        except Exception as e:
-                            st.error("No se pudo leer el documento original.")
-                    else:
-                        st.warning("El documento original ha sido archivado o no está disponible en la ruta.")
-
-                    # Trazabilidad VISUAL (anti-caja negra): en pruebas de imagen, mostrar el estudio
-                    # para que el facultativo verifique la fuente y detecte posibles errores u omisiones de la IA.
-                    if ev.tipo == "examen":
-                        imgs = sorted(list(ruta_docs.glob("*.png")) + list(ruta_docs.glob("*.jpg")) + list(ruta_docs.glob("*.jpeg")))
-                        if imgs:
-                            st.markdown("**🖼️ Estudio de imagen asociado (revisión del especialista):**")
-                            st.image(str(imgs[0]), use_container_width=True,
-                                     caption="⚠️ La IA NO interpreta la imagen — el facultativo la revisa para verificar la fuente y detectar omisiones.")
-        else:
-            st.info("No hay eventos clínicos extraídos aún.")
-            
-    with tab_resumen:
-        st.subheader("📝 Historia Clínica Consolidada — Validación del Facultativo")
-        st.info("Revise, **edite o complete** el borrador generado por la IA. Debe **dar el visto bueno** para descargar el informe final; toda modificación queda registrada (Human-in-the-Loop).")
-        st.warning("🔒 **Principio del sistema:** la aplicación **NO inventa**. Solo redacta sobre la evidencia documental del expediente y **cada párrafo cita su fuente**. Lo que no tenga respaldo se marca como **HUÉRFANO** para su revisión. El visto bueno es responsabilidad del **facultativo**, no de la IA.")
-
-        # Recuperar resumen de los eventos de "analisis_seccion"
-        resumen_ia = ""
-        for ev in data["events"]:
-            if ev["type"] == "analisis_seccion":
-                texto_seccion = (ev['details'].get('texto', '') or '').strip()
-                if texto_seccion:
-                    # La IA ya suele incluir su propio "## Título"; solo añadirlo si falta (evita duplicar)
-                    if not texto_seccion.lstrip().startswith("#"):
-                        texto_seccion = f"## {ev['details'].get('seccion', 'Sección')}\n{texto_seccion}"
-                    resumen_ia += texto_seccion + "\n\n"
-        if not resumen_ia:
-            resumen_ia = "No se encontraron secciones redactadas para este paciente."
-
-        # ===================== ESTACIÓN DE AUDITORÍA: fuente ⟷ historia =====================
-        ruta_docs_aud = Path(f"datos/expedientes/{nif_seleccionado}")
-        docs_disponibles = sorted([p.name for p in ruta_docs_aud.glob("*")
-                                   if p.suffix.lower() in (".md", ".txt")])
-        sk_fuente = f"fuente_activa_{nif_seleccionado}"
-        if st.session_state.get(sk_fuente) not in docs_disponibles:
-            st.session_state[sk_fuente] = docs_disponibles[0] if docs_disponibles else None
-
-        st.markdown("### 🩺 Estación de auditoría")
-        st.markdown("**Paso 1 · Revise la fuente y edite la historia** — a la izquierda el respaldo documental, a la derecha la historia editable.")
-        col_fuente, col_hist = st.columns(2)
-
-        with col_fuente:
-            st.markdown(f"##### 📚 Respaldo documental ({len(docs_disponibles)} fuentes del expediente)")
-            if docs_disponibles:
-                idx = docs_disponibles.index(st.session_state[sk_fuente]) if st.session_state[sk_fuente] in docs_disponibles else 0
-                sel = st.selectbox("Documento de origen:", docs_disponibles, index=idx, key=f"selfuente_{nif_seleccionado}")
-                st.session_state[sk_fuente] = sel
-                st.text_area("Contenido COMPLETO de la fuente:",
-                             value=(ruta_docs_aud / sel).read_text(encoding="utf-8", errors="ignore"),
-                             height=430, disabled=True, key=f"viewfuente_{nif_seleccionado}")
+if perfil == "Doctor (Facultativo)":
+    # MODAL PARA VER DOCUMENTOS (Pop-ups nativos)
+    @st.dialog("Visor de Documento Original", width="large")
+    def mostrar_documento(ruta_archivo, fragmento=None):
+        if not ruta_archivo.exists():
+            matches = list(ruta_archivo.parent.glob(f"{ruta_archivo.stem}.*"))
+            if matches:
+                ruta_archivo = matches[0]
             else:
-                st.warning("No hay documentos de origen disponibles para este paciente.")
+                st.warning(f"💡 **Fuente Externa:** El asistente ha citado una guía médica o referencia literaria ('{ruta_archivo.name}') que no forma parte de los documentos físicos del expediente del paciente.")
+                return
+                
+        if ruta_archivo.exists():
+            ext = ruta_archivo.suffix.lower()
+            if ext == ".pdf":
+                st.markdown(f"**Visualizando:** `{ruta_archivo.name}`")
+                
+                # --- DEEP LINKING FORENSE (Bounding Box) ---
+                if fragmento:
+                    try:
+                        from normalizador_pdf import localizar_en_pdf
+                        import fitz
+                        pagina, rects = localizar_en_pdf(str(ruta_archivo), fragmento)
+                        if pagina >= 0:
+                            d = fitz.open(str(ruta_archivo))
+                            pg = d[pagina]
+                            for r in rects:
+                                pg.draw_rect(r, color=(1,0,0), fill=(1,1,0), fill_opacity=0.3)
+                            # Renderizar a mayor resolución (zoom 2x) para evitar pixelado o distorsión
+                            mat = fitz.Matrix(2, 2)
+                            img_bytes = pg.get_pixmap(matrix=mat).tobytes("png")
+                            st.image(img_bytes, caption=f"Página {pagina + 1} (Fragmento Resaltado)", use_container_width=True)
+                            return
+                    except Exception as e:
+                        st.warning("No se pudo generar el resaltado (Deep Linking). Mostrando documento original.")
+                
+                # --- PDF COMPLETO (Fallback si no hay fragmento) ---
+                import base64
+                with open(ruta_archivo, "rb") as f:
+                    base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+                pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}#view=FitH" width="100%" height="600" type="application/pdf" style="border: none;"></iframe>'
+                st.markdown(pdf_display, unsafe_allow_html=True)
+            elif ext in [".png", ".jpg", ".jpeg"]:
+                st.image(str(ruta_archivo), use_container_width=True)
+            elif ext == ".docx":
+                import docx
+                doc = docx.Document(ruta_archivo)
+                texto = "\n\n".join([p.text for p in doc.paragraphs])
+                st.markdown(f"**Contenido DOCX:**\n\n{texto}")
+                # Imagen diagnóstica asociada (p. ej. la radiografía del mismo estudio de radiología).
+                # No es analizada por el pipeline semántico; se muestra para verificación visual del facultativo.
+                imagen_asociada = ruta_archivo.with_name(f"{ruta_archivo.stem}_img.png")
+                if imagen_asociada.exists():
+                    st.divider()
+                    st.caption("🖼️ Imagen diagnóstica asociada (verificación visual)")
+                    st.image(str(imagen_asociada), use_container_width=True)
+            else:
+                st.text_area("Contenido:", value=ruta_archivo.read_text(encoding="utf-8", errors="ignore"), height=400, disabled=True)
+        else:
+            st.error("El documento no se encuentra en el servidor.")
 
-        with col_hist:
-            st.markdown("##### ✍️ Historia clínica (edite / complete — bajo su responsabilidad)")
-            resumen_modificado = st.text_area("Historia (editable):", value=resumen_ia, height=430,
-                                              key=f"resumen_{nif_seleccionado}", label_visibility="collapsed")
+    # PESTAÑAS SEPARADAS
+    tab_historia, tab_alta, tab_tramite, tab_traz = st.tabs([
+        "Historia Clínica", 
+        "Informes de Alta", 
+        "Trámite Baja Laboral (RD 1060/2022)",
+        "Trazabilidad Documental"
+    ])
+    
+    # Procesar y dividir secciones
+    resumen_historia = ""
+    resumen_alta = ""
+    
+    for ev in data["events"]:
+        if ev["type"] == "analisis_seccion":
+            texto_seccion = (ev['details'].get('texto', '') or '').strip()
+            if texto_seccion:
+                if not texto_seccion.lstrip().startswith("#"):
+                    texto_seccion = f"### {ev['details'].get('seccion', 'Sección')}\n{texto_seccion}"
+                
+                # Clasificar según las fuentes citadas
+                if "ALTA_" in texto_seccion:
+                    resumen_alta += texto_seccion + "\n\n"
+                else:
+                    resumen_historia += texto_seccion + "\n\n"
+                    
+    def renderizar_texto_con_botones(texto, nif):
+        """Renderiza Markdown y agrupa en recuadros los bloques que tienen fuentes, pegando los botones a la línea exacta."""
+        ruta_docs = Path(f"datos/expedientes/{nif}")
+        bloques = texto.split("\n\n")
+        
+        for idx_b, bloque in enumerate(bloques):
+            if not bloque.strip(): continue
+            
+            if "[Fuente:" in bloque:
+                # Mostrar en un recuadro (container con borde)
+                with st.container(border=True):
+                    lineas = bloque.split("\n")
+                    for idx_l, linea in enumerate(lineas):
+                        if not linea.strip(): continue
+                        
+                        citas_raw = re.findall(r'\[Fuente:\s*([^\]#]+?)\s*(?:#[^\]]+)?\]', linea)
+                        fuentes_unicas = list(set(citas_raw))
+                        
+                        texto_limpio = re.sub(r'\[Fuente:\s*([^\]#]+?)\s*(?:#[^\]]+)?\]', '', linea)
+                        
+                        # Reemplazar viñetas dobles o markdown roto si ocurre al separar por saltos
+                        st.markdown(texto_limpio)
+                        
+                        if fuentes_unicas:
+                            num_cols = min(len(fuentes_unicas), 4)
+                            cols = st.columns(num_cols)
+                            for i, arch in enumerate(fuentes_unicas):
+                                with cols[i % num_cols]:
+                                    if st.button(f"📄 {arch}", key=f"btn_{nif}_{idx_b}_{idx_l}_{i}", help="Abrir original", use_container_width=True):
+                                        mostrar_documento(ruta_docs / arch, fragmento=linea)
+            else:
+                st.markdown(bloque)
+            
+            st.write("") # Espaciador
 
-        # === Trazabilidad por sección + botón 👁️ que abre la fuente a la izquierda ===
-        st.divider()
-        st.markdown("#### 🔍 Paso 2 · Trazabilidad — verifique el respaldo de cada sección")
-        st.caption("Cada sección de la historia con su(s) fuente(s). El botón 👁️ abre la fuente en el panel de la izquierda. Lo que no tenga fuente se marca como huérfano.")
-        secciones_ia = [(ev['details'].get('seccion', 'Sección'), ev['details'].get('texto', ''))
-                        for ev in data["events"] if ev["type"] == "analisis_seccion" and ev['details'].get('texto')]
-        n_huerfanas = 0
-        for si, (seccion, texto_sec) in enumerate(secciones_ia):
-            citas_raw = re.findall(r'\[Fuente:\s*([^\]#]+?)\s*(?:#([^\]]+))?\]', texto_sec)
-            citas = []
-            for arch, chk in citas_raw:
-                par = (arch.strip(), (chk or "").strip())
-                if par not in citas:
-                    citas.append(par)
-            fuentes = sorted(set(a for a, _ in citas))
-            if not fuentes:
-                n_huerfanas += 1
-            etiqueta = "⚠️ SIN FUENTE (huérfano)" if not fuentes else f"✅ {len(fuentes)} fuente(s)"
-            with st.expander(f"📄 {seccion}  —  {etiqueta}"):
-                if not fuentes:
-                    st.error("⚠️ Sección SIN fuente → afirmación no respaldada por la IA. Verifíquela manualmente.")
-                rk = f"resaltar_{nif_seleccionado}"
-                for fi, (archivo, chunk_id) in enumerate(citas):
-                    existe = (ruta_docs_aud / archivo).exists()
-                    c1, c2, c3 = st.columns([4, 1, 1.4])
-                    c1.markdown(f"🔗 `{archivo}`" + ("" if existe else "  ⚠️ *no localizada (cita no verificable)*"))
-                    if existe and c2.button("👁️ Ver", key=f"ver_{nif_seleccionado}_{si}_{fi}"):
-                        st.session_state[sk_fuente] = archivo
-                        st.rerun()
-                    if existe and c3.button("🔍 Resaltar", key=f"res_{nif_seleccionado}_{si}_{fi}"):
-                        st.session_state[rk] = (archivo, chunk_id)
-                    if existe and st.session_state.get(rk) == (archivo, chunk_id):
-                        m = re.search(r'_chunk_(\d+)', chunk_id or "")
-                        idx = int(m.group(1)) if m else 0
-                        pdf_canon = str(Path("datos/expedientes_pdf") / nif_seleccionado / (Path(archivo).stem + ".pdf"))
-                        try:
-                            png, encontrado, pagina, total_pags = render_folio_resaltado(str(ruta_docs_aud / archivo), idx, pdf_canon)
-                            cap = (f"🔎 Deep Linking — {archivo} · página {pagina}/{total_pags} · recuadro sobre la línea citada"
-                                   if encontrado else
-                                   f"🔎 {archivo} · página {pagina}/{total_pags} (no se localizó el fragmento exacto)")
-                            st.image(png, caption=cap, use_container_width=True)
-                        except Exception as e:
-                            st.warning(f"No se pudo renderizar el resaltado de {archivo}: {e}")
-        if secciones_ia:
-            (st.success if n_huerfanas == 0 else st.warning)(
-                "✅ Trazabilidad completa: ninguna sección huérfana." if n_huerfanas == 0
-                else f"⚠️ {n_huerfanas} de {len(secciones_ia)} secciones SIN fuente → verificación manual.")
-        st.caption(f"📌 El expediente aporta **{len(docs_disponibles)} documentos** de soporte. Verifique que la historia refleja TODOS los eventos clínicos relevantes antes de validar.")
-
-        # === Validación de campos del guion (contrato semántico YAML) ===
-        campos_por_sec = _campos_guion()
-        if campos_por_sec and secciones_ia:
+    with tab_historia:
+        st.subheader("Evolución y Diagnósticos Previos")
+        if resumen_historia:
+            renderizar_texto_con_botones(resumen_historia, nif_seleccionado)
+        else:
+            st.info("No hay información clínica general disponible.")
+            
+    with tab_alta:
+        st.subheader("Resumen de Informes de Alta Médica")
+        if resumen_alta:
+            renderizar_texto_con_botones(resumen_alta, nif_seleccionado)
+        else:
+            st.info("El paciente no tiene eventos de alta registrados.")
+            
+    with tab_tramite:
+        st.subheader("Trámite de Incapacidad Temporal (RD 1060/2022)")
+        st.info("Esta sección evalúa estrictamente la **Vigencia Regulatoria** de los documentos presentados para justificar la baja actual. Los documentos antiguos siguen en el historial, pero pueden no tener validez administrativa para este trámite.")
+        
+        eventos_vigencia = [e for e in data.get("events", []) if e["type"] == "validacion_vigencia"]
+        
+        if not eventos_vigencia:
+            st.warning("No se encontraron eventos de validación de vigencia.")
+        else:
+            # Los errores de vigencia se guardan en el estado (errores) o en los detalles si se registran
+            st.markdown("### Análisis de Vigencia Documental")
+            doc_vigentes = []
+            doc_caducados = []
+            
+            # Recorrer todos los folios para ver cuáles pasaron la validación de vigencia
+            historial_v = HistorialClinicoVisual(f"datos/expedientes/{nif_seleccionado}")
+            _ = historial_v.cargar_expediente(nif_seleccionado, data["nombre"])
+            
+            from datetime import datetime, timedelta
+            hoy = datetime.now()
+            
+            for ev in historial_v.eventos:
+                if ev.fecha >= (hoy - timedelta(days=180)):
+                    doc_vigentes.append(ev)
+                else:
+                    doc_caducados.append(ev)
+                    
+            col_v1, col_v2 = st.columns(2)
+            with col_v1:
+                st.success(f"Vigentes para IT (últimos 6 meses): {len(doc_vigentes)} documentos")
+                for d in doc_vigentes:
+                    st.markdown(f"- `{d.fuente}` ({d.fecha.strftime('%d/%m/%Y')})")
+            
+            with col_v2:
+                st.error(f"SIN VIGENCIA para IT (> 6 meses): {len(doc_caducados)} documentos")
+                for d in doc_caducados:
+                    st.markdown(f"- `{d.fuente}` ({d.fecha.strftime('%d/%m/%Y')}) - *Válido clínicamente*")
+                    
             st.divider()
-            st.markdown("#### 🧪 Validación de campos del guion (contrato semántico)")
-            st.caption("Cada campo definido en `baja_laboral.yaml` se verifica contra la sección redactada (patrón CIE-10, fechas, presencia, validación cruzada).")
-            _icono = {"ok": "✅", "aviso": "🟡", "falta": "⚠️", "manual": "👤"}
-            for seccion, texto_sec in secciones_ia:
-                campos = campos_por_sec.get(seccion, [])
-                if not campos:
-                    continue
-                faltan = sum(1 for c in campos if _validar_campo(c, texto_sec)[0] == "falta")
-                cab = f"📋 {seccion} — {len(campos)} campo(s)" + (f"  ·  ⚠️ {faltan} sin cumplir" if faltan else "  ·  ✅ completos")
-                with st.expander(cab):
-                    for campo in campos:
-                        estado, detalle = _validar_campo(campo, texto_sec)
-                        req = " *(requerido)*" if campo.get("requerido") else ""
-                        cruz = " · 🔁 validación cruzada" if campo.get("validacion_cruzada") else ""
-                        st.markdown(f"{_icono.get(estado,'')} **{campo.get('nombre')}**{req}{cruz} — {detalle}")
-
-        # === Visto bueno + validación (deja huella) + descarga ===
-        st.divider()
-        st.markdown("#### ✅ Paso 3 · Visto bueno del facultativo")
-
-        # REGLA DE ORO: chequeo PÁRRAFO A PÁRRAFO sobre la historia editada (ningún párrafo sin fuente)
-        def _parrafos_sin_fuente(texto):
-            huer = []
-            for bloque in re.split(r'\n\s*\n', texto or ""):
-                b = bloque.strip()
-                if not b:
-                    continue
-                contenido = " ".join(l for l in b.split("\n") if not l.lstrip().startswith("#")).strip()
-                if not contenido:
-                    continue
-                if "[Fuente:" not in b and "Sin información documental" not in b:
-                    huer.append(contenido)
-            return huer
-        parrafos_huerfanos = _parrafos_sin_fuente(resumen_modificado)
-        asumo_notas = True
-        if parrafos_huerfanos:
-            st.error(f"🚫 **Regla de oro:** hay **{len(parrafos_huerfanos)}** párrafo(s) SIN fuente en la historia. La aplicación no respalda párrafos huérfanos.")
-            with st.expander(f"Ver los {len(parrafos_huerfanos)} párrafo(s) sin fuente"):
-                for p in parrafos_huerfanos:
-                    st.markdown(f"- {p[:160]}{'…' if len(p) > 160 else ''}")
-            asumo_notas = st.checkbox(
-                "Estos párrafos son **notas propias del facultativo** (no generadas por la IA) y las asumo bajo mi responsabilidad.",
-                key=f"asumo_{nif_seleccionado}")
-
-        col_v1, col_v2 = st.columns([2, 3])
-        nombre_medico = col_v1.text_input("Facultativo (nombre / nº colegiado):", key=f"med_{nif_seleccionado}")
-        visto_bueno = col_v2.checkbox(
-            "✔️ Doy el visto bueno bajo MI responsabilidad como facultativo (no la de la IA)",
-            key=f"vb_{nif_seleccionado}")
-
-        bloqueado = (not visto_bueno) or (bool(parrafos_huerfanos) and not asumo_notas)
-        if parrafos_huerfanos and not asumo_notas:
-            st.caption("⛔ Visto bueno **bloqueado** hasta resolver los párrafos sin fuente (o asumirlos como notas propias).")
-        if st.button("✅ Validar y aprobar informe", type="primary", disabled=bloqueado):
-            editado = resumen_modificado.strip() != resumen_ia.strip()
-            pdf_bytes = generar_pdf_historia(data['nombre'], data['nif'], resumen_modificado, nombre_medico)
-            _ = registrar_validacion_facultativo(data['nif'], nombre_medico, editado, resumen_modificado)
-            st.session_state[f"pdf_validado_{nif_seleccionado}"] = pdf_bytes
-            accion = "editada y validada" if editado else "validada (visto bueno)"
-            st.success(f"✅ Historia **{accion}** por {nombre_medico or 'el facultativo'} "
-                       f"({datetime.now():%d/%m/%Y %H:%M}). **Huella de auditoría guardada** (queda constancia de lo editado).")
-
-        if st.session_state.get(f"pdf_validado_{nif_seleccionado}"):
-            st.download_button(
-                "⬇️ Descargar Historia Clínica Consolidada (PDF)",
-                data=st.session_state[f"pdf_validado_{nif_seleccionado}"],
-                file_name=f"Historia_Clinica_{data['nif']}_{datetime.now():%Y%m%d}.pdf",
-                mime="application/pdf", type="primary")
+            st.markdown("#### Resolución Administrativa")
+            if doc_vigentes:
+                st.success("El paciente ha aportado pruebas médicas recientes válidas para continuar el trámite de IT.")
+            else:
+                st.error("BLOQUEO ADMINISTRATIVO: El paciente no ha aportado pruebas médicas recientes (menos de 6 meses) que justifiquen la baja actual. Se requiere solicitar informe actualizado.")
 
     with tab_traz:
-        st.subheader("📅 Trazabilidad de Folios — por fecha y tipo de estudio")
-        st.caption("Cada folio del expediente, ubicable por fecha y por tipo de estudio. Ordene haciendo clic en una columna; filtre por tipo o busque por nombre de documento.")
-        def _tipo_estudio(nombre, tipo_evento):
-            # tipo detectado por contenido; si es genérico, se deriva del nombre del documento (determinista, no inventa nada clínico)
-            if tipo_evento and tipo_evento.lower() not in ("evento", ""):
-                return tipo_evento.capitalize()
-            base = str(nombre).upper()
-            for pref, etiqueta in (("TRAMPA", "⚠ Errata"), ("RAD", "Radiología"), ("RX", "Radiología"),
-                                   ("TAC", "TAC"), ("RMN", "RMN"), ("ECO", "Ecografía"), ("LAB", "Laboratorio"),
-                                   ("ANA", "Analítica"), ("CONS", "Consulta"), ("URG", "Urgencias"),
-                                   ("INTERC", "Interconsulta"), ("INF", "Informe"), ("ALTA", "Alta"),
-                                   ("QUIR", "Quirúrgico"), ("REHAB", "Rehabilitación"), ("FARM", "Farmacia"), ("IT", "Parte IT")):
-                if base.startswith(pref):
-                    return etiqueta
-            return "Documento"
+        st.subheader("Trazabilidad Cronológica de Folios")
+        st.caption("Cada folio del expediente organizado cronológicamente.")
+        
         historial_t = HistorialClinicoVisual(f"datos/expedientes/{nif_seleccionado}")
         _ = historial_t.cargar_expediente(nif_seleccionado, data["nombre"])
         if historial_t.eventos:
             filas = [{"Fecha": e.fecha.strftime("%d/%m/%Y"),
                       "_orden": e.fecha,
-                      "Tipo de estudio": _tipo_estudio(e.fuente, e.tipo),
-                      "Documento (folio)": e.fuente} for e in historial_t.eventos]
-            df_fol = (pd.DataFrame(filas).sort_values("_orden").drop(columns=["_orden"])
+                      "Tipo": e.tipo.capitalize(),
+                      "Documento (Clickable)": e.fuente} for e in historial_t.eventos]
+            df_fol = (pd.DataFrame(filas).sort_values("_orden", ascending=False).drop(columns=["_orden"])
                       .drop_duplicates().reset_index(drop=True))
-            c1, c2 = st.columns(2)
-            tipos = ["(todos)"] + sorted(df_fol["Tipo de estudio"].unique().tolist())
-            ftipo = c1.selectbox("Filtrar por tipo de estudio:", tipos, key=f"ftipo_{nif_seleccionado}")
-            fbusca = c2.text_input("Buscar (documento):", key=f"fbusca_{nif_seleccionado}")
-            df_view = df_fol
-            if ftipo != "(todos)":
-                df_view = df_view[df_view["Tipo de estudio"] == ftipo]
-            if fbusca:
-                df_view = df_view[df_view["Documento (folio)"].str.lower().str.contains(fbusca.lower())]
-            st.dataframe(df_view, use_container_width=True, hide_index=True, height=430)
-            st.caption(f"📌 Mostrando {len(df_view)} de {len(df_fol)} folios del expediente.")
+            
+            st.dataframe(df_fol, use_container_width=True, hide_index=True)
         else:
-            st.info("No hay folios con fecha identificada para este paciente.")
+            st.info("No hay folios procesados.")
 
 # PERFIL TRIBUNAL
 else:

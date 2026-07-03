@@ -177,3 +177,17 @@ datos/*.json
 
 # PDFs canonicos de folios (datos clinicos)
 datos/expedientes_pdf/
+
+# Modelo OCR de terceros (binario grande, ~2.3MB, descargar en GUIA_DE_EJECUCION.md)
+datos/_tessdata/
+
+# Auditorias/fixtures con datos sinteticos generados en tiempo de ejecucion
+datos/auditorias/
+datos/trampas_eval/
+
+# Resultado de benchmark con texto clinico sintetico embebido (el script si se versiona)
+benchmark_confusion_matrix_resultado.json
+
+# Tooling de edicion del TFM (no es parte del aplicativo)
+extract_table.py
+eta.txt

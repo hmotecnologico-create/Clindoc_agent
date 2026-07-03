@@ -1,0 +1,38 @@
+{
+  "prompt": "Redacta en espanol un resumen clinico breve de una baja laboral por lumbalgia mecanica: incluye diagnostico, evolucion y una recomendacion. Cita la fuente.",
+  "num_predict": 160,
+  "resultados": [
+    {
+      "modelo": "gemma3:4b",
+      "eval_count": 160,
+      "tok_s": 4.71,
+      "load_s": 2.1,
+      "tfm_tabla14": 6.4,
+      "delta": -1.69
+    },
+    {
+      "modelo": "llama3.1:latest",
+      "eval_count": 160,
+      "tok_s": 2.6,
+      "load_s": 1.0,
+      "tfm_tabla14": 3.7,
+      "delta": -1.1
+    },
+    {
+      "modelo": "phi3:latest",
+      "eval_count": 160,
+      "tok_s": 2.64,
+      "load_s": 0.1,
+      "tfm_tabla14": 3.2,
+      "delta": -0.56
+    },
+    {
+      "modelo": "mistral:latest",
+      "eval_count": 160,
+      "tok_s": 1.86,
+      "load_s": 0.2,
+      "tfm_tabla14": 2.8,
+      "delta": -0.94
+    }
+  ]
+}

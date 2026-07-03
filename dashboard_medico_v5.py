@@ -125,7 +125,7 @@ class DashboardMedicov5:
             st.markdown(f"""
             **Infraestructura Local:**
             - **LLM Activo:** `{modelo_activo}` (Ollama)
-            - **Embedding:** `all-MiniLM-L6-v2`
+            - **Embedding:** `paraphrase-multilingual-mpnet-base-v2`
             - **DB Vectorial:** `Qdrant` (Local)
             - **Privacidad:** `100% RGPD Compliant` 🛡️
             """)

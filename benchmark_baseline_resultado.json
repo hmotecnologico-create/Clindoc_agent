@@ -1,0 +1,207 @@
+{
+  "nif": "25988000R",
+  "topk": 3,
+  "n_consultas": 12,
+  "resumen_acierto": {
+    "keyword": {
+      "exacta": 50.0,
+      "conceptual": 33.3,
+      "global": 41.7
+    },
+    "semantica": {
+      "exacta": 16.7,
+      "conceptual": 50.0,
+      "global": 33.3
+    }
+  },
+  "detalle": [
+    {
+      "consulta": "Hemoglobina",
+      "tipo": "exacta",
+      "ground_truth_folios": 116,
+      "keyword_top": [
+        "LAB_150.pdf",
+        "LAB_149.pdf",
+        "LAB_148.pdf"
+      ],
+      "keyword_acierto": true,
+      "semantica_top": [
+        "ALTA_174.pdf",
+        "ALTA_044.pdf",
+        "ALTA_088.pdf"
+      ],
+      "semantica_acierto": false
+    },
+    {
+      "consulta": "Colesterol",
+      "tipo": "exacta",
+      "ground_truth_folios": 111,
+      "keyword_top": [
+        "LAB_150.pdf",
+        "LAB_149.pdf",
+        "LAB_148.pdf"
+      ],
+      "keyword_acierto": true,
+      "semantica_top": [
+        "LAB_017.pdf",
+        "LAB_019.pdf",
+        "LAB_130.pdf"
+      ],
+      "semantica_acierto": true
+    },
+    {
+      "consulta": "artroscopia de rodilla",
+      "tipo": "exacta",
+      "ground_truth_folios": 0,
+      "keyword_top": [
+        "RAD_114.docx",
+        "RAD_113.docx",
+        "RAD_102.docx"
+      ],
+      "keyword_acierto": false,
+      "semantica_top": [
+        "CONS_052.pdf",
+        "CONS_070.pdf",
+        "CONS_068.pdf"
+      ],
+      "semantica_acierto": false
+    },
+    {
+      "consulta": "infiltración epidural",
+      "tipo": "exacta",
+      "ground_truth_folios": 0,
+      "keyword_top": [],
+      "keyword_acierto": false,
+      "semantica_top": [
+        "ALTA_001.pdf",
+        "ALTA_133.pdf",
+        "ALTA_111.pdf"
+      ],
+      "semantica_acierto": false
+    },
+    {
+      "consulta": "Creatinina",
+      "tipo": "exacta",
+      "ground_truth_folios": 118,
+      "keyword_top": [
+        "LAB_149.pdf",
+        "LAB_148.pdf",
+        "LAB_146.pdf"
+      ],
+      "keyword_acierto": true,
+      "semantica_top": [
+        "ALTA_131.pdf",
+        "ALTA_174.pdf",
+        "ALTA_044.pdf"
+      ],
+      "semantica_acierto": false
+    },
+    {
+      "consulta": "Ferritina",
+      "tipo": "exacta",
+      "ground_truth_folios": 0,
+      "keyword_top": [],
+      "keyword_acierto": false,
+      "semantica_top": [
+        "ALTA_001.pdf",
+        "ALTA_084.pdf",
+        "ALTA_057.pdf"
+      ],
+      "semantica_acierto": false
+    },
+    {
+      "consulta": "anemia",
+      "tipo": "conceptual",
+      "ground_truth_folios": 116,
+      "keyword_top": [],
+      "keyword_acierto": false,
+      "semantica_top": [
+        "ALTA_001.pdf",
+        "ALTA_116.pdf",
+        "ALTA_105.pdf"
+      ],
+      "semantica_acierto": false
+    },
+    {
+      "consulta": "diabetes",
+      "tipo": "conceptual",
+      "ground_truth_folios": 161,
+      "keyword_top": [
+        "CONS_074.pdf",
+        "CONS_073.pdf",
+        "CONS_072.pdf"
+      ],
+      "keyword_acierto": true,
+      "semantica_top": [
+        "CONS_014.pdf",
+        "CONS_060.pdf",
+        "CONS_040.pdf"
+      ],
+      "semantica_acierto": true
+    },
+    {
+      "consulta": "dislipemia",
+      "tipo": "conceptual",
+      "ground_truth_folios": 168,
+      "keyword_top": [
+        "CONS_071.pdf",
+        "CONS_056.pdf",
+        "CONS_054.pdf"
+      ],
+      "keyword_acierto": true,
+      "semantica_top": [
+        "ALTA_001.pdf",
+        "ALTA_082.pdf",
+        "ALTA_073.pdf"
+      ],
+      "semantica_acierto": true
+    },
+    {
+      "consulta": "función tiroidea",
+      "tipo": "conceptual",
+      "ground_truth_folios": 71,
+      "keyword_top": [
+        "RAD_039.docx",
+        "CONS_022.pdf",
+        "ALTA_143.pdf"
+      ],
+      "keyword_acierto": false,
+      "semantica_top": [
+        "ALTA_174.pdf",
+        "ALTA_131.pdf",
+        "ALTA_088.pdf"
+      ],
+      "semantica_acierto": true
+    },
+    {
+      "consulta": "infección con glóbulos blancos elevados",
+      "tipo": "conceptual",
+      "ground_truth_folios": 111,
+      "keyword_top": [
+        "ALTA_173.pdf",
+        "ALTA_170.pdf",
+        "ALTA_163.pdf"
+      ],
+      "keyword_acierto": false,
+      "semantica_top": [
+        "ALTA_114.pdf",
+        "ALTA_150.pdf",
+        "ALTA_005.pdf"
+      ],
+      "semantica_acierto": false
+    },
+    {
+      "consulta": "déficit de hierro",
+      "tipo": "conceptual",
+      "ground_truth_folios": 0,
+      "keyword_top": [],
+      "keyword_acierto": false,
+      "semantica_top": [
+        "ALTA_131.pdf",
+        "ALTA_174.pdf",
+        "ALTA_088.pdf"
+      ],
+      "semantica_acierto": false
+    }
+  ]
+}

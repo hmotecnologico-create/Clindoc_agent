@@ -1,0 +1,20 @@
+{
+  "nif": "25988000R",
+  "resumen": {
+    "keyword": {
+      "exacta": 50.0,
+      "conceptual": 33.3,
+      "global": 41.7
+    },
+    "semantica": {
+      "exacta": 16.7,
+      "conceptual": 50.0,
+      "global": 33.3
+    },
+    "hibrida": {
+      "exacta": 50.0,
+      "conceptual": 33.3,
+      "global": 41.7
+    }
+  }
+}

@@ -1,0 +1,229 @@
+{
+  "muestra": 15,
+  "docling": {
+    "tiempo_total": 112.59,
+    "resultados": [
+      {
+        "archivo": "LAB_001.pdf",
+        "chars": 857,
+        "filas_tabla_detectadas": 8
+      },
+      {
+        "archivo": "LAB_002.pdf",
+        "chars": 712,
+        "filas_tabla_detectadas": 6
+      },
+      {
+        "archivo": "LAB_003.pdf",
+        "chars": 881,
+        "filas_tabla_detectadas": 8
+      },
+      {
+        "archivo": "LAB_004.pdf",
+        "chars": 881,
+        "filas_tabla_detectadas": 8
+      },
+      {
+        "archivo": "LAB_005.pdf",
+        "chars": 1022,
+        "filas_tabla_detectadas": 10
+      },
+      {
+        "archivo": "LAB_006.pdf",
+        "chars": 952,
+        "filas_tabla_detectadas": 9
+      },
+      {
+        "archivo": "LAB_007.pdf",
+        "chars": 812,
+        "filas_tabla_detectadas": 7
+      },
+      {
+        "archivo": "LAB_008.pdf",
+        "chars": 812,
+        "filas_tabla_detectadas": 7
+      },
+      {
+        "archivo": "LAB_009.pdf",
+        "chars": 742,
+        "filas_tabla_detectadas": 6
+      },
+      {
+        "archivo": "LAB_010.pdf",
+        "chars": 952,
+        "filas_tabla_detectadas": 9
+      },
+      {
+        "archivo": "LAB_011.pdf",
+        "chars": 1022,
+        "filas_tabla_detectadas": 10
+      },
+      {
+        "archivo": "LAB_012.pdf",
+        "chars": 952,
+        "filas_tabla_detectadas": 9
+      },
+      {
+        "archivo": "LAB_013.pdf",
+        "chars": 812,
+        "filas_tabla_detectadas": 7
+      },
+      {
+        "archivo": "LAB_014.pdf",
+        "chars": 952,
+        "filas_tabla_detectadas": 9
+      },
+      {
+        "archivo": "LAB_015.pdf",
+        "chars": 791,
+        "filas_tabla_detectadas": 7
+      }
+    ]
+  },
+  "pymupdf": {
+    "tiempo_total": 0.1,
+    "resultados": [
+      {
+        "archivo": "LAB_001.pdf",
+        "chars": 590,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_002.pdf",
+        "chars": 518,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_003.pdf",
+        "chars": 602,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_004.pdf",
+        "chars": 599,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_005.pdf",
+        "chars": 675,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_006.pdf",
+        "chars": 641,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_007.pdf",
+        "chars": 564,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_008.pdf",
+        "chars": 559,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_009.pdf",
+        "chars": 520,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_010.pdf",
+        "chars": 636,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_011.pdf",
+        "chars": 678,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_012.pdf",
+        "chars": 635,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_013.pdf",
+        "chars": 565,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_014.pdf",
+        "chars": 640,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_015.pdf",
+        "chars": 551,
+        "filas_tabla_detectadas": 2
+      }
+    ]
+  },
+  "tesseract": {
+    "tiempo_total": 7.9,
+    "resultados": [
+      {
+        "archivo": "LAB_001.pdf",
+        "chars": 400,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_002.pdf",
+        "chars": 362,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_003.pdf",
+        "chars": 362,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_004.pdf",
+        "chars": 361,
+        "filas_tabla_detectadas": 2
+      },
+      {
+        "archivo": "LAB_005.pdf",
+        "chars": 362,
+        "filas_tabla_detectadas": 2
+      }
+    ]
+  },
+  "marker": {
+    "tiempo_total": 289.32,
+    "resultados": [
+      {
+        "archivo": "LAB_001.pdf",
+        "chars": 829,
+        "filas_tabla_detectadas": 8
+      },
+      {
+        "archivo": "LAB_002.pdf",
+        "chars": 697,
+        "filas_tabla_detectadas": 6
+      },
+      {
+        "archivo": "LAB_003.pdf",
+        "chars": 861,
+        "filas_tabla_detectadas": 8
+      },
+      {
+        "archivo": "LAB_004.pdf",
+        "chars": 861,
+        "filas_tabla_detectadas": 8
+      },
+      {
+        "archivo": "LAB_005.pdf",
+        "chars": 995,
+        "filas_tabla_detectadas": 10
+      }
+    ]
+  },
+  "filas_tabla_totales": {
+    "docling": 120,
+    "pymupdf": 30,
+    "tesseract": 10,
+    "marker": 40
+  }
+}

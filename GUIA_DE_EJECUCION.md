@@ -50,7 +50,7 @@ Con Ollama instalado y en ejecución:
 ollama pull gemma3:4b
 ```
 
-> El sistema usa **`gemma3:4b`** (redacción) y **`all-MiniLM-L6-v2`** (embeddings, se descarga solo la primera vez). Si `gemma3:4b` no está, el sistema cae a otro modelo local disponible, pero **los resultados documentados corresponden a `gemma3:4b`**.
+> El sistema usa **`gemma3:4b`** (redacción) y **`paraphrase-multilingual-mpnet-base-v2`** (embeddings, se descarga solo la primera vez). Si `gemma3:4b` no está, el sistema cae a otro modelo local disponible, pero **los resultados documentados corresponden a `gemma3:4b`**.
 
 ## 5. Datos: usar los de prueba o aportar los tuyos
 
