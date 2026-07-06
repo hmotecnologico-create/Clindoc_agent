@@ -365,7 +365,7 @@ if perfil == "Doctor (Facultativo)":
                 else:
                     resumen_historia += texto_seccion + "\n\n"
                     
-    def renderizar_texto_con_botones(texto, nif):
+    def renderizar_texto_con_botones(texto, nif, seccion="s"):
         """Renderiza Markdown y agrupa en recuadros los bloques que tienen fuentes, pegando los botones a la línea exacta."""
         ruta_docs = Path(f"datos/expedientes/{nif}")
         bloques = texto.split("\n\n")
@@ -393,7 +393,7 @@ if perfil == "Doctor (Facultativo)":
                             cols = st.columns(num_cols)
                             for i, arch in enumerate(fuentes_unicas):
                                 with cols[i % num_cols]:
-                                    if st.button(f"📄 {arch}", key=f"btn_{nif}_{idx_b}_{idx_l}_{i}", help="Abrir original", use_container_width=True):
+                                    if st.button(f"📄 {arch}", key=f"btn_{seccion}_{nif}_{idx_b}_{idx_l}_{i}", help="Abrir original", use_container_width=True):
                                         mostrar_documento(ruta_docs / arch, fragmento=linea)
             else:
                 st.markdown(bloque)
@@ -403,14 +403,14 @@ if perfil == "Doctor (Facultativo)":
     with tab_historia:
         st.subheader("Evolución y Diagnósticos Previos")
         if resumen_historia:
-            renderizar_texto_con_botones(resumen_historia, nif_seleccionado)
+            renderizar_texto_con_botones(resumen_historia, nif_seleccionado, seccion="historia")
         else:
             st.info("No hay información clínica general disponible.")
             
     with tab_alta:
         st.subheader("Resumen de Informes de Alta Médica")
         if resumen_alta:
-            renderizar_texto_con_botones(resumen_alta, nif_seleccionado)
+            renderizar_texto_con_botones(resumen_alta, nif_seleccionado, seccion="alta")
         else:
             st.info("El paciente no tiene eventos de alta registrados.")
             

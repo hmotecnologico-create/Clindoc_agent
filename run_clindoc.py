@@ -426,6 +426,11 @@ class OrquestadorLangGraph:
         
         for doc in state["documentos"]:
             validacion = self.verificador_vigencia.validar(doc["texto"], "reciente_6_meses")
+            self.recorder.record_event("validacion_vigencia", {
+                "documento": doc["nombre"],
+                "valido": validacion["valido"],
+                "detalle": validacion["detalle"],
+            })
             if not validacion["valido"]:
                 errores.append(f"VIGENCIA: {doc['nombre']} - {validacion['detalle']}")
                 state["trace"].append(f"  ⚠️ {validacion['detalle']}")

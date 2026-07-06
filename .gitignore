@@ -188,6 +188,9 @@ datos/trampas_eval/
 # Resultado de benchmark con texto clinico sintetico embebido (el script si se versiona)
 benchmark_confusion_matrix_resultado.json
 
+# Config local del preview tool (no es parte del aplicativo)
+.claude/
+
 # Tooling de edicion del TFM (no es parte del aplicativo)
 extract_table.py
 eta.txt
