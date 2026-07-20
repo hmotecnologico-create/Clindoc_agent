@@ -96,6 +96,15 @@ class DashboardRecorder:
         with open(self.output_file, 'w', encoding='utf-8') as f:
             json.dump(self.data, f, indent=4)
 
+    def actualizar_nombre_real(self, nif: str, nombre_real: str):
+        """Sustituye el placeholder 'Paciente {NIF}' (fijado en set_paciente antes de
+        procesar ningún documento) por el nombre real, una vez extraído de la sección
+        de identificación ya redactada. Evita que el placeholder de arranque quede
+        grabado como dato final en dashboard_data.json."""
+        if nombre_real and nif in self.data["pacientes"]:
+            self.data["pacientes"][nif]["nombre"] = nombre_real
+            self._save()
+
 
 
 # --- MODELOS DE DATOS (Pydantic v2 - FASE 5) ---
@@ -1075,7 +1084,19 @@ if __name__ == "__main__":
         sistema.recorder.set_paciente(nif_paciente, nombre_paciente)
         
         resultados = sistema.ejecutar(paciente_data)
-        
+
+        # Sustituir el placeholder "Paciente {NIF}" por el nombre real, extraído de la
+        # sección de identificación ya redactada (mismo patrón que usa app_clindoc.py).
+        eventos_paciente = sistema.recorder.data["pacientes"].get(nif_paciente, {}).get("events", [])
+        texto_id = ""
+        for ev in eventos_paciente:
+            if ev.get("type") == "analisis_seccion" and ev["details"].get("seccion") == "Datos de Identificación del Paciente":
+                texto_id = ev["details"].get("texto", "")
+                break
+        m_nombre = re.search(r'Nombre completo:\s*([^\[\n]+?)\s*(?:\[|$)', texto_id, re.MULTILINE)
+        if m_nombre:
+            sistema.recorder.actualizar_nombre_real(nif_paciente, m_nombre.group(1).strip())
+
         print(f"\n[{nif_paciente}] PROCESADO CORRECTAMENTE")
 
     print("\n" + "="*50)
