@@ -205,14 +205,27 @@ with col_t1:
         except:
             pass
     
-    DEMO_PATIENTS = {
-        "25988000R": {"edad": 68, "sexo": "Masculino", "telefono": "654 321 987", "direccion": "Calle Mayor 12, 3ºB, Madrid"},
-        "52880483X": {"edad": 74, "sexo": "Femenino", "telefono": "698 765 432", "direccion": "Avenida de la Libertad 45, Barcelona"},
-        "48991234S": {"edad": 45, "sexo": "Masculino", "telefono": "611 222 333", "direccion": "Plaza España 1, Sevilla"},
-        "75114422X": {"edad": 38, "sexo": "Femenino", "telefono": "688 999 111", "direccion": "Gran Vía 40, Bilbao"},
-        "33445566R": {"edad": 55, "sexo": "Masculino", "telefono": "622 334 455", "direccion": "Paseo Marítimo 10, Valencia"},
-    }
-    demo_data = DEMO_PATIENTS.get(data['nif'], {"edad": "N/A", "sexo": "N/A", "telefono": "N/A", "direccion": "N/A"})
+    def _extraer_demografia(data):
+        """Edad y sexo del encabezado se leen del texto ya extraído del corpus real
+        (sección 'Datos de Identificación del Paciente'), no de un valor fijo por NIF:
+        un dato hardcodeado no refleja qué encontró realmente el sistema en los
+        documentos, y puede quedar desactualizado en silencio si el corpus cambia.
+        Si el modelo no extrajo el dato en esta corrida (ocurre, es variabilidad real
+        del extractor), se muestra "No extraído" en vez de inventar un valor."""
+        texto_id = ""
+        for ev in data.get("events", []):
+            if ev.get("type") == "analisis_seccion" and ev["details"].get("seccion") == "Datos de Identificación del Paciente":
+                texto_id = ev["details"].get("texto", "")
+                break
+        m_edad = re.search(r'(?:Edad:\s*|de\s+)(\d{1,3})\s*a[nñ]os', texto_id, re.IGNORECASE)
+        m_sexo = re.search(r'Sexo:\s*(Masculino|Femenino)|paciente es (masculino|femenino)', texto_id, re.IGNORECASE)
+        return {
+            "edad": m_edad.group(1) if m_edad else "No extraído",
+            "sexo": (m_sexo.group(1) or m_sexo.group(2)).capitalize() if m_sexo else "No extraído",
+            "telefono": "No incluido en el guion",
+            "direccion": "No incluido en el guion",
+        }
+    demo_data = _extraer_demografia(data)
     
     # Perfil del Paciente (Datos Personales Básicos - Estilo Premium)
     st.markdown(f"""
@@ -221,7 +234,7 @@ with col_t1:
         <div style="display:flex; justify-content:space-between; flex-wrap:wrap; color:#2d3748;">
             <div style="flex:1; min-width:200px;">
                 <p><b>NIF:</b> <span style="background:#e0f2fe; padding:2px 8px; border-radius:4px; font-family:monospace;">{data['nif']}</span></p>
-                <p><b>Edad:</b> {demo_data['edad']} años</p>
+                <p><b>Edad:</b> {demo_data['edad']}{' años' if demo_data['edad'] != 'No extraído' else ''}</p>
             </div>
             <div style="flex:1; min-width:200px;">
                 <p><b>Sexo:</b> {demo_data['sexo']}</p>
