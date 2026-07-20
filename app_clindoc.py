@@ -115,6 +115,29 @@ def load_data():
 data_general = load_data()
 pacientes_db = data_general.get("pacientes", {})
 
+def _extraer_demografia(data):
+    """Nombre, edad y sexo del encabezado se leen del texto ya extraído del corpus real
+    (sección 'Datos de Identificación del Paciente'), no de un valor fijo por NIF:
+    un dato hardcodeado no refleja qué encontró realmente el sistema en los
+    documentos, y puede quedar desactualizado en silencio si el corpus cambia.
+    Si el modelo no extrajo el dato en esta corrida (ocurre, es variabilidad real
+    del extractor), se muestra "No extraído" en vez de inventar un valor."""
+    texto_id = ""
+    for ev in data.get("events", []):
+        if ev.get("type") == "analisis_seccion" and ev["details"].get("seccion") == "Datos de Identificación del Paciente":
+            texto_id = ev["details"].get("texto", "")
+            break
+    m_edad = re.search(r'(?:Edad:\s*|de\s+)(\d{1,3})\s*a[nñ]os', texto_id, re.IGNORECASE)
+    m_sexo = re.search(r'Sexo:\s*(Masculino|Femenino)|paciente es (masculino|femenino)', texto_id, re.IGNORECASE)
+    m_nombre = re.search(r'Nombre completo:\s*([^\[\n]+?)\s*(?:\[|$)', texto_id, re.MULTILINE)
+    return {
+        "nombre": m_nombre.group(1).strip() if m_nombre else None,
+        "edad": m_edad.group(1) if m_edad else "No extraído",
+        "sexo": (m_sexo.group(1) or m_sexo.group(2)).capitalize() if m_sexo else "No extraído",
+        "telefono": "No incluido en el guion",
+        "direccion": "No incluido en el guion",
+    }
+
 # --- SIDEBAR (Perfiles y Pacientes) ---
 with st.sidebar:
     st.image("https://cdn-icons-png.flaticon.com/512/3774/3774293.png", width=80)
@@ -137,7 +160,13 @@ with st.sidebar:
             st.error("NIF no encontrado. Mostrando paciente por defecto.")
     
     data = pacientes_db[nif_seleccionado]
-    
+    demo_data = _extraer_demografia(data)
+    # "data['nombre']" es el placeholder "Paciente {NIF}" que fija run_clindoc.py ANTES de
+    # procesar ningún documento (necesario para arrancar el pipeline, pero nunca se actualiza
+    # después con el nombre real ya extraído). Se usa aquí solo como último recurso si la
+    # extracción del corpus no encontró nada.
+    nombre_mostrado = demo_data['nombre'] or data['nombre']
+
     st.write("---")
     from chat_asistente_medico import obtener_modelo_ollama_disponible
     modelo_activo = obtener_modelo_ollama_disponible("gemma3:4b")
@@ -151,7 +180,7 @@ with st.sidebar:
         
     chat = st.session_state.chat_asistente
     if not chat.conversacion_actual or chat.conversacion_actual.paciente_nif != nif_seleccionado:
-        _ = chat.iniciar_conversacion(f"inf_{nif_seleccionado}", nif_seleccionado, data["nombre"])
+        _ = chat.iniciar_conversacion(f"inf_{nif_seleccionado}", nif_seleccionado, nombre_mostrado)
         
     # Contenedor para mensajes
     chat_container = st.container(height=300)
@@ -205,32 +234,10 @@ with col_t1:
         except:
             pass
     
-    def _extraer_demografia(data):
-        """Edad y sexo del encabezado se leen del texto ya extraído del corpus real
-        (sección 'Datos de Identificación del Paciente'), no de un valor fijo por NIF:
-        un dato hardcodeado no refleja qué encontró realmente el sistema en los
-        documentos, y puede quedar desactualizado en silencio si el corpus cambia.
-        Si el modelo no extrajo el dato en esta corrida (ocurre, es variabilidad real
-        del extractor), se muestra "No extraído" en vez de inventar un valor."""
-        texto_id = ""
-        for ev in data.get("events", []):
-            if ev.get("type") == "analisis_seccion" and ev["details"].get("seccion") == "Datos de Identificación del Paciente":
-                texto_id = ev["details"].get("texto", "")
-                break
-        m_edad = re.search(r'(?:Edad:\s*|de\s+)(\d{1,3})\s*a[nñ]os', texto_id, re.IGNORECASE)
-        m_sexo = re.search(r'Sexo:\s*(Masculino|Femenino)|paciente es (masculino|femenino)', texto_id, re.IGNORECASE)
-        return {
-            "edad": m_edad.group(1) if m_edad else "No extraído",
-            "sexo": (m_sexo.group(1) or m_sexo.group(2)).capitalize() if m_sexo else "No extraído",
-            "telefono": "No incluido en el guion",
-            "direccion": "No incluido en el guion",
-        }
-    demo_data = _extraer_demografia(data)
-    
     # Perfil del Paciente (Datos Personales Básicos - Estilo Premium)
     st.markdown(f"""
     <div class="premium-card">
-        <h2 style="margin-top:0; color:#005B96;">{data['nombre']}</h2>
+        <h2 style="margin-top:0; color:#005B96;">{nombre_mostrado}</h2>
         <div style="display:flex; justify-content:space-between; flex-wrap:wrap; color:#2d3748;">
             <div style="flex:1; min-width:200px;">
                 <p><b>NIF:</b> <span style="background:#e0f2fe; padding:2px 8px; border-radius:4px; font-family:monospace;">{data['nif']}</span></p>
@@ -446,7 +453,7 @@ if perfil == "Doctor (Facultativo)":
             
             # Recorrer todos los folios para ver cuáles pasaron la validación de vigencia
             historial_v = HistorialClinicoVisual(f"datos/expedientes/{nif_seleccionado}")
-            _ = historial_v.cargar_expediente(nif_seleccionado, data["nombre"])
+            _ = historial_v.cargar_expediente(nif_seleccionado, nombre_mostrado)
             
             from datetime import datetime, timedelta
             hoy = datetime.now()
@@ -480,7 +487,7 @@ if perfil == "Doctor (Facultativo)":
         st.caption("Cada folio del expediente organizado cronológicamente.")
         
         historial_t = HistorialClinicoVisual(f"datos/expedientes/{nif_seleccionado}")
-        _ = historial_t.cargar_expediente(nif_seleccionado, data["nombre"])
+        _ = historial_t.cargar_expediente(nif_seleccionado, nombre_mostrado)
         if historial_t.eventos:
             filas = [{"Fecha": e.fecha.strftime("%d/%m/%Y"),
                       "_orden": e.fecha,
