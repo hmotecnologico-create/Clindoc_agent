@@ -267,8 +267,30 @@ class AgenteRedactor:
                 partes_validas.append(resultado_doc)
 
         if not partes_validas:
-            return "Sin información documental para esta sección."
+            return self._abstencion_con_confianza(evidencias)
         return "\n\n".join(partes_validas)
+
+    def _abstencion_con_confianza(self, evidencias: List[Dict]) -> str:
+        """Cuando ningún documento recuperado aportó contenido usable, la ausencia
+        puede deberse a que el dato genuinamente no está en el expediente, o a que
+        la búsqueda no recuperó el documento correcto (riesgo real: 16,7% de acierto
+        en consultas exactas medido en la línea base, Tabla 22). El sistema no puede
+        distinguir ambos casos con certeza, pero SÍ puede reportar la señal que ya
+        calcula Qdrant y antes se descartaba: la similitud del mejor candidato
+        consultado. Un score bajo es consistente con ausencia real; un score alto
+        pese a no extraer nada es más sospechoso de fallo de recuperación -- se
+        reporta el número crudo, sin una etiqueta categórica "alta/baja" inventada
+        sin calibración estadística real, para que la verificación humana (siempre
+        indispensable, ver cap. 8) tenga una señal objetiva en la que apoyarse.
+        """
+        if not evidencias or all('score' not in e for e in evidencias):
+            return "Sin información documental para esta sección."
+        mejor_score = max(e['score'] for e in evidencias if 'score' in e)
+        return (
+            "Sin información documental para esta sección. "
+            f"(Mejor coincidencia semántica entre los documentos consultados: {mejor_score:.2f} "
+            "-- verificar manualmente si este valor es alto pese a la ausencia de contenido extraído.)"
+        )
 
     def _redactar_un_documento(self, seccion: Seccion, evidencia: Dict) -> str:
         """Redacta lo que UN único documento aporta a la sección. Al ver un solo

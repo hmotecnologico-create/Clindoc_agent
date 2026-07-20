@@ -173,6 +173,7 @@ class IndiceCorpus:
         return [{
             "texto": r.payload["texto"],
             "archivo": r.payload["nombre_archivo"],
-            "chunk_id": r.payload.get("chunk_id", "unknown")
+            "chunk_id": r.payload.get("chunk_id", "unknown"),
+            "score": r.score,
         } for r in res]
 
