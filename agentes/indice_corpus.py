@@ -110,35 +110,68 @@ class IndiceCorpus:
         
         if chunk_actual:
             fragmentos.append(chunk_actual.strip())
-        
-        return fragmentos if fragmentos else [texto]
+
+        # Fusionar fragmentos demasiado pequeños (p.ej. un encabezado "## INFORME..."
+        # aislado, sin contenido clínico) con el fragmento siguiente. Un chunk minúsculo
+        # compite en la búsqueda semántica por su brevedad/genericidad y puede ganarle
+        # al fragmento real que sí contiene el diagnóstico, dejando la sección vacía.
+        MIN_CHUNK = 100
+        fusionados = []
+        pendiente = ""
+        for frag in fragmentos:
+            pendiente = (pendiente + "\n\n" + frag).strip() if pendiente else frag
+            if len(pendiente) >= MIN_CHUNK:
+                fusionados.append(pendiente)
+                pendiente = ""
+        if pendiente:
+            if fusionados:
+                fusionados[-1] = (fusionados[-1] + "\n\n" + pendiente).strip()
+            else:
+                fusionados.append(pendiente)
+
+        return fusionados if fusionados else [texto]
 
     def indexar_documento(self, doc_id: str, texto: str, nombre_original: str):
         """Indexa documento con chunk_id para Deep Linking"""
         fragmentos = self._semantic_chunking(texto)
+        tipo_documento = nombre_original.split('_')[0] if '_' in nombre_original else nombre_original
         points = []
         for i, frag in enumerate(fragmentos):
             vector = self.modelo_emb.encode(frag).tolist()
             chunk_id = f"{doc_id}_chunk_{i}"
             points.append(models.PointStruct(
                 id=str(uuid.uuid4()),  # UUID válido para Qdrant
-                vector=vector, 
+                vector=vector,
                 payload={
                     "texto": frag,
                     "chunk_id": chunk_id,  # GUARDAR PARA DEEP LINKING
                     "nombre_archivo": nombre_original,
+                    "tipo_documento": tipo_documento,  # prefijo (ALTA/CONS/LAB/RAD) para filtrar por fuente_preferente
                     "doc_id": doc_id,
                     "patient_hash": self.patient_hash  # seudonimización SHA-256 del NIF (RGPD)
                 }
             ))
         self.cliente.upsert(collection_name=self.nombre_coleccion, points=points)
 
-    def buscar_evidencias(self, consulta: str, n: int = 3) -> List[Dict]:
-        """Busca evidencias con referencias de chunk"""
+    def buscar_evidencias(self, consulta: str, n: int = 3, tipo_documento: str = None) -> List[Dict]:
+        """Busca evidencias con referencias de chunk.
+
+        tipo_documento: si se indica (ej. "ALTA"), restringe la búsqueda a chunks de ese
+        tipo de documento. Evita que, en un corpus de 524 folios/paciente con tipos muy
+        heterogéneos (LAB/CONS/RAD), un fragmento irrelevante gane por similitud al
+        fragmento correcto de la sección buscada.
+        """
         vector = self.modelo_emb.encode(consulta).tolist()
-        res = self.cliente.query_points(collection_name=self.nombre_coleccion, query=vector, limit=n).points
+        query_filter = None
+        if tipo_documento:
+            query_filter = models.Filter(
+                must=[models.FieldCondition(key="tipo_documento", match=models.MatchValue(value=tipo_documento))]
+            )
+        res = self.cliente.query_points(
+            collection_name=self.nombre_coleccion, query=vector, limit=n, query_filter=query_filter
+        ).points
         return [{
-            "texto": r.payload["texto"], 
+            "texto": r.payload["texto"],
             "archivo": r.payload["nombre_archivo"],
             "chunk_id": r.payload.get("chunk_id", "unknown")
         } for r in res]

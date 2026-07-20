@@ -206,8 +206,11 @@ with col_t1:
             pass
     
     DEMO_PATIENTS = {
-        "25988000R": {"edad": 45, "sexo": "Masculino", "telefono": "654 321 987", "direccion": "Calle Mayor 12, 3ºB, Madrid"},
-        "52880483X": {"edad": 38, "sexo": "Femenino", "telefono": "698 765 432", "direccion": "Avenida de la Libertad 45, Barcelona"}
+        "25988000R": {"edad": 68, "sexo": "Masculino", "telefono": "654 321 987", "direccion": "Calle Mayor 12, 3ºB, Madrid"},
+        "52880483X": {"edad": 74, "sexo": "Femenino", "telefono": "698 765 432", "direccion": "Avenida de la Libertad 45, Barcelona"},
+        "48991234S": {"edad": 45, "sexo": "Masculino", "telefono": "611 222 333", "direccion": "Plaza España 1, Sevilla"},
+        "75114422X": {"edad": 38, "sexo": "Femenino", "telefono": "688 999 111", "direccion": "Gran Vía 40, Bilbao"},
+        "33445566R": {"edad": 55, "sexo": "Masculino", "telefono": "622 334 455", "direccion": "Paseo Marítimo 10, Valencia"},
     }
     demo_data = DEMO_PATIENTS.get(data['nif'], {"edad": "N/A", "sexo": "N/A", "telefono": "N/A", "direccion": "N/A"})
     

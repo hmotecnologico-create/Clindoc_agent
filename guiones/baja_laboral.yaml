@@ -9,7 +9,6 @@ paciente_campos_identidad:
 secciones:
   - id: S01
     titulo: "Datos de Identificación del Paciente"
-    fuente_preferente: [informe_medico, baja_medica, poliza_seguro]
     campos:
       - nombre: nombre_completo
         requerido: true
@@ -17,33 +16,32 @@ secciones:
         requerido: true
         validacion_cruzada: true
       - nombre: fecha_nacimiento
-        requerido: true
+        requerido: false
 
   - id: S02
     titulo: "Diagnóstico Principal y Datos de la Baja"
-    fuente_preferente: [baja_medica_inicial, informe_alta_urgencias, informe_medico]
+    fuente_preferente: ALTA
     campos:
       - nombre: diagnostico_principal
         tipo: texto_clinico
         requerido: true
       - nombre: codigo_cie10
         tipo: string
-        requerido: true
+        requerido: false
         patron: "^[A-Z][0-9]{2}(\\.[0-9]{1,2})?$"
       - nombre: num_seguridad_social
         tipo: string
-        requerido: true
+        requerido: false
       - nombre: empresa
         tipo: string
-        requerido: true
+        requerido: false
       - nombre: fecha_inicio_baja
         tipo: fecha
-        requerido: true
+        requerido: false
         vigencia: activo
 
   - id: S03
     titulo: "Evolución Clínica"
-    fuente_preferente: [partes_confirmacion, informe_especialista]
     campos:
       - nombre: partes_confirmacion
         tipo: lista_cronologica

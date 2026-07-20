@@ -76,9 +76,7 @@ class AgenteEscanner:
         
         if self.docling_disponible:
             try:
-                from docling.document_converter import DocumentConverter
-                converter = DocumentConverter()
-                result = converter.convert(archivo)
+                result = self.converter.convert(archivo)
                 json_data = result.document.export_to_dict()
                 # El esquema actual de Docling (texts/body/tables) ya no expone una clave
                 # "text" plana en export_to_dict(); el contenido real se obtiene con

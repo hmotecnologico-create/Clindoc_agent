@@ -109,6 +109,7 @@ class Seccion(BaseModel):
     id: str
     titulo: str
     instruccion: str
+    fuente_preferente: Optional[str] = None
 
 class IdentidadDocumento(BaseModel):
     documento_id: str
@@ -225,39 +226,235 @@ class AgenteRedactor:
         self.modelo = obtener_modelo_ollama_disponible(modelo)
 
     def redactar(self, seccion: Seccion) -> str:
-        """Redacta sección con Deep Linking a fuentes"""
-        evidencias = self.indice.buscar_evidencias(seccion.titulo)
-        
-        # Deep Linking: incluir chunk_id en las referencias
-        contexto = "\n".join([
-            f"- {e['texto']} [Fuente: {e['archivo']}#{e['chunk_id']}]"
-            for e in evidencias
-        ])
-        
-        prompt = f"""Eres un auditor clínico que redacta la sección '{seccion.titulo}' de una historia clínica consolidada para un proceso de Incapacidad Temporal (RD 1060/2022).
+        """Redacta sección con Deep Linking a fuentes.
 
-REGLAS ESTRICTAS Y OBLIGATORIAS:
-1. PROHIBIDO INVENTAR. Solo puedes afirmar lo que aparece de forma EXPLÍCITA en los DATOS de abajo. No supongas, no infieras, no añadas conocimiento médico externo.
-2. NADA HUÉRFANO: CADA párrafo DEBE terminar con su cita en el formato [Fuente: archivo#chunk_id]. Un párrafo sin fuente NO está permitido.
-3. EXCEPCIÓN A LA REGLA 2: Si los DATOS no contienen información para esta sección, responde EXACTAMENTE y solo: "Sin información documental para esta sección." (SIN NINGUNA FUENTE NI CITA).
-4. Estilo ASERTIVO y DIRECTO. Para una conclusión o recomendación usa el patrón: "Basado en [documento/estudio del DD/MM/AAAA], se determina/observa ...". Prohibido el relleno y los disclaimers genéricos ("recomendaciones generales", "debe individualizarse", etc.).
-5. NO confundas un procedimiento (p. ej. artroscopia) con un diagnóstico. Incluye el código CIE-10 SOLO si aparece textualmente o es inequívoco en los DATOS.
+        Genera por documento (un prompt por evidencia, cada uno viendo un único
+        documento) en vez de darle al modelo todos los documentos juntos. Esto
+        elimina estructuralmente la mala atribución de citas entre fragmentos
+        (confirmado empíricamente: con varios documentos en un mismo contexto, un
+        modelo pequeño mezcla con frecuencia el diagnóstico de un documento con la
+        cita de otro) — el modelo nunca tiene que rastrear a cuál de varios
+        documentos pertenece cada afirmación, porque solo ve uno a la vez. Los
+        resultados por documento se unen por código, no por el modelo.
+        """
+        evidencias = self.indice.buscar_evidencias(seccion.titulo, tipo_documento=seccion.fuente_preferente)
 
-Instrucción de la sección: {seccion.instruccion}
+        # Búsqueda complementaria: la consulta genérica del título de sección no
+        # siempre recupera episodios atípicos pero relevantes (p. ej. un accidente de
+        # trabajo entre 180 informes de enfermedad común) porque su similitud semántica
+        # con el título genérico es baja incluso cuando el contenido es justo el que se
+        # busca. Se añade una consulta explícita como red de seguridad, sin sustituir
+        # la búsqueda principal, para no alterar el comportamiento ya validado en el
+        # caso común (los resultados duplicados se descartan por chunk_id).
+        if seccion.fuente_preferente:
+            complementarias = self.indice.buscar_evidencias(
+                "accidente de trabajo, empresa, mutua, parte de accidente laboral",
+                n=2, tipo_documento=seccion.fuente_preferente,
+            )
+            ids_existentes = {e['chunk_id'] for e in evidencias}
+            for e in complementarias:
+                if e['chunk_id'] not in ids_existentes:
+                    evidencias.append(e)
+                    ids_existentes.add(e['chunk_id'])
 
-DATOS (ÚNICA fuente permitida; redacta cada párrafo a partir de aquí):
-{contexto}
+        if not evidencias:
+            return "Sin información documental para esta sección."
 
-Responde en español, técnico y conciso. Recuerda: cada párrafo con su [Fuente: ...]; si no hay datos para la sección, escribe únicamente "Sin información documental para esta sección."."""
-        
+        partes_validas = []
+        for e in evidencias:
+            resultado_doc = self._redactar_un_documento(seccion, e)
+            if resultado_doc.strip() != "Sin información documental para esta sección.":
+                partes_validas.append(resultado_doc)
+
+        if not partes_validas:
+            return "Sin información documental para esta sección."
+        return "\n\n".join(partes_validas)
+
+    def _redactar_un_documento(self, seccion: Seccion, evidencia: Dict) -> str:
+        """Redacta lo que UN único documento aporta a la sección. Al ver un solo
+        documento, no puede confundir su contenido con la cita de otro."""
+        contexto = f"- {evidencia['texto']} [Fuente: {evidencia['archivo']}#{evidencia['chunk_id']}]"
+
+        prompt = f"""Eres un auditor clínico que extrae información de UN ÚNICO documento para la sección '{seccion.titulo}' de una historia clínica consolidada para un proceso de Incapacidad Temporal (RD 1060/2022).
+
+## Reglas Estrictas y Obligatorias
+
+1. **Prohibido inventar.** Solo puedes afirmar lo que aparece de forma EXPLÍCITA en el DOCUMENTO. No supongas, no infieras, no añadas conocimiento médico externo.
+
+2. **Cita exacta obligatoria.** CADA afirmación DEBE terminar con la cita en formato [Fuente: archivo#chunk_id]. Este es el único formato válido. No omitas "Fuente:", no inventes nombres de archivo ni chunk_id distintos a los proporcionados. Si necesitas citar el mismo fragmento múltiples veces, repite la cita cada vez.
+
+3. **Excepción a la Regla 2.** Si el DOCUMENTO no contiene información relevante para esta sección, responde EXACTAMENTE y solo: "Sin información documental para esta sección." (sin cita ni fuente).
+
+4. **Estilo asertivo y directo.** Para una conclusión o recomendación, usa: "Basado en [documento, fecha si aparece], se determina/observa...". Prohibido relleno genérico ("recomendaciones generales", "debe individualizarse", disclaimers).
+
+5. **No confundas procedimiento con diagnóstico.** Un procedimiento es una intervención (artroscopia, punción); un diagnóstico es la condición detectada. Incluye código CIE-10 SOLO si aparece textualmente en el documento o es inequívoco del contexto clínico explícito.
+
+6. **Desambiguación de campos críticos.**
+   - NIF del paciente: aparece en la cabecera del documento, es un identificador personal de 8 dígitos + 1 letra (ej: 25988000R).
+   - Número de seguridad social: aparece en la cabecera o en campos administrativos, es una secuencia de 12 dígitos.
+   - Fecha del informe (cabecera): cuándo se redactó el documento.
+   - Fecha de inicio de la baja: cuándo comenzó la incapacidad, explícitamente etiquetada en el documento como tal.
+   NO confundas estos campos a menos que el documento lo diga explícitamente con esas palabras exactas. Si tienes duda, indica cuál es el campo que se menciona en el documento y por qué.
+
+7. **Campos opcionales:** si el guion marca un campo como opcional ("requerido: false"), inclúyelo SOLO si aparece en los DATOS del documento. Si no aparece, OMÍTELO sin inventar, sin comentarios, sin excusas.
+
+## Entrada
+
+**Instrucción de la sección:** {seccion.instruccion}
+
+**DOCUMENTO (ÚNICA fuente permitida):**
+- {contexto}
+
+## Salida
+
+Responde en español, técnico y conciso. Cada afirmación debe terminar con [Fuente: archivo#chunk_id]. Si el documento no aporta nada a esta sección, escribe únicamente: "Sin información documental para esta sección.\""""
+
+        # Reintento acotado ante abstención: confirmado empíricamente que el modelo a
+        # veces responde "sin información" pese a tener evidencia real (variabilidad
+        # estocástica). Con un solo documento por llamada el riesgo es menor que antes,
+        # pero se mantiene un reintento ligero como red de seguridad.
+        MAX_INTENTOS = 2
+        resultado = "Sin información documental para esta sección."
+        for intento in range(MAX_INTENTOS):
+            resultado = self._generar_desde_prompt(prompt)
+            if resultado.strip() != "Sin información documental para esta sección.":
+                return self._sanear_resultado(resultado, evidencia)
+        return resultado
+
+    def _sanear_resultado(self, texto: str, evidencia: Dict) -> str:
+        """Correcciones deterministas que no dependen de que el modelo "se acuerde":
+        ni el prompt (ninguna versión probada) ni los reintentos eliminaron del todo
+        dos patrones recurrentes, así que se corrigen aquí con reglas objetivas.
+        """
+        # Terminador de valor compartido: captura el valor de un campo hasta el
+        # límite real (punto final de frase, corchete de cita, salto de línea o fin
+        # de cadena) SIN cortarse en un punto interno legítimo del propio valor
+        # (decimales de CIE-10 como "S93.4", abreviaturas como "S.L."). Un punto
+        # cuenta como fin de frase solo si va seguido de espacio + mayúscula (nueva
+        # frase/campo) o de corchete de cita -- un punto pegado al siguiente
+        # carácter (sin espacio) se trata como parte del valor. Bug real detectado
+        # y corregido en esta sesión: la versión anterior (`[^.\[\n]{0,N}`) cortaba
+        # "S.L." dejando basura como "no disponible en el documento.L." en el texto.
+        _VALOR_CAMPO = r'([^\[\n]*?)(?=\.\s+[A-ZÁÉÍÓÚÑ]|\.\s*\[|\.\s*$|\[|\n|$)'
+
+        # 0) Fecha de nacimiento sin respaldo real: encontrado en la regeneración
+        # completa de esta sesión -- el corpus SOLO escribe "Edad: X años" y la fecha
+        # del propio informe (fecha de la visita), jamás una fecha de nacimiento real
+        # (0/60 documentos verificados). El modelo confunde ambos datos: a veces
+        # etiqueta la edad como si fuera la fecha ("Fecha de nacimiento: 55 años",
+        # visto literalmente en producción), a veces usa la fecha del informe. Mismo
+        # razonamiento que el resto: si el documento no menciona "nacimiento" en
+        # ningún lado, cualquier valor reportado es forzosamente inventado.
+        if not re.search(r'nacimiento', evidencia['texto'], re.IGNORECASE):
+            patron_nacimiento_cualquiera = re.compile(
+                r'(fecha\s+de\s+nacimiento|fecha_nacimiento)\s*:?\s*' + _VALOR_CAMPO,
+                re.IGNORECASE,
+            )
+            texto = patron_nacimiento_cualquiera.sub(
+                lambda m: f"{m.group(1)}: no disponible en el documento", texto
+            )
+
+        # 1) Número de seguridad social sin respaldo real: filtrar por formato o por
+        # "aparece en algún lugar del texto" no basta -- el NIF real del paciente SÍ
+        # aparece en el documento (correctamente, como NIF), así que ese chequeo lo
+        # daba por válido aunque estuviera mal etiquetado como NSS. Y el modelo llegó
+        # a escribir variantes de formato ("Num Seguridad Social" con espacio) que el
+        # patrón exacto no cubría. Se corta el problema de raíz: en TODO este corpus
+        # ningún documento contiene jamás un número de seguridad social real (0/900
+        # verificado), así que si el propio DOCUMENTO FUENTE no menciona la frase
+        # "seguridad social" en ningún lado, cualquier valor que el modelo reporte
+        # para ese campo es forzosamente inventado, sea cual sea su formato.
+        if not re.search(r'seguridad\s+social', evidencia['texto'], re.IGNORECASE):
+            patron_nss_cualquiera = re.compile(
+                r'(n[uú]mero\s+de\s+seguridad\s+social|num[\s_]seguridad[\s_]social|nss)\s*:?\s*' + _VALOR_CAMPO,
+                re.IGNORECASE,
+            )
+            texto = patron_nss_cualquiera.sub(
+                lambda m: f"{m.group(1)}: no disponible en el documento", texto
+            )
+
+        # 1a) Código CIE-10 sin respaldo real: verificado sobre el generador de corpus
+        # y sobre una muestra de 30 documentos ALTA reales -- 0/524 documentos por
+        # paciente contienen jamás un código con forma de CIE-10 (letra + 2 dígitos,
+        # ej. "M25.5"). El guion declara un `patron` de validación para este campo,
+        # pero ese patrón nunca se aplica en el código (dead metadata) -- así que la
+        # única defensa real es esta: si el documento fuente no contiene un código con
+        # forma de CIE-10, cualquier código que el modelo reporte es inventado.
+        if not re.search(r'\b[A-Z]\d{2}(\.\d{1,2})?\b', evidencia['texto']):
+            patron_cie10_cualquiera = re.compile(
+                r'(c[oó]digo\s+cie[\s\-]?10|cie[\s\-]?10|codigo_cie10)\s*:?\s*' + _VALOR_CAMPO,
+                re.IGNORECASE,
+            )
+            texto = patron_cie10_cualquiera.sub(
+                lambda m: f"{m.group(1)}: no disponible en el documento", texto
+            )
+
+        # 1b) Empresa sin respaldo real: en TODO el corpus, la palabra "empresa" solo
+        # aparece en el documento de accidente de trabajo (1 de 524 por paciente,
+        # ver Hallazgo 2/3 del plan) -- ningún otro documento la menciona jamás. Mismo
+        # razonamiento que el NSS: si el DOCUMENTO citado no menciona "empresa" en
+        # ningún lado, cualquier nombre de empresa que el modelo reporte es forzosamente
+        # inventado (aplica al 523/524 de los documentos posibles por paciente).
+        if not re.search(r'empresa', evidencia['texto'], re.IGNORECASE):
+            patron_empresa_cualquiera = re.compile(
+                r'(empresa)\s*:?\s*' + _VALOR_CAMPO,
+                re.IGNORECASE,
+            )
+            texto = patron_empresa_cualquiera.sub(
+                lambda m: f"{m.group(1)}: no disponible en el documento", texto
+            )
+
+        # 2) Fecha de inicio de baja sin forma de fecha real: detectado en producción
+        # (app real, no solo en pruebas) que el modelo a veces toma una frase cercana
+        # sin relación ("control en 7-10 días") y la reporta como si fuera la fecha de
+        # inicio de la baja, en vez de reconocer que el documento no la especifica. A
+        # diferencia del NSS, una fecha real SÍ puede existir en el documento, así que
+        # no se descarta el campo entero -- se verifica que el valor reportado tenga
+        # forma de fecha (DD/MM/AAAA); si no la tiene, es forzosamente una confusión,
+        # no un dato real, y se reemplaza.
+        patron_fecha_baja = re.compile(
+            r'(fecha[\s_]de[\s_]inicio[\s_](?:de[\s_]la[\s_])?baja|fecha_inicio_baja)\s*:?\s*' + _VALOR_CAMPO,
+            re.IGNORECASE,
+        )
+        def _validar_fecha(m):
+            valor = m.group(2)
+            if re.search(r'\d{1,2}[/\-]\d{1,2}[/\-]\d{2,4}', valor):
+                return m.group(0)
+            if re.search(r'no\s+(est[aá]|se)\s|no\s+disponible|no\s+especific|desconocid', valor, re.IGNORECASE):
+                return m.group(0)
+            return f"{m.group(1)}: no disponible en el documento"
+        texto = patron_fecha_baja.sub(_validar_fecha, texto)
+
+        # 3) Cita mal formada (placeholder sin resolver "archivo#chunk_id", texto
+        # generico como "[Fuente: documento]", etc.): al generar por documento, solo
+        # existe UNA cita válida posible en toda la respuesta — la de esta evidencia —
+        # así que en vez de intentar reconocer cada variante rota, se reemplaza
+        # cualquier "[Fuente: ...]" por la cita real garantizada.
+        cita_real = f"{evidencia['archivo']}#{evidencia['chunk_id']}"
+        texto = re.sub(r'\[Fuente:[^\]]*\]', f'[Fuente: {cita_real}]', texto, flags=re.IGNORECASE)
+
+        return texto
+
+    def _generar_desde_prompt(self, prompt: str) -> str:
         try:
             r = ollama.chat(model=self.modelo, messages=[{'role': 'user', 'content': prompt}])
             resp = r['message']['content']
-            
-            if "Sin información documental" in resp:
-                return "Sin información documental para esta sección."
-                
+
+            # Nota: NO se descarta toda la respuesta solo porque contenga la frase "Sin
+            # información documental" en algún punto. El modelo la usa a veces para señalar
+            # que un CAMPO concreto (p. ej. el CIE-10) no está documentado, dentro de una
+            # respuesta por lo demás válida y bien citada. Un chequeo por subcadena aquí
+            # destruía respuestas correctas completas. El caso de sección genuinamente vacía
+            # ya queda cubierto abajo: si tras el filtro de párrafos huérfanos no sobrevive
+            # ningún párrafo con cita real, se devuelve el mensaje de "sin información".
+
             # Filtro de Destrucción de Párrafos Huérfanos
+            # Acepta tanto el formato exacto "[Fuente: archivo#chunk_id]" como variantes sin
+            # la etiqueta "Fuente:" (ej. "[ALTA_078.pdf#ALTA_078_chunk_0]"), que gemma3:4b
+            # genera con frecuencia pese a la instrucción explícita. Antes, el chequeo exacto
+            # de "[Fuente:" destruía párrafos con citas reales y bien formadas, colapsando
+            # la sección entera a "Sin información documental" pese a haber evidencia válida.
+            CITA_PATTERN = re.compile(r'\[[^\[\]]*\.(?:pdf|docx)[^\[\]]*\]', re.IGNORECASE)
             parrafos_validos = []
             for p in resp.split('\n'):
                 p_limpio = p.strip()
@@ -266,9 +463,15 @@ Responde en español, técnico y conciso. Recuerda: cada párrafo con su [Fuente
                 # Si es un encabezado markdown (ej. ##), lo pasamos
                 if p_limpio.startswith('#'):
                     parrafos_validos.append(p_limpio)
-                # Si tiene fuente, es válido
-                elif "[Fuente:" in p_limpio:
-                    parrafos_validos.append(p_limpio)
+                # Si tiene una cita reconocible (con o sin etiqueta "Fuente:"), es válido
+                elif "[Fuente:" in p_limpio or CITA_PATTERN.search(p_limpio):
+                    # Limpieza cosmética: si la frase de "sin información" quedó incrustada
+                    # a mitad de un párrafo que sí tiene contenido citado real (se refería a
+                    # un campo puntual, no a toda la sección), se retira para no dejar una
+                    # frase contradictoria en medio de un párrafo por lo demás válido.
+                    p_limpio = re.sub(r'\s*Sin información documental para esta sección\.\s*', ' ', p_limpio).strip()
+                    if p_limpio:
+                        parrafos_validos.append(p_limpio)
                 # Si no tiene fuente y no es encabezado, SE DESTRUYE (se ignora)
             
             resultado_filtrado = "\n\n".join(parrafos_validos)
@@ -764,11 +967,27 @@ def cargar_guion_yaml(ruta: str = "guiones/baja_laboral.yaml") -> Dict:
     for s in y.get("secciones", []):
         instr = (s.get("instruccion") or "").strip()
         if not instr:
-            campos = [c.get("nombre", "") for c in s.get("campos", []) if c.get("nombre")]
-            campos_txt = ", ".join(campos) if campos else "los datos relevantes del expediente"
-            instr = (f"Redacta la sección '{s['titulo']}' cubriendo: {campos_txt}. "
-                     f"Cíñete estrictamente a la evidencia documental del expediente.")
-        secciones.append({"id": s["id"], "titulo": s["titulo"], "instruccion": instr})
+            campos_def = s.get("campos", [])
+            obligatorios = [c.get("nombre", "") for c in campos_def if c.get("nombre") and c.get("requerido", False)]
+            opcionales = [c.get("nombre", "") for c in campos_def if c.get("nombre") and not c.get("requerido", False)]
+            if obligatorios or opcionales:
+                partes_instr = [f"Redacta la sección '{s['titulo']}'."]
+                if obligatorios:
+                    partes_instr.append(f"Campos obligatorios (deben aparecer si el expediente los documenta): {', '.join(obligatorios)}.")
+                if opcionales:
+                    partes_instr.append(
+                        f"Campos opcionales (inclúyelos SOLO si aparecen explícitamente en los DATOS; "
+                        f"si un campo opcional no está documentado, OMÍTELO sin mencionarlo, no inventes ni un valor de ejemplo): {', '.join(opcionales)}."
+                    )
+                partes_instr.append("Cíñete estrictamente a la evidencia documental del expediente.")
+                instr = " ".join(partes_instr)
+            else:
+                instr = (f"Redacta la sección '{s['titulo']}' cubriendo los datos relevantes del expediente. "
+                         f"Cíñete estrictamente a la evidencia documental del expediente.")
+        secciones.append({
+            "id": s["id"], "titulo": s["titulo"], "instruccion": instr,
+            "fuente_preferente": s.get("fuente_preferente"),
+        })
     return {"titulo": y.get("titulo", "Informe Técnico de Expediente"), "secciones": secciones}
 
 

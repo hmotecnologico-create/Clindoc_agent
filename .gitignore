@@ -194,3 +194,10 @@ benchmark_confusion_matrix_resultado.json
 # Tooling de edicion del TFM (no es parte del aplicativo)
 extract_table.py
 eta.txt
+
+# Archivo de residuos y auditorias puntuales (no es parte del aplicativo)
+_archivo_residuos_*/
+_qa_loc_resultados*.json
+_verificacion_semantica_final_resultado.json
+_verificador_semantico_final.py
+resultados_s02_con_accidente.json
