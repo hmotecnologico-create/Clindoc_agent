@@ -427,6 +427,35 @@ if perfil == "Doctor (Facultativo)":
         st.subheader("Evolución y Diagnósticos Previos")
         if resumen_historia:
             renderizar_texto_con_botones(resumen_historia, nif_seleccionado, seccion="historia")
+
+            st.divider()
+            with st.expander("✏️ Rectificar o validar esta historia clínica (Human-in-the-Loop)", expanded=False):
+                st.caption("El facultativo puede corregir el texto generado por la IA antes de darlo por bueno. "
+                           "La validación queda registrada de forma auditable (Anexo D) y la historia final se guarda cifrada (AES-256-GCM).")
+                key_texto = f"edicion_historia_{nif_seleccionado}"
+                if key_texto not in st.session_state:
+                    st.session_state[key_texto] = resumen_historia
+                texto_editado = st.text_area(
+                    "Texto de la historia clínica:",
+                    value=st.session_state[key_texto],
+                    height=350,
+                    key=f"textarea_{key_texto}"
+                )
+                nombre_facultativo = st.text_input("Nombre del facultativo responsable:", key=f"medico_{nif_seleccionado}")
+
+                col_guardar, col_pdf = st.columns(2)
+                with col_guardar:
+                    if st.button("💾 Guardar corrección", key=f"guardar_{nif_seleccionado}", type="primary", use_container_width=True):
+                        editado = texto_editado.strip() != resumen_historia.strip()
+                        registrar_validacion_facultativo(nif_seleccionado, nombre_facultativo, editado, historia=texto_editado)
+                        st.session_state[key_texto] = texto_editado
+                        st.success(("✅ Guardado con correcciones" if editado else "✅ Validado (visto bueno, sin cambios)")
+                                   + f" por {nombre_facultativo or '(sin nombre)'}.")
+                with col_pdf:
+                    pdf_bytes = generar_pdf_historia(nombre_mostrado, nif_seleccionado, texto_editado, nombre_facultativo)
+                    st.download_button("📄 Descargar PDF validado", data=pdf_bytes,
+                                        file_name=f"historia_clinica_{nif_seleccionado}.pdf", mime="application/pdf",
+                                        key=f"pdf_{nif_seleccionado}", use_container_width=True)
         else:
             st.info("No hay información clínica general disponible.")
             
