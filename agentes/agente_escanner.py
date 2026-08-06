@@ -1,4 +1,5 @@
 import os
+import time
 from pathlib import Path
 from typing import List, Dict
 import pypdf
@@ -47,25 +48,30 @@ class AgenteEscanner:
             # Crear documento de prueba si no hay ninguno
             test_file = self.ruta / "paciente_juan.txt"
             test_file.write_text("Hallazgos clínicos en paciente Juan Pérez García: El paciente presenta una evolución favorable tras cirugía cardiovascular. Se recomienda reposo por 15 días.", encoding='utf-8')
-        
+
+        # Se listan los 4 formatos de una vez (no perezosamente por tipo) para poder
+        # imprimir "X/total" desde el primer documento -- sin esto, un expediente de
+        # 524 folios no da ninguna señal de progreso durante varios minutos.
+        pdfs = sorted(self.ruta.glob("*.pdf"))
+        mds = sorted(self.ruta.glob("*.md"))
+        txts = sorted(self.ruta.glob("*.txt"))
+        docxs = sorted(self.ruta.glob("*.docx"))
+        total = len(pdfs) + len(mds) + len(txts) + len(docxs)
+
         documentos = []
-        
-        # PDFs
-        for f in self.ruta.glob("*.pdf"):
-            documentos.append(self._procesar_pdf(f))
-        
-        # Markdown
-        for f in self.ruta.glob("*.md"):
-            documentos.append(self._procesar_markdown(f))
-        
-        # TXT (legacy)
-        for f in self.ruta.glob("*.txt"):
-            documentos.append(self._procesar_txt(f))
-        
-        # DOCX
-        for f in self.ruta.glob("*.docx"):
-            documentos.append(self._procesar_docx(f))
-        
+        inicio = time.time()
+        procesador_por_tipo = (
+            [(f, self._procesar_pdf) for f in pdfs]
+            + [(f, self._procesar_markdown) for f in mds]
+            + [(f, self._procesar_txt) for f in txts]
+            + [(f, self._procesar_docx) for f in docxs]
+        )
+        for idx, (f, procesador) in enumerate(procesador_por_tipo, start=1):
+            documentos.append(procesador(f))
+            if idx == total or idx % 10 == 0:
+                transcurrido = time.time() - inicio
+                print(f"  [{idx}/{total}] Escaneados ({transcurrido:.0f}s) - último: {f.name}")
+
         return documentos
     
     def _procesar_pdf(self, archivo: Path) -> Dict:
