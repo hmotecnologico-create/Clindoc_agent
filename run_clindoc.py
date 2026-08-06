@@ -246,37 +246,67 @@ class AgenteRedactor:
         documentos pertenece cada afirmación, porque solo ve uno a la vez. Los
         resultados por documento se unen por código, no por el modelo.
         """
-        evidencias = self.indice.buscar_evidencias(seccion.titulo, tipo_documento=seccion.fuente_preferente)
-
-        # Búsqueda complementaria: la consulta genérica del título de sección no
-        # siempre recupera episodios atípicos pero relevantes (p. ej. un accidente de
-        # trabajo entre 180 informes de enfermedad común) porque su similitud semántica
-        # con el título genérico es baja incluso cuando el contenido es justo el que se
-        # busca. Se añade una consulta explícita como red de seguridad, sin sustituir
-        # la búsqueda principal, para no alterar el comportamiento ya validado en el
-        # caso común (los resultados duplicados se descartan por chunk_id).
+        # Episodio "actual": determinista por la fecha REAL del documento (metadato
+        # guardado al indexar, ver IndiceCorpus.documento_mas_reciente), no por
+        # similitud semántica. Se probó primero ordenar por fecha ENTRE los resultados
+        # de una búsqueda semántica normal, pero se descartó con evidencia real: los
+        # ~180 informes de alta de un mismo paciente comparten estructura y encabezado
+        # casi idénticos, y sus puntajes de similitud quedan a menos de 0,005 de
+        # diferencia entre sí -- el propio conjunto de "los 3 más relevantes" ya no es
+        # estable de una corrida a otra, así que ordenar por fecha solo esos 3 no
+        # garantiza nada. documento_mas_reciente() evita el problema por completo: no
+        # depende de relevancia semántica, compara la fecha real de TODOS los
+        # documentos del tipo preferente.
+        evidencias = []
         if seccion.fuente_preferente:
-            complementarias = self.indice.buscar_evidencias(
-                "accidente de trabajo, empresa, mutua, parte de accidente laboral",
-                n=2, tipo_documento=seccion.fuente_preferente,
-            )
-            ids_existentes = {e['chunk_id'] for e in evidencias}
-            for e in complementarias:
-                if e['chunk_id'] not in ids_existentes:
-                    evidencias.append(e)
-                    ids_existentes.add(e['chunk_id'])
-
+            evidencias = self.indice.documento_mas_reciente(seccion.fuente_preferente)
         if not evidencias:
+            # Respaldo: sin fuente_preferente, o ningún documento de ese tipo tuvo
+            # fecha reconocible -- se recurre a la búsqueda semántica original en vez
+            # de devolver la sección vacía.
+            evidencias = self.indice.buscar_evidencias(seccion.titulo, tipo_documento=seccion.fuente_preferente)
+
+        # Búsqueda complementaria: un accidente de trabajo no debe desaparecer de
+        # esta sección solo porque no sea el episodio más reciente (p. ej. un
+        # accidente de ayer no debe perderse porque hoy hubo una consulta por otro
+        # motivo). Antes esto se resolvía con una búsqueda semántica de seguridad,
+        # pero se descartó con evidencia real: en el paciente 48991234S trajo un
+        # ALTA de Cólico Nefrítico sin relación alguna con ningún accidente, el
+        # mismo tipo de ruido por puntajes poco fiables que ya se había diagnosticado
+        # para la selección del episodio principal. tipo_episodio es un metadato
+        # exacto (no similitud), así que localizar un accidente ya no requiere
+        # adivinar por relevancia semántica.
+        evidencias_complementarias = []
+        if seccion.fuente_preferente:
+            accidente = self.indice.documento_accidente_trabajo(seccion.fuente_preferente)
+            ids_existentes = {e['chunk_id'] for e in evidencias}
+            for e in accidente:
+                if e['chunk_id'] not in ids_existentes:
+                    evidencias_complementarias.append(e)
+                    ids_existentes.add(e['chunk_id'])
+            # Si hay un episodio de accidente (sea el principal o el recién añadido
+            # arriba), su Parte de Accidente de Trabajo es el documento que respalda
+            # la afirmación -- sin él, "empresa"/"mutua" sería solo una frase suelta
+            # dentro del ALTA, sin evidencia independiente verificable.
+            hay_accidente = bool(accidente) or (evidencias and evidencias[0].get("tipo_episodio") == "accidente_trabajo")
+            if hay_accidente:
+                for e in self.indice.documentos_por_tipo("PAT"):
+                    if e['chunk_id'] not in ids_existentes:
+                        evidencias_complementarias.append(e)
+                        ids_existentes.add(e['chunk_id'])
+
+        evidencias_todas = evidencias + evidencias_complementarias
+        if not evidencias_todas:
             return "Sin información documental para esta sección."
 
         partes_validas = []
-        for e in evidencias:
+        for e in evidencias_todas:
             resultado_doc = self._redactar_un_documento(seccion, e)
             if resultado_doc.strip() != "Sin información documental para esta sección.":
                 partes_validas.append(resultado_doc)
 
         if not partes_validas:
-            return self._abstencion_con_confianza(evidencias)
+            return self._abstencion_con_confianza(evidencias_todas)
         return "\n\n".join(partes_validas)
 
     def _abstencion_con_confianza(self, evidencias: List[Dict]) -> str:
