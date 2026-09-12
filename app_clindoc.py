@@ -18,6 +18,13 @@ from chat_asistente_medico import ChatAsistenteMedico, TipoMensaje
 
 from utils.ui_helpers import _chunking_folio, render_folio_resaltado, _campos_guion, _validar_campo, _periodo_historia, generar_pdf_historia, registrar_validacion_facultativo
 
+
+def _neutralizar_markdown_peligroso(texto):
+    """Quita la URL de cualquier imagen/enlace markdown (![alt](url) / [texto](url)), dejando solo el texto
+    visible. El contenido documental (vía citas del LLM o respuestas del chat) no es de confianza; sin esto,
+    un documento o respuesta con `![](http://host/beacon)` dispararía una petición de red al renderizarlo."""
+    return re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', str(texto))
+
 # Configuración de página
 st.set_page_config(
     page_title="ClinDoc Agent | Multi-Paciente",
@@ -190,7 +197,7 @@ with st.sidebar:
             if msg.tipo in [TipoMensaje.PREGUNTA, TipoMensaje.CORRECCION, TipoMensaje.APROBACION]:
                 st.markdown(f"**👨‍⚕️ Médico:** {msg.contenido}")
             elif msg.tipo == TipoMensaje.RESPUESTA:
-                st.markdown(f"**🤖 IA:** {msg.contenido}")
+                st.markdown(f"**🤖 IA:** {_neutralizar_markdown_peligroso(msg.contenido)}")
                 
     # Chat input en el sidebar
     msg_texto = st.chat_input("Consulta o corrige a la IA...")
@@ -351,7 +358,8 @@ if perfil == "Doctor (Facultativo)":
                 import docx
                 doc = docx.Document(ruta_archivo)
                 texto = "\n\n".join([p.text for p in doc.paragraphs])
-                st.markdown(f"**Contenido DOCX:**\n\n{texto}")
+                st.markdown("**Contenido DOCX:**")
+                st.text_area("Contenido DOCX:", value=texto, height=400, disabled=True, label_visibility="collapsed")
                 # Imagen diagnóstica asociada (p. ej. la radiografía del mismo estudio de radiología).
                 # No es analizada por el pipeline semántico; se muestra para verificación visual del facultativo.
                 imagen_asociada = ruta_archivo.with_name(f"{ruta_archivo.stem}_img.png")
@@ -410,7 +418,7 @@ if perfil == "Doctor (Facultativo)":
                         texto_limpio = re.sub(r'\[Fuente:\s*([^\]#]+?)\s*(?:#[^\]]+)?\]', '', linea)
                         
                         # Reemplazar viñetas dobles o markdown roto si ocurre al separar por saltos
-                        st.markdown(texto_limpio)
+                        st.markdown(_neutralizar_markdown_peligroso(texto_limpio))
                         
                         if fuentes_unicas:
                             num_cols = min(len(fuentes_unicas), 4)
@@ -420,8 +428,8 @@ if perfil == "Doctor (Facultativo)":
                                     if st.button(f"📄 {arch}", key=f"btn_{seccion}_{nif}_{idx_b}_{idx_l}_{i}", help="Abrir original", use_container_width=True):
                                         mostrar_documento(ruta_docs / arch, fragmento=linea)
             else:
-                st.markdown(bloque)
-            
+                st.markdown(_neutralizar_markdown_peligroso(bloque))
+
             st.write("") # Espaciador
 
     with tab_historia:

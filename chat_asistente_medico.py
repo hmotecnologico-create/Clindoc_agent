@@ -433,10 +433,11 @@ def interfaz_chat():
     # Mostrar mensajes
     if chat.conversacion_actual:
         for msg in chat.conversacion_actual.mensajes[-10:]:  # Últimos 10
+            contenido_seguro = re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', str(msg.contenido))
             if msg.tipo == TipoMensaje.PREGUNTA or msg.tipo == TipoMensaje.CORRECCION:
-                st.markdown(f"**👨‍⚕️ Médico:** {msg.contenido}")
+                st.markdown(f"**👨‍⚕️ Médico:** {contenido_seguro}")
             elif msg.tipo == TipoMensaje.RESPUESTA:
-                st.markdown(f"**🤖 IA:** {msg.contenido}")
+                st.markdown(f"**🤖 IA:** {contenido_seguro}")
             else:
                 st.caption(msg.contenido)
     

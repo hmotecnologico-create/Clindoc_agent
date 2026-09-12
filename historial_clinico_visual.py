@@ -528,8 +528,12 @@ def mostrar_historial_clinico(paciente_nif: str, paciente_nombre: str):
         
         for e in resultados:
             with st.expander(f"📅 {e.fecha.strftime('%d/%m/%Y')} - {e.titulo}"):
+                # e.descripcion es una subcadena literal del documento ingerido (sin pasar por el LLM);
+                # se neutraliza la sintaxis de imagen/enlace markdown para evitar balizas de red si un
+                # documento fuente contiene `![](http://host/beacon)`.
+                descripcion_segura = re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', str(e.descripcion))
                 st.markdown(f"**Tipo:** {e.tipo.capitalize()}")
-                st.markdown(f"**Descripción:** {e.descripcion}")
+                st.markdown(f"**Descripción:** {descripcion_segura}")
                 st.markdown(f"**Fuente:** {e.fuente}")
     
     # Gráfico de timeline
