@@ -12,7 +12,12 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
 class CifradoClinDoc:
-    def __init__(self, clave: str = "clinDoc_Sovereign_2026"):
+    def __init__(self, clave: str = None):
+        # La clave por defecto solo existe para que el sistema funcione "out of the box"
+        # en una evaluación/demo (ver Anexo E de reproducibilidad); al ser un valor literal
+        # en el código fuente público, no aporta confidencialidad real. Un despliegue real
+        # debe fijar CLINDOC_CIFRADO_KEY a un secreto propio del entorno.
+        clave = clave or os.environ.get("CLINDOC_CIFRADO_KEY", "clinDoc_Sovereign_2026")
         self.key = hashlib.sha256(clave.encode()).digest()  # 32 bytes = AES-256
         self.aes = AESGCM(self.key)
 

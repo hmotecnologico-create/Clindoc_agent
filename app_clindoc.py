@@ -1,6 +1,7 @@
 import streamlit as st
 import json
 import re
+import html as _html
 import pandas as pd
 from datetime import datetime
 import plotly.express as px
@@ -237,19 +238,19 @@ with col_t1:
     # Perfil del Paciente (Datos Personales Básicos - Estilo Premium)
     st.markdown(f"""
     <div class="premium-card">
-        <h2 style="margin-top:0; color:#005B96;">{nombre_mostrado}</h2>
+        <h2 style="margin-top:0; color:#005B96;">{_html.escape(str(nombre_mostrado))}</h2>
         <div style="display:flex; justify-content:space-between; flex-wrap:wrap; color:#2d3748;">
             <div style="flex:1; min-width:200px;">
-                <p><b>NIF:</b> <span style="background:#e0f2fe; padding:2px 8px; border-radius:4px; font-family:monospace;">{data['nif']}</span></p>
-                <p><b>Edad:</b> {demo_data['edad']}{' años' if demo_data['edad'] != 'No extraído' else ''}</p>
+                <p><b>NIF:</b> <span style="background:#e0f2fe; padding:2px 8px; border-radius:4px; font-family:monospace;">{_html.escape(str(data['nif']))}</span></p>
+                <p><b>Edad:</b> {_html.escape(str(demo_data['edad']))}{' años' if demo_data['edad'] != 'No extraído' else ''}</p>
             </div>
             <div style="flex:1; min-width:200px;">
-                <p><b>Sexo:</b> {demo_data['sexo']}</p>
+                <p><b>Sexo:</b> {_html.escape(str(demo_data['sexo']))}</p>
                 <p><b>Estado:</b> <span style="color:#047857; font-weight:bold;">● Activo</span></p>
             </div>
             <div style="flex:1; min-width:200px;">
-                <p><b>Teléfono:</b> {demo_data['telefono']}</p>
-                <p><b>Dirección:</b> {demo_data['direccion']}</p>
+                <p><b>Teléfono:</b> {_html.escape(str(demo_data['telefono']))}</p>
+                <p><b>Dirección:</b> {_html.escape(str(demo_data['direccion']))}</p>
             </div>
         </div>
     </div>

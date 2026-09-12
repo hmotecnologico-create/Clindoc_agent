@@ -17,6 +17,7 @@ Módulo crítica para Capítulo 5 y 6 del TFM.
 import streamlit as st
 import json
 import os
+import html
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, List, Dict
@@ -237,8 +238,8 @@ class DashboardMedico:
                 with st.container():
                     st.markdown(f"""
                     <div class="seccion-auditar">
-                        <h4>{titulo}</h4>
-                        <p>{contenido[:500]}{'...' if len(contenido) > 500 else ''}</p>
+                        <h4>{html.escape(str(titulo))}</h4>
+                        <p>{html.escape(str(contenido)[:500])}{'...' if len(contenido) > 500 else ''}</p>
                     </div>
                     """, unsafe_allow_html=True)
                     
@@ -252,7 +253,8 @@ class DashboardMedico:
                     
                     notas = ""
                     texto_modificado = ""
-                    
+                    categoria = "Falso Positivo"
+
                     if opcion == "✗ Modificar":
                         texto_modificado = st.text_area(
                             "Texto corregido:",
@@ -269,12 +271,13 @@ class DashboardMedico:
                             "Nuevo hallazgo (lo que la IA no vio):",
                             key=f"nuevo_{titulo}"
                         )
-                    
+
                     validaciones.append({
                         "seccion": titulo,
                         "opcion": opcion,
                         "texto_modificado": texto_modificado,
-                        "notas": notas
+                        "notas": notas,
+                        "categoria": categoria
                     })
                     
                     st.markdown("---")
@@ -296,13 +299,20 @@ class DashboardMedico:
                         texto_original=secciones.get(val["seccion"], "")
                     )
                 elif val["opcion"] == "✗ Modificar":
+                    mapa_categoria = {
+                        "Falso Positivo": CategoriaError.FALSO_POSITIVO,
+                        "Error Fecha": CategoriaError.ERROR_FECHA,
+                        "Error NIF": CategoriaError.ERROR_NIF,
+                        "Alucinación": CategoriaError.ALUCINACION,
+                        "Otro": CategoriaError.FALSO_POSITIVO,
+                    }
                     v = ValidacionSeccion(
                         seccion=val["seccion"],
                         validacion=TipoValidacion.MODIFICADO,
                         texto_original=secciones.get(val["seccion"], ""),
                         texto_modificado=val["texto_modificado"],
                         notas_medico=val["notas"],
-                        categoria_error=CategoriaError.FALSO_POSITIVO
+                        categoria_error=mapa_categoria.get(val["categoria"], CategoriaError.FALSO_POSITIVO)
                     )
                 else:  # Añadir
                     v = ValidacionSeccion(
@@ -435,6 +445,10 @@ class DashboardMedico:
             generar = st.form_submit_button("🔬 Generar Informe con IA", type="primary")
         
         if generar and nombre and nif:
+            from agentes.verificadores import validar_nif
+            if not validar_nif(nif):
+                st.error("❌ NIF/NIE con formato inválido. Debe ser 8 dígitos + letra de control (o X/Y/Z + 7 dígitos + letra).")
+                st.stop()
             try:
                 import yaml
                 secciones = json.loads(secciones_input)

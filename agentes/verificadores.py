@@ -76,14 +76,14 @@ class VerificadorIdentidad:
         # -----------------------------------------------
 
         if not nif_doc:
-            return {"valido": False, "detalle": "No se detectó ningún NIF/NIE en el documento."}
-            
+            return {"valido": False, "detalle": "No se detectó ningún NIF/NIE en el documento.", "nif_encontrado": None}
+
         if not validar_nif(nif_doc):
-            return {"valido": False, "detalle": f"El NIF detectado ({nif_doc}) no tiene un formato/letra válido."}
-            
+            return {"valido": False, "detalle": f"El NIF detectado ({nif_doc}) no tiene un formato/letra válido.", "nif_encontrado": nif_doc}
+
         if nif_doc.upper() != nif_ref.upper():
-            return {"valido": False, "detalle": f"NIF incorrecto. Esperado: {nif_ref}, Encontrado: {nif_doc}"}
-            
+            return {"valido": False, "detalle": f"NIF incorrecto. Esperado: {nif_ref}, Encontrado: {nif_doc}", "nif_encontrado": nif_doc}
+
         # NUEVO: Validacion Cruzada de Nombre (Si el DNI coincide pero es un fraude de identidad)
         if nombre_ref:
             # Comprobar si al menos el primer apellido aparece en el texto
@@ -93,11 +93,11 @@ class VerificadorIdentidad:
                 import unicodedata
                 texto_limpio = unicodedata.normalize('NFKD', texto_doc.upper()).encode('ASCII', 'ignore').decode('utf-8')
                 apellido_limpio = unicodedata.normalize('NFKD', apellido).encode('ASCII', 'ignore').decode('utf-8')
-                
+
                 if apellido_limpio not in texto_limpio:
-                    return {"valido": False, "detalle": f"FRAUDE: DNI correcto ({nif_doc}) pero no pertenece a {nombre_ref}."}
-            
-        return {"valido": True, "detalle": "Identidad validada correctamente (NIF y Nombre coincidentes)."}
+                    return {"valido": False, "detalle": f"FRAUDE: DNI correcto ({nif_doc}) pero no pertenece a {nombre_ref}.", "nif_encontrado": nif_doc}
+
+        return {"valido": True, "detalle": "Identidad validada correctamente (NIF y Nombre coincidentes).", "nif_encontrado": nif_doc}
 
 # --- VERIFICADOR DE VIGENCIA MEJORADO (FASE 2) ---
 class VerificadorVigencia:
