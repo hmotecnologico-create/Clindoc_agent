@@ -1,0 +1,10 @@
+[run]
+source = .
+omit =
+    tests/*
+    */site-packages/*
+    */.venv/*
+    benchmark_*.py
+
+[report]
+ignore_errors = True

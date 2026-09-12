@@ -1,0 +1,618 @@
+{
+  "n_folios": 100,
+  "n_pacientes": 5,
+  "metrica": "líneas con nombre + valor decimal asociado en la misma línea (proxy de asociación biomarcador-valor preservada)",
+  "docling_ya_validado": {
+    "tiempo_por_folio_s": 5.695,
+    "pct_preservacion_estructura": 100.0,
+    "nota": "reutilizado de benchmark_ingesta_ampliado_resultado.json (v1); validado manualmente contra LAB_001.pdf -- tabla markdown real con biomarcador|valor|unidad en la misma fila"
+  },
+  "pymupdf_corregido": {
+    "tiempo_por_folio_s": 0.0032,
+    "n_folios_con_alguna_fila_asociada": 0,
+    "n_folios_asociacion_totalmente_perdida": 100,
+    "pct_folios_asociacion_perdida": 100.0
+  },
+  "detalle_pymupdf": [
+    {
+      "archivo": "LAB_001.pdf",
+      "chars": 590,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_002.pdf",
+      "chars": 518,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_003.pdf",
+      "chars": 602,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_004.pdf",
+      "chars": 599,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_005.pdf",
+      "chars": 675,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_006.pdf",
+      "chars": 641,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_007.pdf",
+      "chars": 564,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_008.pdf",
+      "chars": 559,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_009.pdf",
+      "chars": 520,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_010.pdf",
+      "chars": 636,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_011.pdf",
+      "chars": 678,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_012.pdf",
+      "chars": 635,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_013.pdf",
+      "chars": 565,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_014.pdf",
+      "chars": 640,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_015.pdf",
+      "chars": 551,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_016.pdf",
+      "chars": 558,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_017.pdf",
+      "chars": 561,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_018.pdf",
+      "chars": 635,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_019.pdf",
+      "chars": 591,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_020.pdf",
+      "chars": 681,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_001.pdf",
+      "chars": 640,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_002.pdf",
+      "chars": 557,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_003.pdf",
+      "chars": 594,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_004.pdf",
+      "chars": 602,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_005.pdf",
+      "chars": 515,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_006.pdf",
+      "chars": 673,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_007.pdf",
+      "chars": 544,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_008.pdf",
+      "chars": 547,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_009.pdf",
+      "chars": 561,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_010.pdf",
+      "chars": 553,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_011.pdf",
+      "chars": 591,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_012.pdf",
+      "chars": 560,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_013.pdf",
+      "chars": 635,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_014.pdf",
+      "chars": 672,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_015.pdf",
+      "chars": 675,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_016.pdf",
+      "chars": 672,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_017.pdf",
+      "chars": 636,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_018.pdf",
+      "chars": 595,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_019.pdf",
+      "chars": 548,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_020.pdf",
+      "chars": 516,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_001.pdf",
+      "chars": 588,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_002.pdf",
+      "chars": 516,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_003.pdf",
+      "chars": 600,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_004.pdf",
+      "chars": 597,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_005.pdf",
+      "chars": 673,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_006.pdf",
+      "chars": 639,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_007.pdf",
+      "chars": 562,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_008.pdf",
+      "chars": 557,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_009.pdf",
+      "chars": 518,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_010.pdf",
+      "chars": 634,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_011.pdf",
+      "chars": 676,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_012.pdf",
+      "chars": 633,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_013.pdf",
+      "chars": 563,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_014.pdf",
+      "chars": 638,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_015.pdf",
+      "chars": 549,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_016.pdf",
+      "chars": 556,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_017.pdf",
+      "chars": 559,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_018.pdf",
+      "chars": 633,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_019.pdf",
+      "chars": 589,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_020.pdf",
+      "chars": 679,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_001.pdf",
+      "chars": 679,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_002.pdf",
+      "chars": 521,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_003.pdf",
+      "chars": 515,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_004.pdf",
+      "chars": 684,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_005.pdf",
+      "chars": 600,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_006.pdf",
+      "chars": 680,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_007.pdf",
+      "chars": 631,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_008.pdf",
+      "chars": 604,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_009.pdf",
+      "chars": 518,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_010.pdf",
+      "chars": 680,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_011.pdf",
+      "chars": 678,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_012.pdf",
+      "chars": 607,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_013.pdf",
+      "chars": 640,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_014.pdf",
+      "chars": 598,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_015.pdf",
+      "chars": 556,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_016.pdf",
+      "chars": 638,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_017.pdf",
+      "chars": 603,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_018.pdf",
+      "chars": 533,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_019.pdf",
+      "chars": 640,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_020.pdf",
+      "chars": 558,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_001.pdf",
+      "chars": 665,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_002.pdf",
+      "chars": 507,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_003.pdf",
+      "chars": 501,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_004.pdf",
+      "chars": 670,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_005.pdf",
+      "chars": 586,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_006.pdf",
+      "chars": 666,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_007.pdf",
+      "chars": 617,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_008.pdf",
+      "chars": 590,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_009.pdf",
+      "chars": 504,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_010.pdf",
+      "chars": 666,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_011.pdf",
+      "chars": 664,
+      "lineas_totales": 51,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_012.pdf",
+      "chars": 593,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_013.pdf",
+      "chars": 626,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_014.pdf",
+      "chars": 584,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_015.pdf",
+      "chars": 542,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_016.pdf",
+      "chars": 624,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_017.pdf",
+      "chars": 589,
+      "lineas_totales": 41,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_018.pdf",
+      "chars": 519,
+      "lineas_totales": 31,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_019.pdf",
+      "chars": 626,
+      "lineas_totales": 46,
+      "filas_biomarcador_valor_asociado": 0
+    },
+    {
+      "archivo": "LAB_020.pdf",
+      "chars": 544,
+      "lineas_totales": 36,
+      "filas_biomarcador_valor_asociado": 0
+    }
+  ]
+}

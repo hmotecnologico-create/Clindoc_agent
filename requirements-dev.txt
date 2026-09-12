@@ -1,0 +1,6 @@
+# Dependencias de desarrollo/evaluación (no necesarias para ejecutar la app,
+# solo para reproducir la suite de tests y el reporte de cobertura del Anexo E).
+-r requirements.txt
+
+pytest
+coverage
