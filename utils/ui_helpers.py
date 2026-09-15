@@ -120,6 +120,17 @@ def _periodo_historia(texto):
 def generar_pdf_historia(nombre, nif, texto, medico):
     """Genera, en memoria, el PDF profesional de la Historia Clínica Consolidada validada por el facultativo."""
     import io
+
+    def _esc_reportlab(s):
+        """Escapa para interpolar de forma segura en el mini-XML de ReportLab (Paragraph). `nombre`
+        proviene de una sección redactada por el LLM (documento-derivado, no de confianza); sin esto,
+        un `<link href=...>` inyectado se renderizaría como un hipervínculo real en el PDF oficial."""
+        return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                .replace('"', "&quot;").replace("'", "&#39;"))
+
+    nombre = _esc_reportlab(nombre)
+    nif = _esc_reportlab(nif)
+    medico = _esc_reportlab(medico) if medico else medico
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.units import cm
     from reportlab.lib import colors
@@ -136,9 +147,10 @@ def generar_pdf_historia(nombre, nif, texto, medico):
         base_path = Path(f"datos/expedientes/{nif}").resolve().as_posix()
         def replacer(match):
             archivo = match.group(1)
+            archivo_href = archivo.replace('"', "%22")
             # ReportLab permite <link href="...">...</link>
             # Subrayado y color azul para que parezca un enlace real
-            return f'<font color="blue"><u><link href="file:///{base_path}/{archivo}">[Fuente: {archivo}]</link></u></font>'
+            return f'<font color="blue"><u><link href="file:///{base_path}/{archivo_href}">[Fuente: {archivo}]</link></u></font>'
         
         s = re.sub(r'\[Fuente:\s*([^\]#]+?)(?:#[^\]]+)?\]', replacer, s)
         return s

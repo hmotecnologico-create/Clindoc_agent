@@ -17,6 +17,7 @@ Módulo crítica para Capítulo 5 y 6 del TFM.
 import streamlit as st
 import json
 import os
+import re
 import html
 from datetime import datetime
 from pathlib import Path
@@ -236,10 +237,15 @@ class DashboardMedico:
             
             for titulo, contenido in secciones.items():
                 with st.container():
+                    titulo_seguro = re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', str(titulo))
+                    contenido_seguro = str(contenido)
+                    contenido_seguro = re.sub(r'(?m)^[ \t]{0,3}\[[^\]]+\]:\s*\S.*$', '', contenido_seguro)
+                    contenido_seguro = re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', contenido_seguro)
+                    contenido_seguro = re.sub(r'<(https?://[^>\s]+|mailto:[^>\s]+)>', r'\1', contenido_seguro)
                     st.markdown(f"""
                     <div class="seccion-auditar">
-                        <h4>{html.escape(str(titulo))}</h4>
-                        <p>{html.escape(str(contenido)[:500])}{'...' if len(contenido) > 500 else ''}</p>
+                        <h4>{html.escape(titulo_seguro)}</h4>
+                        <p>{html.escape(contenido_seguro[:500])}{'...' if len(contenido_seguro) > 500 else ''}</p>
                     </div>
                     """, unsafe_allow_html=True)
                     

@@ -20,10 +20,16 @@ from utils.ui_helpers import _chunking_folio, render_folio_resaltado, _campos_gu
 
 
 def _neutralizar_markdown_peligroso(texto):
-    """Quita la URL de cualquier imagen/enlace markdown (![alt](url) / [texto](url)), dejando solo el texto
-    visible. El contenido documental (vía citas del LLM o respuestas del chat) no es de confianza; sin esto,
-    un documento o respuesta con `![](http://host/beacon)` dispararía una petición de red al renderizarlo."""
-    return re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', str(texto))
+    """Neutraliza sintaxis markdown/GFM que Streamlit renderiza como imagen o enlace VIVO (con o sin
+    unsafe_allow_html=True): enlaces/imágenes inline (![alt](url), [texto](url)), definiciones de
+    referencia ([id]: url, que resuelven [texto][id]/[texto][] a un enlace real) y autolinks (<http://...>).
+    El contenido documental (vía citas del LLM o respuestas del chat) no es de confianza; sin esto, un
+    documento o respuesta con cualquiera de estas formas dispararía una petición de red al renderizarlo."""
+    texto = str(texto)
+    texto = re.sub(r'(?m)^[ \t]{0,3}\[[^\]]+\]:\s*\S.*$', '', texto)
+    texto = re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', texto)
+    texto = re.sub(r'<(https?://[^>\s]+|mailto:[^>\s]+)>', r'\1', texto)
+    return texto
 
 # Configuración de página
 st.set_page_config(
@@ -243,9 +249,10 @@ with col_t1:
             pass
     
     # Perfil del Paciente (Datos Personales Básicos - Estilo Premium)
+    nombre_mostrado_seguro = _neutralizar_markdown_peligroso(nombre_mostrado)
     st.markdown(f"""
     <div class="premium-card">
-        <h2 style="margin-top:0; color:#005B96;">{_html.escape(str(nombre_mostrado))}</h2>
+        <h2 style="margin-top:0; color:#005B96;">{_html.escape(nombre_mostrado_seguro)}</h2>
         <div style="display:flex; justify-content:space-between; flex-wrap:wrap; color:#2d3748;">
             <div style="flex:1; min-width:200px;">
                 <p><b>NIF:</b> <span style="background:#e0f2fe; padding:2px 8px; border-radius:4px; font-family:monospace;">{_html.escape(str(data['nif']))}</span></p>

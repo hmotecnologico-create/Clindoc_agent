@@ -531,7 +531,10 @@ def mostrar_historial_clinico(paciente_nif: str, paciente_nombre: str):
                 # e.descripcion es una subcadena literal del documento ingerido (sin pasar por el LLM);
                 # se neutraliza la sintaxis de imagen/enlace markdown para evitar balizas de red si un
                 # documento fuente contiene `![](http://host/beacon)`.
-                descripcion_segura = re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', str(e.descripcion))
+                descripcion_segura = str(e.descripcion)
+                descripcion_segura = re.sub(r'(?m)^[ \t]{0,3}\[[^\]]+\]:\s*\S.*$', '', descripcion_segura)
+                descripcion_segura = re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', descripcion_segura)
+                descripcion_segura = re.sub(r'<(https?://[^>\s]+|mailto:[^>\s]+)>', r'\1', descripcion_segura)
                 st.markdown(f"**Tipo:** {e.tipo.capitalize()}")
                 st.markdown(f"**Descripción:** {descripcion_segura}")
                 st.markdown(f"**Fuente:** {e.fuente}")
