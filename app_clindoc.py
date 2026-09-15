@@ -154,7 +154,7 @@ def _extraer_demografia(data):
 
 # --- SIDEBAR (Perfiles y Pacientes) ---
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/3774/3774293.png", width=80)
+    st.markdown("<div style='font-size:64px;text-align:center;'>🩺</div>", unsafe_allow_html=True)
     st.header("Modo de Acceso")
     perfil = st.radio("Seleccione Perfil:", ["Doctor (Facultativo)", "Tribunal Académico"])
     st.write("---")
