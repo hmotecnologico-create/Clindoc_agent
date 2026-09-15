@@ -59,7 +59,7 @@ docs/                       Manuales de usuario y revisor técnico
 requirements.txt            Dependencias
 ```
 
-> **Nota sobre `dashboard_medico.py`:** es un panel Streamlit independiente y experimental, no integrado en `app_clindoc.py` (no se importa desde ningún otro módulo del aplicativo) y no forma parte del flujo demostrado en este trabajo — se lanza aparte con `streamlit run dashboard_medico.py`. Limitación conocida: la corrección de texto que el facultativo introduce al marcar una sección como "Modificar" se registra en las estadísticas de `modulo_auditoria.py` (matriz de confusión) pero no se reescribe en el informe (`data["secciones"]`), por lo que el contenido corregido no queda persistido en el registro subyacente. No es el mecanismo de corrección que usa el sistema principal (ver `utils/ui_helpers.py::registrar_validacion_facultativo`, usado por `app_clindoc.py`, que sí persiste la corrección correctamente).
+> **Nota sobre `dashboard_medico.py`:** es un panel Streamlit independiente, no integrado en `app_clindoc.py` (no se importa desde ningún otro módulo del aplicativo) y no forma parte del flujo demostrado en este trabajo — se lanza aparte con `streamlit run dashboard_medico.py`. No es el mecanismo de corrección que usa el sistema principal (ver `utils/ui_helpers.py::registrar_validacion_facultativo`, usado por `app_clindoc.py`), pero funciona de forma equivalente: al marcar una sección como "Modificar", el texto corregido por el facultativo se persiste tanto en las estadísticas de `modulo_auditoria.py` (matriz de confusión) como en el contenido del informe (`data["secciones"]`), verificado en caliente el 2026-09-15.
 
 ## Documentación
 

@@ -209,7 +209,7 @@ class DashboardMedico:
         with col1:
             st.metric("NIF", informe.paciente_nif)
         with col2:
-            st.metric("Fecha Generación", informe.fecha_generacion[:10])
+            st.metric("Fecha Generación", informe.fecha_generacion.strftime("%Y-%m-%d"))
         with col3:
             estado = informe.estado
             if estado == "pendiente":
@@ -231,69 +231,71 @@ class DashboardMedico:
             st.warning("No hay secciones disponibles")
             return
         
-        # Formulario de auditoría
-        with st.form(f"auditoria_{informe_id}"):
-            validaciones = []
-            
-            for titulo, contenido in secciones.items():
-                with st.container():
-                    titulo_seguro = re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', str(titulo))
-                    contenido_seguro = str(contenido)
-                    contenido_seguro = re.sub(r'(?m)^[ \t]{0,3}\[[^\]]+\]:\s*\S.*$', '', contenido_seguro)
-                    contenido_seguro = re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', contenido_seguro)
-                    contenido_seguro = re.sub(r'<(https?://[^>\s]+|mailto:[^>\s]+)>', r'\1', contenido_seguro)
-                    st.markdown(f"""
-                    <div class="seccion-auditar">
-                        <h4>{html.escape(titulo_seguro)}</h4>
-                        <p>{html.escape(contenido_seguro[:500])}{'...' if len(contenido_seguro) > 500 else ''}</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    
-                    # Opciones de validación
-                    opcion = st.radio(
-                        f"Validar: {titulo}",
-                        ["✓ Aprobar", "✗ Modificar", "+ Añadir Hallazgo"],
-                        key=f"val_{titulo}",
-                        horizontal=True
+        # Formulario de auditoría. NOTA: no se usa st.form aquí a propósito -- un
+        # st.form no vuelve a ejecutar el script hasta el envío, así que un widget
+        # condicional a otro (el cuadro de "Texto corregido" solo debe verse tras
+        # elegir "Modificar") nunca llegaría a aparecer dentro de un form.
+        validaciones = []
+
+        for titulo, contenido in secciones.items():
+            with st.container():
+                titulo_seguro = re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', str(titulo))
+                contenido_seguro = str(contenido)
+                contenido_seguro = re.sub(r'(?m)^[ \t]{0,3}\[[^\]]+\]:\s*\S.*$', '', contenido_seguro)
+                contenido_seguro = re.sub(r'!?\[([^\]]*)\]\([^)]*\)', r'\1', contenido_seguro)
+                contenido_seguro = re.sub(r'<(https?://[^>\s]+|mailto:[^>\s]+)>', r'\1', contenido_seguro)
+                st.markdown(f"""
+                <div class="seccion-auditar">
+                    <h4>{html.escape(titulo_seguro)}</h4>
+                    <p>{html.escape(contenido_seguro[:500])}{'...' if len(contenido_seguro) > 500 else ''}</p>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # Opciones de validación
+                opcion = st.radio(
+                    f"Validar: {titulo}",
+                    ["✓ Aprobar", "✗ Modificar", "+ Añadir Hallazgo"],
+                    key=f"val_{titulo}",
+                    horizontal=True
+                )
+
+                notas = ""
+                texto_modificado = ""
+                categoria = "Falso Positivo"
+
+                if opcion == "✗ Modificar":
+                    texto_modificado = st.text_area(
+                        "Texto corregido:",
+                        value=contenido,
+                        key=f"mod_{titulo}"
                     )
-                    
-                    notas = ""
-                    texto_modificado = ""
-                    categoria = "Falso Positivo"
+                    categoria = st.selectbox(
+                        "Tipo de error:",
+                        ["Falso Positivo", "Error Fecha", "Error NIF", "Alucinación", "Otro"],
+                        key=f"cat_{titulo}"
+                    )
+                elif opcion == "+ Añadir Hallazgo":
+                    notas = st.text_area(
+                        "Nuevo hallazgo (lo que la IA no vio):",
+                        key=f"nuevo_{titulo}"
+                    )
 
-                    if opcion == "✗ Modificar":
-                        texto_modificado = st.text_area(
-                            "Texto corregido:",
-                            value=contenido,
-                            key=f"mod_{titulo}"
-                        )
-                        categoria = st.selectbox(
-                            "Tipo de error:",
-                            ["Falso Positivo", "Error Fecha", "Error NIF", "Alucinación", "Otro"],
-                            key=f"cat_{titulo}"
-                        )
-                    elif opcion == "+ Añadir Hallazgo":
-                        notas = st.text_area(
-                            "Nuevo hallazgo (lo que la IA no vio):",
-                            key=f"nuevo_{titulo}"
-                        )
+                validaciones.append({
+                    "seccion": titulo,
+                    "opcion": opcion,
+                    "texto_modificado": texto_modificado,
+                    "notas": notas,
+                    "categoria": categoria
+                })
 
-                    validaciones.append({
-                        "seccion": titulo,
-                        "opcion": opcion,
-                        "texto_modificado": texto_modificado,
-                        "notas": notas,
-                        "categoria": categoria
-                    })
-                    
-                    st.markdown("---")
-            
-            # Botones de acción
-            col1, col2 = st.columns(2)
-            with col1:
-                submit_auditar = st.form_submit_button("💾 Guardar Auditoría", type="primary")
-            with col2:
-                submit_aprobar = st.form_submit_button("✓ Aprobar Informe Completo")
+                st.markdown("---")
+
+        # Botones de acción
+        col1, col2 = st.columns(2)
+        with col1:
+            submit_auditar = st.button("💾 Guardar Auditoría", type="primary", key=f"guardar_{informe_id}")
+        with col2:
+            submit_aprobar = st.button("✓ Aprobar Informe Completo", key=f"aprobar_{informe_id}")
         
         # Procesar envío
         if submit_auditar:

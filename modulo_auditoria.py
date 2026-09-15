@@ -55,10 +55,13 @@ class InformeAuditado(BaseModel):
     paciente_nombre: str
     fecha_generacion: datetime
     fecha_auditoria: Optional[datetime] = None
-    
+
     # Estado del informe
     estado: Literal["pendiente", "auditado", "aprobado", "modificado"] = "pendiente"
-    
+
+    # Contenido generado por la IA, por título de sección (lo que el médico revisa/corrige)
+    secciones: Dict[str, str] = {}
+
     # Validaciones por sección
     validaciones: List[ValidacionSeccion] = []
     
@@ -227,7 +230,13 @@ class GestorAuditorias:
         validacion_dict = validacion.model_dump()
         validacion_dict["timestamp"] = validacion.timestamp.isoformat()
         data["validaciones"].append(validacion_dict)
-        
+
+        # Si el médico corrigió el texto, la corrección reemplaza el contenido de la
+        # sección en el informe (antes solo quedaba en las estadísticas de la matriz
+        # de confusión, sin persistirse en el registro que el resto de la interfaz lee)
+        if validacion.validacion == TipoValidacion.MODIFICADO and validacion.texto_modificado:
+            data.setdefault("secciones", {})[validacion.seccion] = validacion.texto_modificado
+
         # Actualizar matriz de confusión
         self.matriz.registrar_validacion(validacion)
         
