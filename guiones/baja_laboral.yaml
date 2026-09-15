@@ -9,6 +9,13 @@ paciente_campos_identidad:
 secciones:
   - id: S01
     titulo: "Datos de Identificación del Paciente"
+    # CONS es el tipo de documento mas frecuente/fiable para estos datos; al fijar
+    # fuente_preferente, documento_mas_reciente() elige UN unico documento en vez de
+    # caer en la busqueda semantica generica de respaldo (que sin este anclaje traia
+    # varios documentos distintos -- todos con la misma cabecera de identificacion --
+    # y el redactor, al generar un parrafo por documento, repetia el mismo dato
+    # estatico 2-3 veces con redaccion ligeramente distinta cada vez).
+    fuente_preferente: CONS
     campos:
       - nombre: nombre_completo
         requerido: true

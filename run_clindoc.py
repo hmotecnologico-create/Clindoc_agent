@@ -300,10 +300,24 @@ class AgenteRedactor:
             return "Sin información documental para esta sección."
 
         partes_validas = []
+        contenidos_vistos = set()
         for e in evidencias_todas:
             resultado_doc = self._redactar_un_documento(seccion, e)
-            if resultado_doc.strip() != "Sin información documental para esta sección.":
-                partes_validas.append(resultado_doc)
+            if resultado_doc.strip() == "Sin información documental para esta sección.":
+                continue
+            # Deduplicar por CONTENIDO, no por documento: secciones sin fuente_preferente
+            # (p.ej. identificación del paciente) caen en una búsqueda semántica genérica
+            # que puede traer varios documentos distintos cuya cabecera repite el mismo
+            # dato estático (nombre, NIF...). "Genera por documento" sigue intacto (evita
+            # mezclar citas entre documentos); esto solo descarta un párrafo si su
+            # contenido, sin la cita, es idéntico a uno ya incluido -- una sección
+            # narrativa real (p.ej. Evolución Clínica) nunca coincide aquí, porque cada
+            # documento aporta un hecho distinto.
+            normalizado = re.sub(r'\[Fuente:[^\]]+\]', '', resultado_doc).strip()
+            if normalizado in contenidos_vistos:
+                continue
+            contenidos_vistos.add(normalizado)
+            partes_validas.append(resultado_doc)
 
         if not partes_validas:
             return self._abstencion_con_confianza(evidencias_todas)
