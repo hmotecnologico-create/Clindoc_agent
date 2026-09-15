@@ -1,0 +1,157 @@
+{
+  "n_folios": 20,
+  "condicion": "degradacion real: rasterizado 150 DPI + skew aleatorio +-3 grados + ruido gaussiano (sigma=12) + desenfoque gaussiano (radio=0.8), PDF solo-imagen sin capa de texto",
+  "metrica": "lineas con nombre + valor decimal en la misma linea (asociacion biomarcador-valor preservada)",
+  "pymupdf_sin_ocr": {
+    "tiempo_medio_s_por_folio": 0.0031,
+    "n_folios_con_alguna_asociacion": 0,
+    "pct_folios_con_alguna_asociacion": 0.0
+  },
+  "docling_con_ocr_interno": {
+    "tiempo_medio_s_por_folio": 16.29,
+    "n_folios_con_alguna_asociacion": 20,
+    "pct_folios_con_alguna_asociacion": 100.0
+  },
+  "detalle": [
+    {
+      "archivo": "DEGRADADO_LAB_001.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 820,
+      "docling_filas_asociadas": 7
+    },
+    {
+      "archivo": "DEGRADADO_LAB_002.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 676,
+      "docling_filas_asociadas": 5
+    },
+    {
+      "archivo": "DEGRADADO_LAB_003.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 844,
+      "docling_filas_asociadas": 7
+    },
+    {
+      "archivo": "DEGRADADO_LAB_004.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 837,
+      "docling_filas_asociadas": 7
+    },
+    {
+      "archivo": "DEGRADADO_LAB_005.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 977,
+      "docling_filas_asociadas": 9
+    },
+    {
+      "archivo": "DEGRADADO_LAB_006.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 907,
+      "docling_filas_asociadas": 8
+    },
+    {
+      "archivo": "DEGRADADO_LAB_007.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 866,
+      "docling_filas_asociadas": 6
+    },
+    {
+      "archivo": "DEGRADADO_LAB_008.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 770,
+      "docling_filas_asociadas": 6
+    },
+    {
+      "archivo": "DEGRADADO_LAB_009.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 698,
+      "docling_filas_asociadas": 5
+    },
+    {
+      "archivo": "DEGRADADO_LAB_010.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 975,
+      "docling_filas_asociadas": 8
+    },
+    {
+      "archivo": "DEGRADADO_LAB_011.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 975,
+      "docling_filas_asociadas": 9
+    },
+    {
+      "archivo": "DEGRADADO_LAB_012.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 905,
+      "docling_filas_asociadas": 8
+    },
+    {
+      "archivo": "DEGRADADO_LAB_013.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 790,
+      "docling_filas_asociadas": 6
+    },
+    {
+      "archivo": "DEGRADADO_LAB_014.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 906,
+      "docling_filas_asociadas": 8
+    },
+    {
+      "archivo": "DEGRADADO_LAB_015.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 748,
+      "docling_filas_asociadas": 6
+    },
+    {
+      "archivo": "DEGRADADO_LAB_016.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 767,
+      "docling_filas_asociadas": 6
+    },
+    {
+      "archivo": "DEGRADADO_LAB_017.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 768,
+      "docling_filas_asociadas": 6
+    },
+    {
+      "archivo": "DEGRADADO_LAB_018.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 905,
+      "docling_filas_asociadas": 8
+    },
+    {
+      "archivo": "DEGRADADO_LAB_019.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 839,
+      "docling_filas_asociadas": 7
+    },
+    {
+      "archivo": "DEGRADADO_LAB_020.pdf",
+      "pymupdf_chars": 0,
+      "pymupdf_filas_asociadas": 0,
+      "docling_chars": 1034,
+      "docling_filas_asociadas": 9
+    }
+  ]
+}

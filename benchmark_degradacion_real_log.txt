@@ -1,0 +1,212 @@
+[32m[INFO] 2026-09-15 00:22:44,616 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:22:44,649 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:22:44,649 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:22:44,951 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:22:44,958 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:22:44,958 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:22:45,072 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:22:45,131 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:22:45,132 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:05,383 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:23:05,400 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:05,400 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:05,632 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:23:05,635 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:05,635 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:05,746 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:23:05,785 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:05,790 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:20,321 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:23:20,344 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:20,344 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:20,546 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:23:20,561 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:20,561 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:20,683 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:23:20,712 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:20,712 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:35,729 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:23:35,753 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:35,755 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:35,976 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:23:35,978 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:35,978 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:36,079 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:23:36,128 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:36,128 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:51,444 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:23:51,476 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:51,476 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:51,695 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:23:51,699 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:51,699 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:51,802 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:23:51,843 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:23:51,843 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:08,642 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:24:08,662 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:08,662 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:08,873 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:24:08,877 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:08,877 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:08,976 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:24:09,025 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:09,025 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:24,385 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:24:24,409 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:24,409 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:24,623 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:24:24,623 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:24,623 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:24,747 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:24:24,787 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:24,787 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:38,280 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:24:38,303 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:38,303 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:38,524 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:24:38,524 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:38,524 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:38,645 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:24:38,686 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:38,686 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:52,569 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:24:52,592 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:52,592 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:52,807 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:24:52,807 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:52,807 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:52,917 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:24:52,950 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:24:52,950 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:05,948 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:25:05,968 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:05,968 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:06,198 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:25:06,203 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:06,203 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:06,318 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:25:06,349 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:06,349 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:21,718 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:25:21,737 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:21,737 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:21,956 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:25:21,964 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:21,964 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:22,074 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:25:22,116 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:22,116 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:37,659 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:25:37,680 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:37,680 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:37,895 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:25:37,897 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:37,897 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:38,014 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:25:38,047 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:38,047 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:53,735 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:25:53,756 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:53,757 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:53,984 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:25:53,988 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:53,988 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:54,099 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:25:54,136 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:25:54,136 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:07,614 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:26:07,635 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:07,635 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:07,846 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:26:07,850 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:07,850 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:07,971 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:26:08,009 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:08,009 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:22,869 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:26:22,889 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:22,889 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:23,100 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:26:23,104 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:23,104 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:23,211 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:26:23,248 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:23,248 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:36,757 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:26:36,778 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:36,778 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:37,003 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:26:37,007 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:37,007 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:37,123 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:26:37,161 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:37,161 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:50,571 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:26:50,594 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:50,594 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:50,809 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:26:50,813 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:50,813 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:50,917 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:26:50,954 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:26:50,954 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:03,090 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:27:03,111 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:03,111 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:03,301 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:27:03,305 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:03,305 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:03,418 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:27:03,452 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:03,452 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:16,368 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:27:16,391 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:16,391 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:16,573 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:27:16,577 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:16,577 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:16,656 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:27:16,689 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:16,689 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:28,924 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:27:28,943 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:28,943 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:29,133 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:27:29,136 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:29,136 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:29,219 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:27:29,256 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:27:29,256 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+Muestra: 20 folios LAB reales de 25988000R
+
+Paso 1/2: degradando folios (rasterizado 150 DPI + skew + ruido + blur reales)...
+  20 folios degradados en 11.6s
+
+Paso 2/2: extrayendo con PyMuPDF (sin OCR, esperado bajo) y Docling (con OCR interno)...
+  DEGRADADO_LAB_001.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=7 (chars=820)
+  DEGRADADO_LAB_002.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=5 (chars=676)
+  DEGRADADO_LAB_003.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=7 (chars=844)
+  DEGRADADO_LAB_004.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=7 (chars=837)
+  DEGRADADO_LAB_005.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=9 (chars=977)
+  DEGRADADO_LAB_006.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=8 (chars=907)
+  DEGRADADO_LAB_007.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=6 (chars=866)
+  DEGRADADO_LAB_008.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=6 (chars=770)
+  DEGRADADO_LAB_009.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=5 (chars=698)
+  DEGRADADO_LAB_010.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=8 (chars=975)
+  DEGRADADO_LAB_011.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=9 (chars=975)
+  DEGRADADO_LAB_012.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=8 (chars=905)
+  DEGRADADO_LAB_013.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=6 (chars=790)
+  DEGRADADO_LAB_014.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=8 (chars=906)
+  DEGRADADO_LAB_015.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=6 (chars=748)
+  DEGRADADO_LAB_016.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=6 (chars=767)
+  DEGRADADO_LAB_017.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=6 (chars=768)
+  DEGRADADO_LAB_018.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=8 (chars=905)
+  DEGRADADO_LAB_019.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=7 (chars=839)
+  DEGRADADO_LAB_020.pdf: PyMuPDF filas_asoc=0 (chars=0) | Docling filas_asoc=9 (chars=1034)
+
+==== RESULTADO: robustez ante degradacion real (n=20 folios) ====
+PyMuPDF (sin OCR):   0/20 folios con alguna asociacion biomarcador-valor (0.0%) | tiempo medio 0.003s/folio
+Docling (OCR interno): 20/20 folios con alguna asociacion biomarcador-valor (100.0%) | tiempo medio 16.29s/folio
+
+Guardado en benchmark_degradacion_real_resultado.json

@@ -1,0 +1,40 @@
+{
+  "nif": "25988000R",
+  "tiempo_ingesta_s": 1276.2,
+  "modelo_real": "gemma3:4b",
+  "modelo_invalido_forzado": "modelo-inexistente-para-forzar-fallo-real",
+  "ciclico_max_retries_2": {
+    "n_secciones": 4,
+    "n_fallidas_error": 0,
+    "secciones_fallidas": [],
+    "longitudes": {
+      "Datos de Identificación del Paciente": 875,
+      "Diagnóstico Principal y Datos de la Baja": 521,
+      "Evolución Clínica": 1305,
+      "Conclusión y Estado Actual": 840
+    },
+    "tiempo_s": 446.6,
+    "n_ciclos_autocorreccion": 1,
+    "fallidas_tras_1er_intento_modelo_invalido": 4
+  },
+  "lineal_max_retries_0": {
+    "n_secciones": 4,
+    "n_fallidas_error": 4,
+    "secciones_fallidas": [
+      "Datos de Identificación del Paciente",
+      "Diagnóstico Principal y Datos de la Baja",
+      "Evolución Clínica",
+      "Conclusión y Estado Actual"
+    ],
+    "longitudes": {
+      "Datos de Identificación del Paciente": 295,
+      "Diagnóstico Principal y Datos de la Baja": 97,
+      "Evolución Clínica": 295,
+      "Conclusión y Estado Actual": 295
+    },
+    "tiempo_s": 0.3,
+    "n_ciclos_autocorreccion": 0
+  },
+  "tasa_fallo_final_ciclico": 0.0,
+  "tasa_fallo_final_lineal": 100.0
+}

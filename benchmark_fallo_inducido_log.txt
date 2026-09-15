@@ -1,0 +1,98 @@
+F:\HMO\TFM_DATA\2026\TFM\PROYECTO_CLINDOC\ClinDoc_Agent\agentes\indice_corpus.py:80: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  self.dim_vectores = self.modelo_emb.get_sentence_embedding_dimension()
+[32m[INFO] 2026-09-15 00:28:29,737 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:28:29,762 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:28:29,762 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_det_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:28:29,918 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:28:29,921 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:28:29,921 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_ppocr_mobile_v2.0_cls_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:28:30,006 [RapidOCR] base.py:22: Using engine_name: onnxruntime[0m
+[32m[INFO] 2026-09-15 00:28:30,041 [RapidOCR] download_file.py:60: File exists and is valid: C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+[32m[INFO] 2026-09-15 00:28:30,041 [RapidOCR] main.py:57: Using C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\rapidocr\models\ch_PP-OCRv4_rec_mobile.onnx[0m
+============================================================
+  FALLO INDUCIDO REAL EN AUTOCORRECCION — paciente 25988000R
+============================================================
+[INFO] Docling disponible para extracción layout-aware
+[INFO] Orquestacion con LangGraph (grafo de estados + ciclo de autocorreccion) ACTIVA
+Modelo real: gemma3:4b | Modelo invalido forzado en 1er intento: modelo-inexistente-para-forzar-fallo-real
+
+[INGESTA] Escaneando + indexando expediente (reutilizable, se paga una vez)...
+  [10/524] Escaneados (28s) - último: ALTA_010.pdf
+  [20/524] Escaneados (47s) - último: ALTA_020.pdf
+  [30/524] Escaneados (66s) - último: ALTA_030.pdf
+  [40/524] Escaneados (85s) - último: ALTA_040.pdf
+  [50/524] Escaneados (102s) - último: ALTA_050.pdf
+  [60/524] Escaneados (119s) - último: ALTA_060.pdf
+  [70/524] Escaneados (136s) - último: ALTA_070.pdf
+  [80/524] Escaneados (153s) - último: ALTA_080.pdf
+  [90/524] Escaneados (171s) - último: ALTA_090.pdf
+  [100/524] Escaneados (188s) - último: ALTA_100.pdf
+  [110/524] Escaneados (205s) - último: ALTA_110.pdf
+  [120/524] Escaneados (222s) - último: ALTA_120.pdf
+  [130/524] Escaneados (239s) - último: ALTA_130.pdf
+  [140/524] Escaneados (256s) - último: ALTA_140.pdf
+  [150/524] Escaneados (273s) - último: ALTA_150.pdf
+  [160/524] Escaneados (290s) - último: ALTA_160.pdf
+  [170/524] Escaneados (307s) - último: ALTA_170.pdf
+  [180/524] Escaneados (325s) - último: ALTA_180.pdf
+  [190/524] Escaneados (342s) - último: CONS_010.pdf
+  [200/524] Escaneados (358s) - último: CONS_020.pdf
+  [210/524] Escaneados (375s) - último: CONS_030.pdf
+  [220/524] Escaneados (392s) - último: CONS_040.pdf
+  [230/524] Escaneados (409s) - último: CONS_050.pdf
+  [240/524] Escaneados (426s) - último: CONS_060.pdf
+  [250/524] Escaneados (442s) - último: CONS_070.pdf
+  [260/524] Escaneados (476s) - último: LAB_006.pdf
+  [270/524] Escaneados (520s) - último: LAB_016.pdf
+  [280/524] Escaneados (566s) - último: LAB_026.pdf
+  [290/524] Escaneados (612s) - último: LAB_036.pdf
+  [300/524] Escaneados (655s) - último: LAB_046.pdf
+  [310/524] Escaneados (700s) - último: LAB_056.pdf
+  [320/524] Escaneados (744s) - último: LAB_066.pdf
+  [330/524] Escaneados (793s) - último: LAB_076.pdf
+  [340/524] Escaneados (848s) - último: LAB_086.pdf
+  [350/524] Escaneados (900s) - último: LAB_096.pdf
+  [360/524] Escaneados (943s) - último: LAB_106.pdf
+  [370/524] Escaneados (987s) - último: LAB_116.pdf
+  [380/524] Escaneados (1030s) - último: LAB_126.pdf
+  [390/524] Escaneados (1073s) - último: LAB_136.pdf
+  [400/524] Escaneados (1117s) - último: LAB_146.pdf
+  [410/524] Escaneados (1135s) - último: RAD_006.docx
+  [420/524] Escaneados (1135s) - último: RAD_016.docx
+  [430/524] Escaneados (1136s) - último: RAD_026.docx
+  [440/524] Escaneados (1136s) - último: RAD_036.docx
+  [450/524] Escaneados (1136s) - último: RAD_046.docx
+  [460/524] Escaneados (1136s) - último: RAD_056.docx
+  [470/524] Escaneados (1136s) - último: RAD_066.docx
+  [480/524] Escaneados (1136s) - último: RAD_076.docx
+  [490/524] Escaneados (1136s) - último: RAD_086.docx
+  [500/524] Escaneados (1137s) - último: RAD_096.docx
+  [510/524] Escaneados (1137s) - último: RAD_106.docx
+  [520/524] Escaneados (1137s) - último: RAD_116.docx
+  [524/524] Escaneados (1137s) - último: RAD_120.docx
+[INGESTA] Completada en 1276.2s. 524 documentos indexados.
+
+============================================================
+  RAMA A: CICLICO (MAX_RETRIES=2) -- 1er intento con modelo INVALIDO
+============================================================
+  [1er intento, modelo invalido] 4/4 fallidas (esperado: todas)
+[RAMA A] TRAS 1 ciclo(s) de autocorreccion: 0/4 fallidas (final)
+
+============================================================
+  RAMA B: LINEAL (MAX_RETRIES=0) -- 1er intento con modelo INVALIDO, SIN reintento
+============================================================
+[RAMA B] SIN autocorreccion (MAX_RETRIES=0): 4/4 fallidas (final, permanente)
+
+============================================================
+  RESULTADO — recuperacion real ante un fallo de inferencia inducido
+============================================================
+  Tasa de fallo FINAL, CICLICO (con autocorreccion): 0.0%
+  Tasa de fallo FINAL, LINEAL  (sin autocorreccion): 100.0%
+
+Resultados guardados en benchmark_fallo_inducido_autocorreccion_resultado.json
+Exception ignored in: <function QdrantClient.__del__ at 0x0000020A6F497B00>
+Traceback (most recent call last):
+  File "C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\qdrant_client\qdrant_client.py", line 169, in __del__
+  File "C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\qdrant_client\qdrant_client.py", line 178, in close
+  File "C:\Users\HMO\AppData\Local\Programs\Python\Python311\Lib\site-packages\qdrant_client\local\qdrant_local.py", line 85, in close
+ImportError: sys.meta_path is None, Python is likely shutting down
