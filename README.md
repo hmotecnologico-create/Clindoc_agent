@@ -26,7 +26,7 @@ La validación (identidad, contratos de datos) se apoya en **Pydantic**; toda la
 
 ## Contribución central: el guion como contrato semántico
 
-Los informes se estructuran según un **guion en YAML** (`guiones/baja_laboral.yaml`) que actúa como contrato semántico: define secciones, campos y criterios. La variante **`v5_option2/`** ejecuta el sistema dirigido por ese guion.
+Los informes se estructuran según un **guion en YAML** (`guiones/baja_laboral.yaml`) que actúa como contrato semántico: define secciones, campos y criterios. `run_clindoc.py` lo carga por defecto (`cargar_guion_yaml`) — no existe una variante separada para esto.
 
 ## Requisitos
 
@@ -36,11 +36,8 @@ Los informes se estructuran según un **guion en YAML** (`guiones/baja_laboral.y
 ## Uso
 
 ```bash
-# Pipeline completo (orquestación LangGraph)
-python run_clindoc.py
-
-# Variante dirigida por el guion YAML
-python v5_option2/run_clindoc_option2.py
+# Pipeline completo (orquestación LangGraph, dirigido por guiones/baja_laboral.yaml)
+python run_clindoc.py            # (o: python run_clindoc.py <NIF> para un paciente)
 
 # Interfaz / dashboard
 streamlit run app_clindoc.py
@@ -58,7 +55,6 @@ historial_clinico_visual.py Visor de historial + Deep Linking
 modulo_auditoria.py         Módulo de auditoría
 dashboard_medico.py         Panel del facultativo
 guiones/baja_laboral.yaml   Guion de informe (contrato semántico)
-v5_option2/                 Variante dirigida por guion YAML
 docs/                       Manuales de usuario y revisor técnico
 requirements.txt            Dependencias
 ```

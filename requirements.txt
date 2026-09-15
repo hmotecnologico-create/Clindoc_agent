@@ -6,6 +6,7 @@ langgraph
 docling
 reportlab
 pypdf
+pymupdf  # fitz: Deep Linking, normalizador_pdf, benchmarks de ingesta
 python-docx  # Para procesar .docx
 
 # [ÍNDICE SEMÁNTICO]

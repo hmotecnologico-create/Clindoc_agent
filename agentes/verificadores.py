@@ -24,7 +24,8 @@ def validar_nif(nif: str) -> bool:
             return False
         letras = "TRWAGMYFPDXBNJZSQVHLCKE"
         return letras[int(nif_numerico) % 23] == letra_control
-    except:
+    except (IndexError, KeyError, ValueError) as e:
+        logger.debug("validar_nif: entrada no procesable (%r): %s", nif, e)
         return False
 
 

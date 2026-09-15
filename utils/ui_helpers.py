@@ -144,9 +144,15 @@ def generar_pdf_historia(nombre, nif, texto, medico):
         s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
         
         # Convertir [Fuente: archivo#chunk] en hipervínculos clickeables en el PDF
-        base_path = Path(f"datos/expedientes/{nif}").resolve().as_posix()
+        base_dir = Path(f"datos/expedientes/{nif}").resolve()
+        base_path = base_dir.as_posix()
         def replacer(match):
             archivo = match.group(1)
+            # El nombre citado debe ser un archivo plano (sin separadores ni "..") que
+            # exista realmente en la carpeta del paciente: evita que una cita manipulada
+            # en el documento origen genere un enlace file:// fuera de esa carpeta.
+            if archivo != Path(archivo).name or not (base_dir / archivo).is_file():
+                return f'[Fuente: {archivo}]'
             archivo_href = archivo.replace('"', "%22")
             # ReportLab permite <link href="...">...</link>
             # Subrayado y color azul para que parezca un enlace real

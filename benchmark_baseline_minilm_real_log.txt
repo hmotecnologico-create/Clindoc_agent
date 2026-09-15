@@ -1,0 +1,29 @@
+F:\HMO\TFM_DATA\2026\TFM\PROYECTO_CLINDOC\ClinDoc_Agent\agentes\indice_corpus.py:80: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  self.dim_vectores = self.modelo_emb.get_sentence_embedding_dimension()
+F:\HMO\TFM_DATA\2026\TFM\PROYECTO_CLINDOC\ClinDoc_Agent\benchmark_baseline_minilm_real.py:127: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = modelo_minilm.get_sentence_embedding_dimension()
+Paso 1/3: leyendo fragmentos REALES (ya extraidos por Docling) de la coleccion de produccion...
+  557 chunks reales leidos de produccion (modelo actual: mpnet, sin re-OCR)
+
+Paso 2/3: reembediendo esos MISMOS textos reales con all-MiniLM-L6-v2 en coleccion temporal aislada...
+  557 chunks reindexados con MiniLM (384d) en coleccion temporal
+
+Paso 3/3: ejecutando las 12 consultas (mismo metodo, keyword como control interno)...
+[exacta    ] 'Hemoglobina                               ' | KW OK  ['LAB_150.pdf', 'LAB_149.pdf'] | SEM-MiniLM OK  ['LAB_129.pdf', 'LAB_125.pdf']
+[exacta    ] 'Colesterol                                ' | KW OK  ['LAB_150.pdf', 'LAB_149.pdf'] | SEM-MiniLM OK  ['LAB_076.pdf', 'LAB_140.pdf']
+[exacta    ] 'artroscopia de rodilla                    ' | KW NO  ['RAD_114.docx', 'RAD_113.docx'] | SEM-MiniLM NO  ['ALTA_008.pdf', 'RAD_113.docx']
+[exacta    ] 'infiltración epidural                     ' | KW NO  [] | SEM-MiniLM NO  ['RAD_113.docx', 'RAD_077.docx']
+[exacta    ] 'Creatinina                                ' | KW OK  ['LAB_149.pdf', 'LAB_148.pdf'] | SEM-MiniLM OK  ['LAB_090.pdf', 'LAB_053.pdf']
+[exacta    ] 'Ferritina                                 ' | KW NO  [] | SEM-MiniLM NO  ['RAD_034.docx', 'RAD_097.docx']
+[conceptual] 'anemia                                    ' | KW NO  [] | SEM-MiniLM NO  ['RAD_019.docx', 'RAD_084.docx']
+[conceptual] 'diabetes                                  ' | KW OK  ['CONS_074.pdf', 'CONS_073.pdf'] | SEM-MiniLM OK  ['CONS_015.pdf', 'CONS_041.pdf']
+[conceptual] 'dislipemia                                ' | KW OK  ['CONS_071.pdf', 'CONS_056.pdf'] | SEM-MiniLM OK  ['CONS_026.pdf', 'CONS_056.pdf']
+[conceptual] 'función tiroidea                          ' | KW NO  ['RAD_039.docx', 'CONS_022.pdf'] | SEM-MiniLM NO  ['ALTA_090.pdf', 'ALTA_107.pdf']
+[conceptual] 'infección con glóbulos blancos elevados   ' | KW NO  ['ALTA_173.pdf', 'ALTA_170.pdf'] | SEM-MiniLM NO  ['ALTA_005.pdf', 'ALTA_077.pdf']
+[conceptual] 'déficit de hierro                         ' | KW NO  [] | SEM-MiniLM NO  ['ALTA_038.pdf', 'ALTA_172.pdf']
+
+==== ACIERTO@3 REAL (con datos reales reembebidos hoy) ====
+keyword             | exacta=50.0% | conceptual=33.3% | global=41.7%
+semantica_minilm    | exacta=50.0% | conceptual=33.3% | global=41.7%
+
+Guardado: benchmark_baseline_minilm_real_resultado.json

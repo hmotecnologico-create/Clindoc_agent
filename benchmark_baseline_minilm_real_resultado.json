@@ -1,0 +1,208 @@
+{
+  "nif": "25988000R",
+  "topk": 3,
+  "n_consultas": 12,
+  "metodologia": "fragmentos reales ya extraidos por Docling en produccion (mismo texto que benchmark_baseline.py), reembebidos con all-MiniLM-L6-v2 en coleccion temporal aislada; keyword recalculado igual como control interno",
+  "resumen_acierto": {
+    "keyword": {
+      "exacta": 50.0,
+      "conceptual": 33.3,
+      "global": 41.7
+    },
+    "semantica_minilm": {
+      "exacta": 50.0,
+      "conceptual": 33.3,
+      "global": 41.7
+    }
+  },
+  "detalle": [
+    {
+      "consulta": "Hemoglobina",
+      "tipo": "exacta",
+      "ground_truth_folios": 116,
+      "keyword_top": [
+        "LAB_150.pdf",
+        "LAB_149.pdf",
+        "LAB_148.pdf"
+      ],
+      "keyword_acierto": true,
+      "semantica_minilm_top": [
+        "LAB_129.pdf",
+        "LAB_125.pdf",
+        "LAB_121.pdf"
+      ],
+      "semantica_minilm_acierto": true
+    },
+    {
+      "consulta": "Colesterol",
+      "tipo": "exacta",
+      "ground_truth_folios": 111,
+      "keyword_top": [
+        "LAB_150.pdf",
+        "LAB_149.pdf",
+        "LAB_148.pdf"
+      ],
+      "keyword_acierto": true,
+      "semantica_minilm_top": [
+        "LAB_076.pdf",
+        "LAB_140.pdf",
+        "LAB_107.pdf"
+      ],
+      "semantica_minilm_acierto": true
+    },
+    {
+      "consulta": "artroscopia de rodilla",
+      "tipo": "exacta",
+      "ground_truth_folios": 0,
+      "keyword_top": [
+        "RAD_114.docx",
+        "RAD_113.docx",
+        "RAD_102.docx"
+      ],
+      "keyword_acierto": false,
+      "semantica_minilm_top": [
+        "ALTA_008.pdf",
+        "RAD_113.docx",
+        "ALTA_011.pdf"
+      ],
+      "semantica_minilm_acierto": false
+    },
+    {
+      "consulta": "infiltración epidural",
+      "tipo": "exacta",
+      "ground_truth_folios": 0,
+      "keyword_top": [],
+      "keyword_acierto": false,
+      "semantica_minilm_top": [
+        "RAD_113.docx",
+        "RAD_077.docx",
+        "ALTA_042.pdf"
+      ],
+      "semantica_minilm_acierto": false
+    },
+    {
+      "consulta": "Creatinina",
+      "tipo": "exacta",
+      "ground_truth_folios": 118,
+      "keyword_top": [
+        "LAB_149.pdf",
+        "LAB_148.pdf",
+        "LAB_146.pdf"
+      ],
+      "keyword_acierto": true,
+      "semantica_minilm_top": [
+        "LAB_090.pdf",
+        "LAB_053.pdf",
+        "LAB_032.pdf"
+      ],
+      "semantica_minilm_acierto": true
+    },
+    {
+      "consulta": "Ferritina",
+      "tipo": "exacta",
+      "ground_truth_folios": 0,
+      "keyword_top": [],
+      "keyword_acierto": false,
+      "semantica_minilm_top": [
+        "RAD_034.docx",
+        "RAD_097.docx",
+        "ALTA_044.pdf"
+      ],
+      "semantica_minilm_acierto": false
+    },
+    {
+      "consulta": "anemia",
+      "tipo": "conceptual",
+      "ground_truth_folios": 116,
+      "keyword_top": [],
+      "keyword_acierto": false,
+      "semantica_minilm_top": [
+        "RAD_019.docx",
+        "RAD_084.docx",
+        "RAD_035.docx"
+      ],
+      "semantica_minilm_acierto": false
+    },
+    {
+      "consulta": "diabetes",
+      "tipo": "conceptual",
+      "ground_truth_folios": 160,
+      "keyword_top": [
+        "CONS_074.pdf",
+        "CONS_073.pdf",
+        "CONS_072.pdf"
+      ],
+      "keyword_acierto": true,
+      "semantica_minilm_top": [
+        "CONS_015.pdf",
+        "CONS_041.pdf",
+        "CONS_073.pdf"
+      ],
+      "semantica_minilm_acierto": true
+    },
+    {
+      "consulta": "dislipemia",
+      "tipo": "conceptual",
+      "ground_truth_folios": 169,
+      "keyword_top": [
+        "CONS_071.pdf",
+        "CONS_056.pdf",
+        "CONS_054.pdf"
+      ],
+      "keyword_acierto": true,
+      "semantica_minilm_top": [
+        "CONS_026.pdf",
+        "CONS_056.pdf",
+        "CONS_071.pdf"
+      ],
+      "semantica_minilm_acierto": true
+    },
+    {
+      "consulta": "función tiroidea",
+      "tipo": "conceptual",
+      "ground_truth_folios": 70,
+      "keyword_top": [
+        "RAD_039.docx",
+        "CONS_022.pdf",
+        "ALTA_143.pdf"
+      ],
+      "keyword_acierto": false,
+      "semantica_minilm_top": [
+        "ALTA_090.pdf",
+        "ALTA_107.pdf",
+        "ALTA_073.pdf"
+      ],
+      "semantica_minilm_acierto": false
+    },
+    {
+      "consulta": "infección con glóbulos blancos elevados",
+      "tipo": "conceptual",
+      "ground_truth_folios": 111,
+      "keyword_top": [
+        "ALTA_173.pdf",
+        "ALTA_170.pdf",
+        "ALTA_163.pdf"
+      ],
+      "keyword_acierto": false,
+      "semantica_minilm_top": [
+        "ALTA_005.pdf",
+        "ALTA_077.pdf",
+        "ALTA_074.pdf"
+      ],
+      "semantica_minilm_acierto": false
+    },
+    {
+      "consulta": "déficit de hierro",
+      "tipo": "conceptual",
+      "ground_truth_folios": 0,
+      "keyword_top": [],
+      "keyword_acierto": false,
+      "semantica_minilm_top": [
+        "ALTA_038.pdf",
+        "ALTA_172.pdf",
+        "RAD_103.docx"
+      ],
+      "semantica_minilm_acierto": false
+    }
+  ]
+}

@@ -87,13 +87,9 @@ Se abre en el navegador (normalmente http://localhost:8501). Si ves *"No hay pac
 
 ---
 
-## 7. Variante dirigida explícitamente por el guion YAML (opcional)
+## 7. Guion YAML
 
-El demo principal ya carga `guiones/baja_laboral.yaml`. Existe además una variante separada:
-
-```bash
-python v5_option2/run_clindoc_option2.py
-```
+El demo principal (`python run_clindoc.py`) ya carga `guiones/baja_laboral.yaml` por defecto (`cargar_guion_yaml`); no existe una variante separada para esto.
 
 ---
 
@@ -119,7 +115,6 @@ chat_asistente_medico.py    Asistente que busca en los folios del paciente
 historial_clinico_visual.py Visor de historial + trazabilidad
 modulo_auditoria.py         Módulo de auditoría
 guiones/baja_laboral.yaml   Guion del informe (contrato semántico)
-v5_option2/                 Variante dirigida por guion YAML
 docs/                       Manuales (facultativo y revisor técnico)
 datos/                      (vacía al clonar; aquí van los expedientes locales)
 requirements.txt            Dependencias
