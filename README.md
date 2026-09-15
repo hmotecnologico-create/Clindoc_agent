@@ -49,15 +49,17 @@ Los expedientes a procesar se colocan en `datos/expedientes/<NIF>/`. Los informe
 
 ```
 run_clindoc.py              Orquestador (LangGraph) + los 5 agentes
-app_clindoc.py              Interfaz / dashboard (Streamlit)
+app_clindoc.py              Interfaz / dashboard (Streamlit) — flujo principal demostrado
 chat_asistente_medico.py    Asistente médico sobre el expediente (RAG)
 historial_clinico_visual.py Visor de historial + Deep Linking
-modulo_auditoria.py         Módulo de auditoría
-dashboard_medico.py         Panel del facultativo
+modulo_auditoria.py         Módulo de auditoría (matriz de confusión de correcciones)
+dashboard_medico.py         Panel del facultativo alternativo — ver nota abajo
 guiones/baja_laboral.yaml   Guion de informe (contrato semántico)
 docs/                       Manuales de usuario y revisor técnico
 requirements.txt            Dependencias
 ```
+
+> **Nota sobre `dashboard_medico.py`:** es un panel Streamlit independiente y experimental, no integrado en `app_clindoc.py` (no se importa desde ningún otro módulo del aplicativo) y no forma parte del flujo demostrado en este trabajo — se lanza aparte con `streamlit run dashboard_medico.py`. Limitación conocida: la corrección de texto que el facultativo introduce al marcar una sección como "Modificar" se registra en las estadísticas de `modulo_auditoria.py` (matriz de confusión) pero no se reescribe en el informe (`data["secciones"]`), por lo que el contenido corregido no queda persistido en el registro subyacente. No es el mecanismo de corrección que usa el sistema principal (ver `utils/ui_helpers.py::registrar_validacion_facultativo`, usado por `app_clindoc.py`, que sí persiste la corrección correctamente).
 
 ## Documentación
 
