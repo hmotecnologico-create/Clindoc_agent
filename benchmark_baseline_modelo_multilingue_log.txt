@@ -1,0 +1,28 @@
+F:\HMO\TFM_DATA\2026\TFM\PROYECTO_CLINDOC\ClinDoc_Agent\benchmark_baseline_modelo_multilingue.py:101: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  dim = modelo.get_sentence_embedding_dimension()
+Cargando y extrayendo texto real de 524 folios de 25988000R...
+Cargando modelo multilingue: paraphrase-multilingual-mpnet-base-v2 (puede descargar ~1GB la primera vez)...
+  modelo cargado en 4.7s | dimension=768
+Indexando 524 folios (chunking real, mismo criterio de produccion)...
+  524 chunks indexados en 220.5s
+
+=== LÍNEA BASE (modelo paraphrase-multilingual-mpnet-base-v2) top-3, ground truth ampliado, paciente 25988000R ===
+
+[exacta    ] 'Hemoglobina                               ' | GT=116 | KW OK  ['LAB_150.pdf', 'LAB_149.pdf'] | SEM OK  ['LAB_115.pdf', 'LAB_147.pdf']
+[exacta    ] 'Colesterol                                ' | GT=111 | KW OK  ['LAB_150.pdf', 'LAB_149.pdf'] | SEM OK  ['LAB_061.pdf', 'LAB_076.pdf']
+[exacta    ] 'artroscopia de rodilla                    ' | GT=  0 | KW NO  ['RAD_114.docx', 'RAD_113.docx'] | SEM NO  ['CONS_052.pdf', 'CONS_066.pdf']
+[exacta    ] 'infiltración epidural                     ' | GT=  0 | KW NO  [] | SEM NO  ['CONS_027.pdf', 'CONS_033.pdf']
+[exacta    ] 'Creatinina                                ' | GT=118 | KW OK  ['LAB_149.pdf', 'LAB_148.pdf'] | SEM OK  ['LAB_091.pdf', 'LAB_104.pdf']
+[exacta    ] 'Ferritina                                 ' | GT=  0 | KW NO  [] | SEM NO  ['LAB_001.pdf', 'LAB_104.pdf']
+[conceptual] 'anemia                                    ' | GT=116 | KW NO  [] | SEM OK  ['LAB_147.pdf', 'LAB_026.pdf']
+[conceptual] 'diabetes                                  ' | GT=160 | KW OK  ['CONS_074.pdf', 'CONS_073.pdf'] | SEM OK  ['CONS_014.pdf', 'CONS_016.pdf']
+[conceptual] 'dislipemia                                ' | GT=169 | KW OK  ['CONS_071.pdf', 'CONS_056.pdf'] | SEM OK  ['CONS_011.pdf', 'CONS_054.pdf']
+[conceptual] 'función tiroidea                          ' | GT= 70 | KW NO  ['RAD_039.docx', 'CONS_022.pdf'] | SEM OK  ['CONS_013.pdf', 'CONS_045.pdf']
+[conceptual] 'infección con glóbulos blancos elevados   ' | GT=111 | KW NO  ['ALTA_173.pdf', 'ALTA_170.pdf'] | SEM OK  ['LAB_010.pdf', 'LAB_057.pdf']
+[conceptual] 'déficit de hierro                         ' | GT=  0 | KW NO  [] | SEM NO  ['LAB_129.pdf', 'LAB_060.pdf']
+
+==== ACIERTO@3 (modelo paraphrase-multilingual-mpnet-base-v2) ====
+Metodo      |   Exactas |  Conceptuales |   Global
+--------------------------------------------------
+keyword     |     50.0% |         33.3% |    41.7%
+semantica   |     50.0% |         83.3% |    66.7%

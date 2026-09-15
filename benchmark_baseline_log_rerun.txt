@@ -1,0 +1,24 @@
+F:\HMO\TFM_DATA\2026\TFM\PROYECTO_CLINDOC\ClinDoc_Agent\agentes\indice_corpus.py:80: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  self.dim_vectores = self.modelo_emb.get_sentence_embedding_dimension()
+=== LÍNEA BASE: recuperación de evidencia (top-3), paciente 25988000R ===
+
+[exacta    ] 'Hemoglobina                               ' | KW OK  ['LAB_150.pdf', 'LAB_149.pdf'] | SEM OK  ['LAB_117.pdf', 'CONS_040.pdf']
+[exacta    ] 'Colesterol                                ' | KW OK  ['LAB_150.pdf', 'LAB_149.pdf'] | SEM OK  ['LAB_017.pdf', 'LAB_019.pdf']
+[exacta    ] 'artroscopia de rodilla                    ' | KW NO  ['RAD_114.docx', 'RAD_113.docx'] | SEM NO  ['CONS_052.pdf', 'CONS_070.pdf']
+[exacta    ] 'infiltración epidural                     ' | KW NO  [] | SEM NO  ['ALTA_067.pdf', 'CONS_027.pdf']
+[exacta    ] 'Creatinina                                ' | KW OK  ['LAB_149.pdf', 'LAB_148.pdf'] | SEM OK  ['LAB_003.pdf', 'LAB_048.pdf']
+[exacta    ] 'Ferritina                                 ' | KW NO  [] | SEM NO  ['ALTA_069.pdf', 'ALTA_067.pdf']
+[conceptual] 'anemia                                    ' | KW NO  [] | SEM NO  ['CONS_040.pdf', 'CONS_021.pdf']
+[conceptual] 'diabetes                                  ' | KW OK  ['CONS_074.pdf', 'CONS_073.pdf'] | SEM OK  ['CONS_014.pdf', 'CONS_060.pdf']
+[conceptual] 'dislipemia                                ' | KW OK  ['CONS_071.pdf', 'CONS_056.pdf'] | SEM OK  ['CONS_011.pdf', 'CONS_030.pdf']
+[conceptual] 'función tiroidea                          ' | KW NO  ['RAD_039.docx', 'CONS_022.pdf'] | SEM OK  ['CONS_013.pdf', 'CONS_045.pdf']
+[conceptual] 'infección con glóbulos blancos elevados   ' | KW NO  ['ALTA_173.pdf', 'ALTA_170.pdf'] | SEM NO  ['ALTA_075.pdf', 'ALTA_044.pdf']
+[conceptual] 'déficit de hierro                         ' | KW NO  [] | SEM NO  ['ALTA_067.pdf', 'ALTA_129.pdf']
+
+==== ACIERTO@3 (% de consultas con un folio relevante en el top-3) ====
+Metodo      |   Exactas |  Conceptuales |   Global
+--------------------------------------------------
+keyword     |     50.0% |         33.3% |    41.7%
+semantica   |     50.0% |         50.0% |    50.0%
+
+Guardado: benchmark_baseline_resultado.json

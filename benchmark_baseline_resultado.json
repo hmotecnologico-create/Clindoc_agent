@@ -9,9 +9,9 @@
       "global": 41.7
     },
     "semantica": {
-      "exacta": 16.7,
+      "exacta": 50.0,
       "conceptual": 50.0,
-      "global": 33.3
+      "global": 50.0
     }
   },
   "detalle": [
@@ -26,11 +26,11 @@
       ],
       "keyword_acierto": true,
       "semantica_top": [
-        "ALTA_174.pdf",
-        "ALTA_044.pdf",
-        "ALTA_088.pdf"
+        "LAB_117.pdf",
+        "CONS_040.pdf",
+        "LAB_023.pdf"
       ],
-      "semantica_acierto": false
+      "semantica_acierto": true
     },
     {
       "consulta": "Colesterol",
@@ -73,9 +73,9 @@
       "keyword_top": [],
       "keyword_acierto": false,
       "semantica_top": [
-        "ALTA_001.pdf",
-        "ALTA_133.pdf",
-        "ALTA_111.pdf"
+        "ALTA_067.pdf",
+        "CONS_027.pdf",
+        "CONS_033.pdf"
       ],
       "semantica_acierto": false
     },
@@ -90,11 +90,11 @@
       ],
       "keyword_acierto": true,
       "semantica_top": [
-        "ALTA_131.pdf",
-        "ALTA_174.pdf",
-        "ALTA_044.pdf"
+        "LAB_003.pdf",
+        "LAB_048.pdf",
+        "LAB_122.pdf"
       ],
-      "semantica_acierto": false
+      "semantica_acierto": true
     },
     {
       "consulta": "Ferritina",
@@ -103,9 +103,9 @@
       "keyword_top": [],
       "keyword_acierto": false,
       "semantica_top": [
-        "ALTA_001.pdf",
-        "ALTA_084.pdf",
-        "ALTA_057.pdf"
+        "ALTA_069.pdf",
+        "ALTA_067.pdf",
+        "LAB_117.pdf"
       ],
       "semantica_acierto": false
     },
@@ -116,16 +116,16 @@
       "keyword_top": [],
       "keyword_acierto": false,
       "semantica_top": [
-        "ALTA_001.pdf",
-        "ALTA_116.pdf",
-        "ALTA_105.pdf"
+        "CONS_040.pdf",
+        "CONS_021.pdf",
+        "CONS_060.pdf"
       ],
       "semantica_acierto": false
     },
     {
       "consulta": "diabetes",
       "tipo": "conceptual",
-      "ground_truth_folios": 161,
+      "ground_truth_folios": 160,
       "keyword_top": [
         "CONS_074.pdf",
         "CONS_073.pdf",
@@ -142,7 +142,7 @@
     {
       "consulta": "dislipemia",
       "tipo": "conceptual",
-      "ground_truth_folios": 168,
+      "ground_truth_folios": 169,
       "keyword_top": [
         "CONS_071.pdf",
         "CONS_056.pdf",
@@ -150,16 +150,16 @@
       ],
       "keyword_acierto": true,
       "semantica_top": [
-        "ALTA_001.pdf",
-        "ALTA_082.pdf",
-        "ALTA_073.pdf"
+        "CONS_011.pdf",
+        "CONS_030.pdf",
+        "CONS_044.pdf"
       ],
       "semantica_acierto": true
     },
     {
       "consulta": "función tiroidea",
       "tipo": "conceptual",
-      "ground_truth_folios": 71,
+      "ground_truth_folios": 70,
       "keyword_top": [
         "RAD_039.docx",
         "CONS_022.pdf",
@@ -167,9 +167,9 @@
       ],
       "keyword_acierto": false,
       "semantica_top": [
-        "ALTA_174.pdf",
-        "ALTA_131.pdf",
-        "ALTA_088.pdf"
+        "CONS_013.pdf",
+        "CONS_045.pdf",
+        "CONS_029.pdf"
       ],
       "semantica_acierto": true
     },
@@ -184,9 +184,9 @@
       ],
       "keyword_acierto": false,
       "semantica_top": [
-        "ALTA_114.pdf",
-        "ALTA_150.pdf",
-        "ALTA_005.pdf"
+        "ALTA_075.pdf",
+        "ALTA_044.pdf",
+        "ALTA_150.pdf"
       ],
       "semantica_acierto": false
     },
@@ -197,9 +197,9 @@
       "keyword_top": [],
       "keyword_acierto": false,
       "semantica_top": [
-        "ALTA_131.pdf",
-        "ALTA_174.pdf",
-        "ALTA_088.pdf"
+        "ALTA_067.pdf",
+        "ALTA_129.pdf",
+        "LAB_085.pdf"
       ],
       "semantica_acierto": false
     }

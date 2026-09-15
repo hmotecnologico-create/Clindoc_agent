@@ -1,0 +1,25 @@
+F:\HMO\TFM_DATA\2026\TFM\PROYECTO_CLINDOC\ClinDoc_Agent\agentes\indice_corpus.py:80: FutureWarning: The `get_sentence_embedding_dimension` method has been renamed to `get_embedding_dimension`.
+  self.dim_vectores = self.modelo_emb.get_sentence_embedding_dimension()
+=== LÍNEA BASE + FUSIÓN HÍBRIDA (RRF), paciente 25988000R ===
+
+[exacta    ] 'Hemoglobina                               ' | KW OK | SEM OK | HIB OK  top-hib=['LAB_141.pdf', 'LAB_150.pdf', 'LAB_117.pdf']
+[exacta    ] 'Colesterol                                ' | KW OK | SEM OK | HIB OK  top-hib=['LAB_140.pdf', 'LAB_130.pdf', 'LAB_138.pdf']
+[exacta    ] 'artroscopia de rodilla                    ' | KW NO | SEM NO | HIB NO  top-hib=['CONS_070.pdf', 'CONS_068.pdf', 'RAD_114.docx']
+[exacta    ] 'infiltración epidural                     ' | KW NO | SEM NO | HIB NO  top-hib=['ALTA_067.pdf', 'CONS_027.pdf', 'CONS_033.pdf']
+[exacta    ] 'Creatinina                                ' | KW OK | SEM OK | HIB OK  top-hib=['LAB_134.pdf', 'LAB_122.pdf', 'LAB_126.pdf']
+[exacta    ] 'Ferritina                                 ' | KW NO | SEM NO | HIB NO  top-hib=['ALTA_069.pdf', 'ALTA_067.pdf', 'LAB_117.pdf']
+[conceptual] 'anemia                                    ' | KW NO | SEM NO | HIB NO  top-hib=['CONS_040.pdf', 'CONS_021.pdf', 'CONS_060.pdf']
+[conceptual] 'diabetes                                  ' | KW OK | SEM OK | HIB OK  top-hib=['CONS_060.pdf', 'CONS_072.pdf', 'CONS_040.pdf']
+[conceptual] 'dislipemia                                ' | KW OK | SEM OK | HIB OK  top-hib=['CONS_056.pdf', 'CONS_054.pdf', 'CONS_044.pdf']
+[conceptual] 'función tiroidea                          ' | KW NO | SEM OK | HIB OK  top-hib=['CONS_022.pdf', 'RAD_039.docx', 'CONS_013.pdf']
+[conceptual] 'infección con glóbulos blancos elevados   ' | KW NO | SEM NO | HIB NO  top-hib=['ALTA_150.pdf', 'ALTA_114.pdf', 'ALTA_125.pdf']
+[conceptual] 'déficit de hierro                         ' | KW NO | SEM NO | HIB NO  top-hib=['ALTA_067.pdf', 'ALTA_129.pdf', 'LAB_085.pdf']
+
+==== ACIERTO@3 ====
+Metodo      |   Exactas |  Conceptuales |   Global
+--------------------------------------------------
+keyword     |     50.0% |         33.3% |    41.7%
+semantica   |     50.0% |         50.0% |    50.0%
+hibrida     |     50.0% |         50.0% |    50.0%
+
+Guardado: benchmark_baseline_hibrido_resultado.json
