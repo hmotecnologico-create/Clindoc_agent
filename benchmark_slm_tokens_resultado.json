@@ -5,34 +5,50 @@
     {
       "modelo": "gemma3:4b",
       "eval_count": 160,
-      "tok_s": 5.86,
-      "load_s": 0.7,
+      "tok_s": 6.59,
+      "load_s": 0.0,
       "tfm_tabla14": 6.4,
-      "delta": -0.54
+      "delta": 0.19
+    },
+    {
+      "modelo": "gemma3:4b",
+      "error": "'charmap' codec can't encode character '\\u0394' in position 52: character maps to <undefined>"
     },
     {
       "modelo": "llama3.1:latest",
       "eval_count": 160,
-      "tok_s": 3.58,
-      "load_s": 0.7,
+      "tok_s": 3.63,
+      "load_s": 0.0,
       "tfm_tabla14": 3.7,
-      "delta": -0.12
+      "delta": -0.07
+    },
+    {
+      "modelo": "llama3.1:latest",
+      "error": "'charmap' codec can't encode character '\\u0394' in position 52: character maps to <undefined>"
     },
     {
       "modelo": "phi3:latest",
       "eval_count": 160,
-      "tok_s": 2.99,
-      "load_s": 0.1,
+      "tok_s": 3.37,
+      "load_s": 0.0,
       "tfm_tabla14": 3.2,
-      "delta": -0.21
+      "delta": 0.17
+    },
+    {
+      "modelo": "phi3:latest",
+      "error": "'charmap' codec can't encode character '\\u0394' in position 52: character maps to <undefined>"
     },
     {
       "modelo": "mistral:latest",
       "eval_count": 160,
-      "tok_s": 2.16,
-      "load_s": 0.1,
+      "tok_s": 2.0,
+      "load_s": 0.0,
       "tfm_tabla14": 2.8,
-      "delta": -0.64
+      "delta": -0.8
+    },
+    {
+      "modelo": "mistral:latest",
+      "error": "'charmap' codec can't encode character '\\u0394' in position 52: character maps to <undefined>"
     }
   ]
 }
