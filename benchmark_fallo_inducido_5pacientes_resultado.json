@@ -1,0 +1,177 @@
+{
+  "33445566R": {
+    "ciclico_max_retries_2": {
+      "n_secciones": 4,
+      "n_fallidas_error": 0,
+      "secciones_fallidas": [],
+      "longitudes": {
+        "Datos de Identificación del Paciente": 350,
+        "Diagnóstico Principal y Datos de la Baja": 884,
+        "Evolución Clínica": 1541,
+        "Conclusión y Estado Actual": 878
+      },
+      "tiempo_s": 531.0,
+      "n_ciclos_autocorreccion": 1,
+      "fallidas_tras_1er_intento": 4
+    },
+    "sin_ciclo_max_retries_0": {
+      "n_secciones": 4,
+      "n_fallidas_error": 4,
+      "secciones_fallidas": [
+        "Datos de Identificación del Paciente",
+        "Diagnóstico Principal y Datos de la Baja",
+        "Evolución Clínica",
+        "Conclusión y Estado Actual"
+      ],
+      "longitudes": {
+        "Datos de Identificación del Paciente": 97,
+        "Diagnóstico Principal y Datos de la Baja": 97,
+        "Evolución Clínica": 97,
+        "Conclusión y Estado Actual": 97
+      },
+      "tiempo_s": 0.2,
+      "n_ciclos_autocorreccion": 0,
+      "fallidas_tras_1er_intento": 4
+    }
+  },
+  "48991234S": {
+    "ciclico_max_retries_2": {
+      "n_secciones": 4,
+      "n_fallidas_error": 0,
+      "secciones_fallidas": [],
+      "longitudes": {
+        "Datos de Identificación del Paciente": 343,
+        "Diagnóstico Principal y Datos de la Baja": 905,
+        "Evolución Clínica": 1124,
+        "Conclusión y Estado Actual": 773
+      },
+      "tiempo_s": 364.3,
+      "n_ciclos_autocorreccion": 1,
+      "fallidas_tras_1er_intento": 4
+    },
+    "sin_ciclo_max_retries_0": {
+      "n_secciones": 4,
+      "n_fallidas_error": 4,
+      "secciones_fallidas": [
+        "Datos de Identificación del Paciente",
+        "Diagnóstico Principal y Datos de la Baja",
+        "Evolución Clínica",
+        "Conclusión y Estado Actual"
+      ],
+      "longitudes": {
+        "Datos de Identificación del Paciente": 97,
+        "Diagnóstico Principal y Datos de la Baja": 97,
+        "Evolución Clínica": 97,
+        "Conclusión y Estado Actual": 97
+      },
+      "tiempo_s": 0.4,
+      "n_ciclos_autocorreccion": 0,
+      "fallidas_tras_1er_intento": 4
+    }
+  },
+  "52880483X": {
+    "ciclico_max_retries_2": {
+      "n_secciones": 4,
+      "n_fallidas_error": 0,
+      "secciones_fallidas": [],
+      "longitudes": {
+        "Datos de Identificación del Paciente": 275,
+        "Diagnóstico Principal y Datos de la Baja": 93,
+        "Evolución Clínica": 460,
+        "Conclusión y Estado Actual": 833
+      },
+      "tiempo_s": 234.3,
+      "n_ciclos_autocorreccion": 1,
+      "fallidas_tras_1er_intento": 4
+    },
+    "sin_ciclo_max_retries_0": {
+      "n_secciones": 4,
+      "n_fallidas_error": 4,
+      "secciones_fallidas": [
+        "Datos de Identificación del Paciente",
+        "Diagnóstico Principal y Datos de la Baja",
+        "Evolución Clínica",
+        "Conclusión y Estado Actual"
+      ],
+      "longitudes": {
+        "Datos de Identificación del Paciente": 97,
+        "Diagnóstico Principal y Datos de la Baja": 97,
+        "Evolución Clínica": 97,
+        "Conclusión y Estado Actual": 97
+      },
+      "tiempo_s": 0.3,
+      "n_ciclos_autocorreccion": 0,
+      "fallidas_tras_1er_intento": 4
+    }
+  },
+  "75114422X": {
+    "ciclico_max_retries_2": {
+      "n_secciones": 4,
+      "n_fallidas_error": 0,
+      "secciones_fallidas": [],
+      "longitudes": {
+        "Datos de Identificación del Paciente": 274,
+        "Diagnóstico Principal y Datos de la Baja": 98,
+        "Evolución Clínica": 1712,
+        "Conclusión y Estado Actual": 1080
+      },
+      "tiempo_s": 352.1,
+      "n_ciclos_autocorreccion": 1,
+      "fallidas_tras_1er_intento": 4
+    },
+    "sin_ciclo_max_retries_0": {
+      "n_secciones": 4,
+      "n_fallidas_error": 4,
+      "secciones_fallidas": [
+        "Datos de Identificación del Paciente",
+        "Diagnóstico Principal y Datos de la Baja",
+        "Evolución Clínica",
+        "Conclusión y Estado Actual"
+      ],
+      "longitudes": {
+        "Datos de Identificación del Paciente": 97,
+        "Diagnóstico Principal y Datos de la Baja": 97,
+        "Evolución Clínica": 97,
+        "Conclusión y Estado Actual": 97
+      },
+      "tiempo_s": 0.3,
+      "n_ciclos_autocorreccion": 0,
+      "fallidas_tras_1er_intento": 4
+    }
+  },
+  "25988000R": {
+    "ciclico_max_retries_2": {
+      "n_secciones": 4,
+      "n_fallidas_error": 0,
+      "secciones_fallidas": [],
+      "longitudes": {
+        "Datos de Identificación del Paciente": 278,
+        "Diagnóstico Principal y Datos de la Baja": 93,
+        "Evolución Clínica": 1283,
+        "Conclusión y Estado Actual": 705
+      },
+      "tiempo_s": 272.9,
+      "n_ciclos_autocorreccion": 1,
+      "fallidas_tras_1er_intento": 4
+    },
+    "sin_ciclo_max_retries_0": {
+      "n_secciones": 4,
+      "n_fallidas_error": 4,
+      "secciones_fallidas": [
+        "Datos de Identificación del Paciente",
+        "Diagnóstico Principal y Datos de la Baja",
+        "Evolución Clínica",
+        "Conclusión y Estado Actual"
+      ],
+      "longitudes": {
+        "Datos de Identificación del Paciente": 97,
+        "Diagnóstico Principal y Datos de la Baja": 97,
+        "Evolución Clínica": 97,
+        "Conclusión y Estado Actual": 97
+      },
+      "tiempo_s": 0.3,
+      "n_ciclos_autocorreccion": 0,
+      "fallidas_tras_1er_intento": 4
+    }
+  }
+}
