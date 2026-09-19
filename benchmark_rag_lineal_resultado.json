@@ -1,0 +1,230 @@
+{
+  "33445566R": {
+    "pipeline": {
+      "secciones": 4,
+      "abstenciones": 0,
+      "segmentos": 29,
+      "segmentos_citados": 29,
+      "citas": 29,
+      "citas_validas": 29,
+      "segmentos_evaluables": 29,
+      "segmentos_sustentados": 19,
+      "numeros_no_respaldados": 0,
+      "pares_frase_folio": 29,
+      "pares_sustentados": 19
+    },
+    "lineal": {
+      "secciones": 4,
+      "abstenciones": 1,
+      "segmentos": 14,
+      "segmentos_citados": 10,
+      "citas": 30,
+      "citas_validas": 30,
+      "segmentos_evaluables": 10,
+      "segmentos_sustentados": 6,
+      "numeros_no_respaldados": 0,
+      "pares_frase_folio": 30,
+      "pares_sustentados": 10
+    },
+    "tiempo_lineal_s": {
+      "Datos de Identificación del Paciente": 173.3,
+      "Diagnóstico Principal y Datos de la Baja": 132.6,
+      "Evolución Clínica": 141.3,
+      "Conclusión y Estado Actual": 17.9
+    },
+    "textos_lineal": {
+      "Datos de Identificación del Paciente": "Paciente: David Sánchez | NIF: 33445566R | Fecha: 09/01/2021 Edad: 55 años | Sexo: Masculino | Tel: 622 334 455 Dirección: Paseo Marítimo 10, Valencia [Fuente: CONS_064.pdf#CONS_064_chunk_0]\nPaciente: David Sánchez | NIF: 33445566R | Fecha: 16/11/2018 Edad: 55 años | Sexo: Masculino | Tel: 622 334 455 Dirección: Paseo Marítimo 10, Valencia [Fuente: CONS_008.pdf#CONS_008_chunk_0]\nPaciente: David Sánchez | NIF: 33445566R | Fecha: 18/04/2022 Edad: 55 años | Sexo: Masculino | [Fuente: CONS_052.pdf#CONS_052_chunk_0]\nPaciente: David Sánchez | NIF: 33445566R | Fecha: 23/10/2019 Edad: 55 años | Sexo: Masculino | Tel: 622 334 455 Dirección: Paseo Marítimo 10, Valencia [Fuente: CONS_020.pdf#CONS_020_chunk_0]\nPaciente: David Sánchez | NIF: 33445566R | Fecha: 17/02/2018 Edad: 55 años | Sexo: Masculino | Tel: 622 33",
+      "Diagnóstico Principal y Datos de la Baja": "El paciente David Sánchez, con NIF 33445566R, ha sido objeto de revisiones programadas por Hipotiroidismo en diversas fechas [Fuente: CONS_014.pdf#CONS_014_chunk_0, CONS_061.pdf#CONS_061_chunk_0, CONS_012.pdf#CONS_012_chunk_0, CONS_021.pdf#CONS_021_chunk_0, CONS_045.pdf#CONS_045_chunk_0]. En todos los informes, el diagnóstico principal es Hipotiroidismo, y el estado clínico del paciente se describe como eutiroideo, tanto clínicamente como analíticamente [Fuente: CONS_014.pdf#CONS_014_chunk_0, CONS_061.pdf#CONS_061_chunk_0, CONS_012.pdf#CONS_012_chunk_0, CONS_021.pdf#CONS_021_chunk_0, CONS_045.pdf#CONS_045_chunk_0].  El plan de tratamiento consiste en mantener la medicación Levotiroxina 75mcg/24h, con una próxima revisión programada en 6 meses [Fuente: CONS_014.pdf#CONS_014_chunk_0, CONS_061.pdf#CONS_061_chunk_0, CONS_012.pdf#CONS_012_chunk_0, CONS_021.pdf#CONS_021_chunk_0, CONS_045.pdf#CONS_045_chunk_0]. Sin informacion documental para esta seccion.",
+      "Evolución Clínica": "Durante su estancia en planta, el paciente ha presentado una evolución favorable al tratamiento pautado. Las constantes vitales se han mantenido estables. Se le ha prescrito fosfomicina 3g [Fuente: ALTA_101.pdf#ALTA_101_chunk_1], [Fuente: ALTA_145.pdf#ALTA_145_chunk_1], [Fuente: ALTA_171.pdf#ALTA_171_chunk_1], [Fuente: ALTA_163.pdf#ALTA_163_chunk_1], [Fuente: ALTA_050.pdf#ALTA_050_chunk_1].  Continúa su medicación habitual: Apixaban 5mg/12h, Omeprazol 20mg/24h, Salbutamol a demanda, Levotiroxina 75mcg/24h, Enalapril 20mg/24h, Paracetamol 1g si dolor y Dexketoprofeno 25mg/8h [Fuente: ALTA_101.pdf#ALTA_101_chunk_1], [Fuente: ALTA_145.pdf#ALTA_145_chunk_1], [Fuente: ALTA_171.pdf#ALTA_171_chunk_1], [Fuente: ALTA_163.pdf#ALTA_163_chunk_1], [Fuente: ALTA_050.pdf#ALTA_050_chunk_1]. Se ha programado un control con su Médico de Atención Primaria en 7-10 días [Fuente: ALTA_101.pdf#ALTA_101_chunk_1], [Fuente",
+      "Conclusión y Estado Actual": "Sin informacion documental para esta seccion."
+    }
+  },
+  "48991234S": {
+    "pipeline": {
+      "secciones": 4,
+      "abstenciones": 0,
+      "segmentos": 34,
+      "segmentos_citados": 31,
+      "citas": 31,
+      "citas_validas": 31,
+      "segmentos_evaluables": 31,
+      "segmentos_sustentados": 20,
+      "numeros_no_respaldados": 0,
+      "pares_frase_folio": 31,
+      "pares_sustentados": 20
+    },
+    "lineal": {
+      "secciones": 4,
+      "abstenciones": 0,
+      "segmentos": 14,
+      "segmentos_citados": 9,
+      "citas": 20,
+      "citas_validas": 20,
+      "segmentos_evaluables": 9,
+      "segmentos_sustentados": 7,
+      "numeros_no_respaldados": 0,
+      "pares_frase_folio": 20,
+      "pares_sustentados": 11
+    },
+    "tiempo_lineal_s": {
+      "Datos de Identificación del Paciente": 132.1,
+      "Diagnóstico Principal y Datos de la Baja": 66.5,
+      "Evolución Clínica": 66.7,
+      "Conclusión y Estado Actual": 56.2
+    },
+    "textos_lineal": {
+      "Datos de Identificación del Paciente": "Paciente: Miguel Ángel Torres | NIF: 48991234S | Fecha: 04/11/2022 Edad: 45 años | Sexo: Masculino | Tel: 611 222 333 Dirección: Plaza España 1, Sevilla [Fuente: CONS_039.pdf#CONS_039_chunk_0]\nPaciente: Miguel Ángel Torres | NIF: 48991234S | Fecha: 18/05/2023 Edad: 45 años | Sexo: Masculino | Tel: 611 222 333 Dirección: Plaza España 1, Sevilla [Fuente: CONS_056.pdf#CONS_056_chunk_0]\nPaciente: Miguel Ángel Torres | NIF: 48991234S | Fecha: 20/01/2019 Edad: 45 años | Sexo: Masculino | Tel: 611 222 333 Dirección: Plaza España 1, Sevilla [Fuente: CONS_071.pdf#CONS_071_chunk_0]\nPaciente: Miguel Ángel Torres | NIF: 48991234S | Fecha: 19/02/2021 Edad: 45 años | Sexo: Masculino | Tel: 611 222 333 Dirección: Plaza España 1, Sevilla [Fuente: CONS_031.pdf#CONS_031_chunk_0]\nPaciente: Miguel Ángel Torres | NIF: 48991234S | Fecha: 01/12/2022 Edad: 45 años |",
+      "Diagnóstico Principal y Datos de la Baja": "El paciente Miguel Ángel Torres, de 45 años, consulta para revisión programada de hipotiroidismo.  En todos los informes consultados, el paciente refiere buen estado general y eutiroideología clínica y analíticamente [Fuente: CONS_045.pdf#CONS_045_chunk_0, CONS_001.pdf#CONS_001_chunk_0, CONS_065.pdf#CONS_065_chunk_0, CONS_047.pdf#CONS_047_chunk_0, CONS_061.pdf#CONS_061_chunk_0].  No se mencionan datos de baja o incapacidad. [Fuente: Todos los archivos]",
+      "Evolución Clínica": "Durante su estancia en planta, el paciente ha presentado una evolución favorable al tratamiento pautado. Las constantes vitales se han mantenido estables. [Fuente: ALTA_120.pdf#ALTA_120_chunk_1], [Fuente: ALTA_069.pdf#ALTA_069_chunk_1], [Fuente: ALTA_163.pdf#ALTA_163_chunk_1], [Fuente: ALTA_098.pdf#ALTA_098_chunk_1], [Fuente: ALTA_067.pdf#ALTA_067_chunk_1] Sin informacion documental para esta seccion.",
+      "Conclusión y Estado Actual": "Según la información disponible, el paciente, Antonio Arte Fiscal, presenta una evolución favorable al tratamiento con Amoxicilina-Clavulánico, Omeprazol, Salbutamol y Atorvastatina, manteniendo constantes vitales estables [Fuente: ALTA_069.pdf#ALTA_069_chunk_1]. La muestra ha sido procesada sin incidencias en las diferentes pruebas realizadas [Fuente: LAB_028.pdf#LAB_028_chunk_1, LAB_146.pdf#LAB_146_chunk_1, LAB_113.pdf#LAB_113_chunk_1, LAB_120.pdf#LAB_120_chunk_1]. Se le ha dado de alta con instrucciones para seguimiento por su Médico de Atención Primaria en 7-10 días [Fuente: ALTA_069.pdf#ALTA_069_chunk_1]."
+    }
+  },
+  "52880483X": {
+    "pipeline": {
+      "secciones": 4,
+      "abstenciones": 0,
+      "segmentos": 30,
+      "segmentos_citados": 26,
+      "citas": 26,
+      "citas_validas": 26,
+      "segmentos_evaluables": 26,
+      "segmentos_sustentados": 19,
+      "numeros_no_respaldados": 0,
+      "pares_frase_folio": 26,
+      "pares_sustentados": 19
+    },
+    "lineal": {
+      "secciones": 4,
+      "abstenciones": 0,
+      "segmentos": 17,
+      "segmentos_citados": 13,
+      "citas": 40,
+      "citas_validas": 40,
+      "segmentos_evaluables": 13,
+      "segmentos_sustentados": 10,
+      "numeros_no_respaldados": 0,
+      "pares_frase_folio": 40,
+      "pares_sustentados": 27
+    },
+    "tiempo_lineal_s": {
+      "Datos de Identificación del Paciente": 102.8,
+      "Diagnóstico Principal y Datos de la Baja": 97.8,
+      "Evolución Clínica": 88.4,
+      "Conclusión y Estado Actual": 81.8
+    },
+    "textos_lineal": {
+      "Datos de Identificación del Paciente": "Paciente: Laura Gómez | NIF: 52880483X | Fecha: 05/10/2023 Edad: 74 años | Sexo: Femenino | Tel: 698 765 432 Dirección: Avenida de la Libertad 45, Barcelona [Fuente: CONS_029.pdf#CONS_029_chunk_0]\nPaciente: Laura Gómez | NIF: 52880483X | Fecha: 03/12/2023 Edad: 74 años | Sexo: Femenino | Tel: 698 765 432 Dirección: Avenida de la Libertad 45, Barcelona [Fuente: CONS_028.pdf#CONS_028_chunk_0]\nPaciente: Laura Gómez | NIF: 52880483X | Fecha: 17/04/2023 Edad: 74 años | Sexo: Femenino | Tel: 698 765 432 Dirección: Avenida de la Libertad 45, Barcelona [Fuente: CONS_039.pdf#CONS_039_chunk_0]\nPaciente: Laura Gómez | NIF: 52880483X | Fecha: 28/08/2019 Edad: 74 años | Sexo: Femenino | Tel: 698 765 432 Dirección: Avenida de la Libertad 45, Barcelona [Fuente: CONS_022.pdf#CONS_022_chunk_0]\nPaciente: Laura Gómez | NIF: 52880483X | Fecha: 15/05/",
+      "Diagnóstico Principal y Datos de la Baja": "El paciente, Laura Gómez, presenta un diagnóstico de Hipotiroidismo, confirmado por informes de revisión programada a lo largo del tiempo [Fuente: CONS_007.pdf#CONS_007_chunk_0, CONS_016.pdf#CONS_016_chunk_0, CONS_037.pdf#CONS_037_chunk_0, CONS_033.pdf#CONS_033_chunk_0, CONS_073.pdf#CONS_073_chunk_0].  En todos los informes, el estado analítico y clínico del paciente se describe como eutiroideo [Fuente: CONS_007.pdf#CONS_007_chunk_0, CONS_016.pdf#CONS_016_chunk_0, CONS_037.pdf#CONS_037_chunk_0, CONS_033.pdf#CONS_033_chunk_0, CONS_073.pdf#CONS_073_chunk_0].  El plan de tratamiento consiste en mantener la medicación Levotiroxina 75mcg/24h y realizar una próxima revisión en 6 meses [Fuente: CONS_007.pdf#CONS_007_chunk_0, CONS_016.pdf#CONS_016_chunk_0, CONS_037.pdf#CONS_037_chunk_0, CONS_033.pdf#CONS_033_chunk_0, CONS_073.pdf#CONS_073_chunk_0]. Sin informacion documental para esta seccion.",
+      "Evolución Clínica": "Durante su estancia en planta, el paciente ha presentado una evolución favorable al tratamiento pautado. Las constantes vitales se han mantenido estables [Fuente: ALTA_055.pdf#ALTA_055_chunk_1, ALTA_122.pdf#ALTA_122_chunk_1, ALTA_019.pdf#ALTA_019_chunk_1, ALTA_113.pdf#ALTA_113_chunk_1, ALTA_064.pdf#ALTA_064_chunk_1]. El tratamiento incluye suero oral y dieta astringente, Omeprazol 20mg/24h, Paracetamol 1g si dolor, Apixaban 5mg/12h, Fosfomicina 3g, Metformina 850mg/12h, Salbutamol a demanda y Atorvastatina 40mg/24h. Se ha programado un control por parte del Médico de Atención Primaria en 7-10 días [Fuente: ALTA_055.pdf#ALTA_055_chunk_1, ALTA_122.pdf#ALTA_122_chunk_1, ALTA_019.pdf#ALTA_019_chunk_1, ALTA_113.pdf#ALTA_113_chunk_1, ALTA_064.pdf#ALTA_064_chunk_1].",
+      "Conclusión y Estado Actual": "El paciente presenta una evolución favorable al tratamiento pautado durante su estancia en planta, con constantes vitales estables [Fuente: ALTA_055.pdf#ALTA_055_chunk_1, ALTA_122.pdf#ALTA_122_chunk_1, ALTA_019.pdf#ALTA_019_chunk_1]. Se le ha prescrito suero oral y dieta astringente, junto con la continuación de su medicación habitual que incluye Omeprazol, Paracetamol y Apixaban, además de Fosfomicina y Metformina [Fuente: ALTA_055.pdf#ALTA_055_chunk_1, ALTA_122.pdf#ALTA_122_chunk_1, ALTA_019.pdf#ALTA_019_chunk_1]. Se ha programado un control con su Médico de Atención Primaria en un plazo de 7-10 días [Fuente: ALTA_055.pdf#ALTA_055_chunk_1, ALTA_122.pdf#ALTA_122_chunk_1, ALTA_019.pdf#ALTA_019_chunk_1]. La muestra ha sido procesada sin incidencias [Fuente: LAB_099.pdf#LAB_099_chunk_1, LAB_033.pdf#LAB_033_chunk_1]."
+    }
+  },
+  "75114422X": {
+    "pipeline": {
+      "secciones": 4,
+      "abstenciones": 0,
+      "segmentos": 28,
+      "segmentos_citados": 23,
+      "citas": 23,
+      "citas_validas": 23,
+      "segmentos_evaluables": 23,
+      "segmentos_sustentados": 15,
+      "numeros_no_respaldados": 0,
+      "pares_frase_folio": 23,
+      "pares_sustentados": 15
+    },
+    "lineal": {
+      "secciones": 4,
+      "abstenciones": 0,
+      "segmentos": 13,
+      "segmentos_citados": 8,
+      "citas": 36,
+      "citas_validas": 36,
+      "segmentos_evaluables": 8,
+      "segmentos_sustentados": 7,
+      "numeros_no_respaldados": 0,
+      "pares_frase_folio": 36,
+      "pares_sustentados": 24
+    },
+    "tiempo_lineal_s": {
+      "Datos de Identificación del Paciente": 106.8,
+      "Diagnóstico Principal y Datos de la Baja": 81.2,
+      "Evolución Clínica": 50.7,
+      "Conclusión y Estado Actual": 70.9
+    },
+    "textos_lineal": {
+      "Datos de Identificación del Paciente": "Nombre del Paciente: Elena Martínez [Fuente: CONS_037.pdf#CONS_037_chunk_0, CONS_046.pdf#CONS_046_chunk_0, CONS_043.pdf#CONS_043_chunk_0, CONS_016.pdf#CONS_016_chunk_0, CONS_073.pdf#CONS_073_chunk_0]\nNIF: 75114422X [Fuente: CONS_037.pdf#CONS_037_chunk_0, CONS_046.pdf#CONS_046_chunk_0, CONS_043.pdf#CONS_043_chunk_0, CONS_016.pdf#CONS_016_chunk_0, CONS_073.pdf#CONS_073_chunk_0]\nFecha de Nacimiento: 04/01/2021 [Fuente: CONS_037.pdf#CONS_037_chunk_0, CONS_046.pdf#CONS_046_chunk_0, CONS_043.pdf#CONS_043_chunk_0, CONS_016.pdf#CONS_016_chunk_0, CONS_073.pdf#CONS_073_chunk_0]\nEdad: 38 años [Fuente: CONS_037.pdf#CONS_037_chunk_0, CONS_046.pdf#CONS_046_chunk_0, CONS_043.pdf#CONS_043_chunk_0, CONS_016.pdf#CONS_016_chunk_0, CONS",
+      "Diagnóstico Principal y Datos de la Baja": "El paciente, Elena Martínez, presenta un diagnóstico de Hipotiroidismo, confirmado por la documentación [Fuente: CONS_007.pdf#CONS_007_chunk_0; CONS_016.pdf#CONS_016_chunk_0; CONS_037.pdf#CONS_037_chunk_0; CONS_073.pdf#CONS_073_chunk_0; CONS_038.pdf#CONS_038_chunk_0].  La exploración física en todos los informes indica un estado general bueno y eutiroideo, con auscultaciones cardíacas y pulmonares normales. El tratamiento actual es el mantenimiento de Levotiroxina 75mcg/24h, con una próxima revisión programada en 6 meses [Fuente: CONS_007.pdf#CONS_007_chunk_0; CONS_016.pdf#CONS_016_chunk_0; CONS_037.pdf#CONS_037_chunk_0; CONS_073.pdf#CONS_073_chunk_0; CONS_038.pdf#CONS_038_chunk_0]. No se proporcionan datos sobre una baja actual. Sin informacion documental para esta seccion.",
+      "Evolución Clínica": "Durante su estancia en planta, el paciente ha presentado una evolución favorable al tratamiento pautado. Las constantes vitales se han mantenido estables. [Fuente: ALTA_153.pdf#ALTA_153_chunk_1], [Fuente: ALTA_055.pdf#ALTA_055_chunk_1], [Fuente: ALTA_122.pdf#ALTA_122_chunk_1], [Fuente: ALTA_113.pdf#ALTA_113_chunk_1], [Fuente: ALTA_064.pdf#ALTA_064_chunk_1]",
+      "Conclusión y Estado Actual": "Tras su estancia en planta, el paciente ha mostrado una evolución favorable al tratamiento, con constantes vitales estables y sin incidencias en el procesamiento de muestras [Fuente: ALTA_055.pdf#ALTA_055_chunk_1, ALTA_122.pdf#ALTA_122_chunk_1, ALTA_153.pdf#ALTA_153_chunk_1, LAB_011.pdf#LAB_011_chunk_1, LAB_099.pdf#LAB_099_chunk_1]. Se le ha prescrito suero oral, dieta astringente, y se continúa con la medicación habitual que incluye Omeprazol, Paracetamol, Apixaban, Fosfomicina, Metformina, Levotiroxina y Atorvastatina [Fuente: ALTA_055.pdf#ALTA_055_chunk_1, ALTA_122.pdf#ALTA_122_chunk_1, ALTA_153.pdf#ALTA_153_chunk_1]. Se ha programado un control con su Médico de Atención Primaria en un plazo de 7-10 días [Fuente: ALTA_055.pdf#ALTA_055_chunk_1, ALTA_122.pdf#ALTA_122_chunk_1, ALTA_153.pdf#ALTA_153_chunk_1]."
+    }
+  },
+  "25988000R": {
+    "pipeline": {
+      "secciones": 4,
+      "abstenciones": 0,
+      "segmentos": 21,
+      "segmentos_citados": 18,
+      "citas": 18,
+      "citas_validas": 18,
+      "segmentos_evaluables": 18,
+      "segmentos_sustentados": 12,
+      "numeros_no_respaldados": 0,
+      "pares_frase_folio": 18,
+      "pares_sustentados": 12
+    },
+    "lineal": {
+      "secciones": 4,
+      "abstenciones": 1,
+      "segmentos": 12,
+      "segmentos_citados": 8,
+      "citas": 22,
+      "citas_validas": 22,
+      "segmentos_evaluables": 8,
+      "segmentos_sustentados": 5,
+      "numeros_no_respaldados": 0,
+      "pares_frase_folio": 22,
+      "pares_sustentados": 8
+    },
+    "tiempo_lineal_s": {
+      "Datos de Identificación del Paciente": 98.0,
+      "Diagnóstico Principal y Datos de la Baja": 82.2,
+      "Evolución Clínica": 74.3,
+      "Conclusión y Estado Actual": 15.9
+    },
+    "textos_lineal": {
+      "Datos de Identificación del Paciente": "Paciente: Carlos Valderrama | NIF: 25988000R | Fecha: 19/01/2020 Edad: 68 años | Sexo: Masculino | Tel: 654 321 987 Dirección: Calle Mayor 12, 3ºB, Madrid [Fuente: CONS_067.pdf#CONS_067_chunk_0]\nPaciente: Carlos Valderrama | NIF: 25988000R | Fecha: 01/01/2020 Edad: 68 años | Sexo: Masculino | Tel: 654 321 987 Dirección: Calle Mayor 12, 3ºB, Madrid [Fuente: CONS_036.pdf#CONS_036_chunk_0]\nPaciente: Carlos Valderrama | NIF: 25988000R | Fecha: 04/11/2022 Edad: 68 años | Sexo: Masculino | Tel: 654 321 987 Dirección: Calle Mayor 12, 3ºB, Madrid [Fuente: CONS_039.pdf#CONS_039_chunk_0]\nPaciente: Carlos Valderrama | NIF: 25988000R | Fecha: 18/05/2023 Edad: 68 años | Sexo: Masculino | Tel: 654 321 987 Dirección: Calle Mayor 12, 3ºB, Madrid [Fuente: CONS_056.pdf#CONS_056_chunk_0]\nPaciente: Carlos Valderrama | NIF: 2",
+      "Diagnóstico Principal y Datos de la Baja": "El paciente Carlos Valderrama, de 68 años, ha sido objeto de revisiones programadas por hipotiroidismo desde el 10/12/2018 hasta el 11/08/2023 [Fuente: CONS_013.pdf#CONS_013_chunk_0, CONS_003.pdf#CONS_003_chunk_0, CONS_050.pdf#CONS_050_chunk_0, CONS_045.pdf#CONS_045_chunk_0, CONS_047.pdf#CONS_047_chunk_0]. En todos los informes, el diagnóstico principal es hipotiroidismo, que se encuentra controlado con tratamiento de Levotiroxina 75mcg/24h [Fuente: CONS_013.pdf#CONS_013_chunk_0, CONS_003.pdf#CONS_003_chunk_0, CONS_050.pdf#CONS_050_chunk_0, CONS_045.pdf#CONS_045_chunk_0, CONS_047.pdf#CONS_047_chunk_0].  No se reportan datos de baja o incapacidad temporal en ninguno de los informes proporcionados. [Fuente: Todos los documentos]",
+      "Evolución Clínica": "El paciente presenta buen estado general y perfil lipídico dentro de la normalidad, según informes de consultas sucesivas. [Fuente: CONS_054.pdf#CONS_054_chunk_0], [Fuente: CONS_037.pdf#CONS_037_chunk_0], [Fuente: CONS_007.pdf#CONS_007_chunk_0], [Fuente: CONS_044.pdf#CONS_044_chunk_0]. La medicación actual incluye Atorvastatina 40mg/24h, y se mantiene la recomendación de revisión programada en 6 meses. [Fuente: CONS_054.pdf#CONS_054_chunk_0], [Fuente: CONS_037.pdf#CONS_037_chunk_0], [Fuente: CONS_007.pdf#CONS_007_chunk_0], [Fuente: CONS_044.pdf#CONS_044_chunk_0]. No se han reportado datos sobre eventos agudos ni complicaciones durante la evolución. Sin informacion documental para esta seccion.",
+      "Conclusión y Estado Actual": "Sin informacion documental para esta seccion."
+    }
+  },
+  "_total": {
+    "pipeline": {
+      "secciones": 20,
+      "abstenciones": 0,
+      "segmentos": 142,
+      "segmentos_citados": 127,
+      "citas": 127,
+      "citas_validas": 127,
+      "segmentos_evaluables": 127,
+      "segmentos_sustentados": 85,
+      "numeros_no_respaldados": 0,
+      "pares_frase_folio": 127,
+      "pares_sustentados": 85
+    },
+    "lineal": {
+      "secciones": 20,
+      "abstenciones": 2,
+      "segmentos": 70,
+      "segmentos_citados": 48,
+      "citas": 148,
+      "citas_validas": 148,
+      "segmentos_evaluables": 48,
+      "segmentos_sustentados": 35,
+      "numeros_no_respaldados": 0,
+      "pares_frase_folio": 148,
+      "pares_sustentados": 80
+    }
+  }
+}
