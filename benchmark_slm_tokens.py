@@ -44,7 +44,7 @@ def main():
             ref = TFM.get(m)
             delta = round(r["tok_s"] - ref, 2) if ref else None
             filas.append({"modelo": m, **r, "tfm_tabla14": ref, "delta": delta})
-            print(f"{m:18} | medido {r['tok_s']:>5} tok/s  (TFM {ref})  Δ={delta}  "
+            print(f"{m:18} | medido {r['tok_s']:>5} tok/s  (TFM {ref})  delta={delta}  "
                   f"[{r['eval_count']} tok, carga {r['load_s']}s]")
         except Exception as e:
             print(f"{m:18} | ERROR: {e}")

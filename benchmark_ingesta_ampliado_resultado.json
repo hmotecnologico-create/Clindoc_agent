@@ -1,4 +1,5 @@
 {
+  "_ADVERTENCIA": "RESULTADO PARCIALMENTE INVALIDO. La metrica de PyMuPDF de esta v1 ('|' in linea) daba un falso 100% porque detectaba el separador del encabezado del paciente, no filas de tabla. Usar benchmark_ingesta_ampliado_v2.py y benchmark_ingesta_ampliado_v2_resultado.json (PyMuPDF real: 0/100). Solo el bloque 'docling' de este fichero es valido (validado manualmente contra LAB_001.pdf).",
   "n_folios": 100,
   "n_pacientes": 5,
   "folios_por_paciente": 20,

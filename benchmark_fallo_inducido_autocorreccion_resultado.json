@@ -17,7 +17,7 @@
     "n_ciclos_autocorreccion": 1,
     "fallidas_tras_1er_intento_modelo_invalido": 4
   },
-  "lineal_max_retries_0": {
+  "sin_ciclo_max_retries_0": {
     "n_secciones": 4,
     "n_fallidas_error": 4,
     "secciones_fallidas": [
@@ -36,5 +36,5 @@
     "n_ciclos_autocorreccion": 0
   },
   "tasa_fallo_final_ciclico": 0.0,
-  "tasa_fallo_final_lineal": 100.0
+  "tasa_fallo_final_sin_ciclo": 100.0
 }

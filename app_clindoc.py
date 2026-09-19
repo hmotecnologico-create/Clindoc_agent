@@ -312,7 +312,7 @@ if perfil == "Tribunal Académico":
     kpi1, kpi2, kpi3, kpi4 = st.columns(4)
     kpi1.metric("📄 Documentos", data["kpis"]["total_docs"])
     kpi2.metric("⏱️ Tiempo Total", f"{data['kpis']['total_time']}s")
-    kpi3.metric("🎯 Confianza", f"{round(data['kpis']['avg_confidence']*100, 1)}%")
+    kpi3.metric("🎯 Índice de ejecución", f"{round(data['kpis']['avg_confidence']*100, 1)}%", help="Valor heurístico: 85% = secciones generadas sin error, 10% = con error. No es una medida de confianza semántica del contenido.")
     kpi4.metric("🚨 Riesgos", data["kpis"]["critical_risks"], delta_color="inverse")
     st.markdown("---")
 
@@ -340,7 +340,7 @@ if perfil == "Doctor (Facultativo)":
                         from normalizador_pdf import localizar_en_pdf
                         import fitz
                         pagina, rects = localizar_en_pdf(str(ruta_archivo), fragmento)
-                        if pagina >= 0:
+                        if rects:
                             d = fitz.open(str(ruta_archivo))
                             pg = d[pagina]
                             for r in rects:

@@ -552,7 +552,7 @@
       "<<< CRÍTICA: todas las secciones validadas"
     ]
   },
-  "lineal_max_retries_0": {
+  "sin_ciclo_max_retries_0": {
     "n_secciones": 4,
     "n_fallidas_error": 0,
     "secciones_fallidas": [],
@@ -1104,5 +1104,5 @@
     ]
   },
   "tasa_fallo_ciclico": 0.0,
-  "tasa_fallo_lineal": 0.0
+  "tasa_fallo_sin_ciclo": 0.0
 }

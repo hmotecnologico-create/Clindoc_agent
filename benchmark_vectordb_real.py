@@ -18,7 +18,7 @@ CORPUS = Path("datos/expedientes/25988000R")
 N_DOCS = 150  # muestra real representativa (LAB+CONS+ALTA)
 QDRANT_TMP = Path("datos/_qdrant_bench_tmp")
 
-# Mismas 12 consultas de la linea base (benchmark_baseline.py) para medir acierto@3
+# 8 de las 12 consultas de la linea base (benchmark_baseline.py) para medir acierto@3
 CONSULTAS = [
     ("Hemoglobina", "Hemoglobina"), ("Colesterol", "Colesterol"),
     ("Creatinina", "Creatinina"), ("Ferritina", "Ferritina"),

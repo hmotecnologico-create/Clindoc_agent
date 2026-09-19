@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# ADVERTENCIA: la metrica de PyMuPDF de este script (v1) es INVALIDA (falso 100%: detecta el "|" del encabezado del paciente). Usar benchmark_ingesta_ampliado_v2.py.
 """
 Ampliación real de benchmark_ingesta_real.py (Tabla 13) para responder a la
 observación de Marlon sobre PI-3: "la superioridad de Docling frente a OCR

@@ -1,0 +1,20 @@
+# Versiones exactas del entorno de evaluacion (pip, 2026-09-19; Python 3.11.9, Windows 11).
+# Runtime Ollama instalado: 0.34.2; modelos: gemma3:4b, llama3.1, phi3, mistral.
+# langchain: no instalado
+langgraph==1.1.9
+docling==2.90.0
+reportlab==4.4.10
+pypdf==6.10.2
+pymupdf==1.27.2.3
+python-docx==1.2.0
+qdrant-client==1.17.1
+sentence-transformers==5.4.1
+pydantic==2.13.1
+python-dotenv==1.2.2
+pyyaml==6.0.3
+matplotlib==3.10.0
+requests==2.33.1
+cryptography==48.0.0
+streamlit==1.56.0
+plotly==6.7.0
+pandas==2.3.3

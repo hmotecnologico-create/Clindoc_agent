@@ -4,7 +4,7 @@ NUEVO (2026-09-15): fallo de inferencia INDUCIDO REAL para PI-2.
 
 Motivacion: benchmark_ablation_autocorreccion.py ya midio el comportamiento del
 ciclo de autocorreccion bajo condiciones NORMALES -- y dio un resultado NULO
-honesto (0% de fallos en ambas ramas, ciclica y lineal) porque Ollama no lanzo
+honesto (0% de fallos en ambas ramas, ciclica y sin ciclo) porque Ollama no lanzo
 ninguna excepcion real durante esa corrida. Un resultado nulo demuestra que no
 hay diferencia EN ESAS CONDICIONES, pero no demuestra que el ciclo de
 autocorreccion realmente recupere de un fallo cuando SI ocurre uno real.
@@ -24,7 +24,7 @@ Comparacion:
   (A) CICLICO (MAX_RETRIES=2): primer intento falla (modelo invalido) -> el
       ciclo de critica detecta el fallo -> reintenta -> segundo intento usa el
       modelo correcto -> deberia recuperar.
-  (B) LINEAL (MAX_RETRIES=0): primer intento falla igual -> no hay reintento ->
+  (B) SIN CICLO (MAX_RETRIES=0): primer intento falla igual -> no hay reintento ->
       el fallo queda permanente en el informe final.
 
 Reutiliza la MISMA ingesta/indice ya construido que benchmark_ablation_autocorreccion.py
@@ -122,8 +122,8 @@ def main():
     print(f"[RAMA A] TRAS {n_ciclos_a} ciclo(s) de autocorreccion: {resumen_a['n_fallidas_error']}/{resumen_a['n_secciones']} fallidas (final)")
     resultados_finales["ciclico_max_retries_2"] = resumen_a
 
-    # --- Rama B: LINEAL ---
-    print(f"\n{'=' * 60}\n  RAMA B: LINEAL (MAX_RETRIES=0) -- 1er intento con modelo INVALIDO, SIN reintento\n{'=' * 60}")
+    # --- Rama B: SIN CICLO ---
+    print(f"\n{'=' * 60}\n  RAMA B: SIN CICLO (MAX_RETRIES=0) -- 1er intento con modelo INVALIDO, SIN reintento\n{'=' * 60}")
     sistema.MAX_RETRIES = 0
     state_b = copy.deepcopy(state_base)
     t0 = time.time()
@@ -139,17 +139,17 @@ def main():
     resumen_b["tiempo_s"] = round(dt_b, 1)
     resumen_b["n_ciclos_autocorreccion"] = n_ciclos_b
     print(f"[RAMA B] SIN autocorreccion (MAX_RETRIES=0): {resumen_b['n_fallidas_error']}/{resumen_b['n_secciones']} fallidas (final, permanente)")
-    resultados_finales["lineal_max_retries_0"] = resumen_b
+    resultados_finales["sin_ciclo_max_retries_0"] = resumen_b
     sistema.MAX_RETRIES = 2
 
     tasa_a = resumen_a["n_fallidas_error"] / resumen_a["n_secciones"] if resumen_a["n_secciones"] else 0
     tasa_b = resumen_b["n_fallidas_error"] / resumen_b["n_secciones"] if resumen_b["n_secciones"] else 0
     resultados_finales["tasa_fallo_final_ciclico"] = round(tasa_a * 100, 1)
-    resultados_finales["tasa_fallo_final_lineal"] = round(tasa_b * 100, 1)
+    resultados_finales["tasa_fallo_final_sin_ciclo"] = round(tasa_b * 100, 1)
 
     print(f"\n{'=' * 60}\n  RESULTADO — recuperacion real ante un fallo de inferencia inducido\n{'=' * 60}")
     print(f"  Tasa de fallo FINAL, CICLICO (con autocorreccion): {resultados_finales['tasa_fallo_final_ciclico']}%")
-    print(f"  Tasa de fallo FINAL, LINEAL  (sin autocorreccion): {resultados_finales['tasa_fallo_final_lineal']}%")
+    print(f"  Tasa de fallo FINAL, SIN CICLO (sin autocorreccion): {resultados_finales['tasa_fallo_final_sin_ciclo']}%")
 
     OUT.write_text(json.dumps(resultados_finales, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\nResultados guardados en {OUT}")

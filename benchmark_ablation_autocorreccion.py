@@ -9,7 +9,7 @@ crítica/reintento) ni por un commit con medición documentada. Este script mide
 diferencia REAL entre:
 
   (A) Pipeline CÍCLICO actual (MAX_RETRIES=2, el que corre en producción)
-  (B) Pipeline LINEAL (MAX_RETRIES=0, ablación — sin ciclo de autocorrección)
+  (B) Pipeline SIN CICLO (MAX_RETRIES=0, ablación — sin ciclo de autocorrección)
 
 sobre el MISMO paciente y el MISMO índice ya construido (la ingesta —el costo
 real de tiempo, ~45 min/paciente— se paga UNA sola vez; ambas ramas reutilizan
@@ -113,8 +113,8 @@ def main():
           f"{n_ciclos_a} ciclo(s) de autocorrección, en {dt_a:.1f}s")
     resultados_finales["ciclico_max_retries_2"] = resumen_a
 
-    # --- Rama B: pipeline LINEAL (MAX_RETRIES=0, ablación) ---
-    print(f"\n{'=' * 60}\n  RAMA B: LINEAL (MAX_RETRIES=0, ablación — sin autocorrección)\n{'=' * 60}")
+    # --- Rama B: pipeline SIN CICLO (MAX_RETRIES=0, ablación) ---
+    print(f"\n{'=' * 60}\n  RAMA B: SIN CICLO (MAX_RETRIES=0, ablación — sin autocorrección)\n{'=' * 60}")
     sistema.MAX_RETRIES = 0
     state_b = copy.deepcopy(state_base)
     t0 = time.time()
@@ -133,18 +133,18 @@ def main():
     resumen_b["trace"] = state_b["trace"]
     print(f"[RAMA B] {resumen_b['n_fallidas_error']}/{resumen_b['n_secciones']} fallidas sin autocorrección, "
           f"en {dt_b:.1f}s")
-    resultados_finales["lineal_max_retries_0"] = resumen_b
+    resultados_finales["sin_ciclo_max_retries_0"] = resumen_b
     sistema.MAX_RETRIES = 2  # restaurar
 
     # --- Comparación ---
     tasa_a = resumen_a["n_fallidas_error"] / resumen_a["n_secciones"] if resumen_a["n_secciones"] else 0
     tasa_b = resumen_b["n_fallidas_error"] / resumen_b["n_secciones"] if resumen_b["n_secciones"] else 0
     resultados_finales["tasa_fallo_ciclico"] = round(tasa_a * 100, 1)
-    resultados_finales["tasa_fallo_lineal"] = round(tasa_b * 100, 1)
+    resultados_finales["tasa_fallo_sin_ciclo"] = round(tasa_b * 100, 1)
 
     print(f"\n{'=' * 60}\n  RESULTADO\n{'=' * 60}")
     print(f"  Tasa de fallo CÍCLICO (con autocorrección): {resultados_finales['tasa_fallo_ciclico']}%")
-    print(f"  Tasa de fallo LINEAL  (sin autocorrección): {resultados_finales['tasa_fallo_lineal']}%")
+    print(f"  Tasa de fallo SIN CICLO (sin autocorrección): {resultados_finales['tasa_fallo_sin_ciclo']}%")
 
     OUT.write_text(json.dumps(resultados_finales, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\nResultados guardados en {OUT}")
